@@ -23,7 +23,6 @@ if __name__ == "__main__":
         with open('./calibration/config.json', 'r') as f:
             config = json.load(f)
 
-
     # 模拟接受数据
     for msg in allMessages:
         # 接受数据
