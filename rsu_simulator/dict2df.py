@@ -1,5 +1,5 @@
 import pandas as pd
-from dataloader import load_data_all
+from dataloader import loadDataAsDict
 from tqdm import tqdm
 
 def dict2df(data : dict):
@@ -17,6 +17,6 @@ def dict2df(data : dict):
 
 
 if __name__ == "__main__":
-    data = load_data_all("../data/result.txt")
+    data = loadDataAsDict("../data/result.txt")
     df = dict2df(data)
     df.to_csv("../data/result.csv", index=False)
