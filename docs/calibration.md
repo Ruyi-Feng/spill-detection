@@ -20,7 +20,7 @@
 <br>
 <p>
 <img
-src="./draw/trajectory.png"
+src="../draw/trajectory.png"
 alt="轨迹坐标"
 title="轨迹坐标"
 width="100%"
