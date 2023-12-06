@@ -1,11 +1,11 @@
-from crowd import crowd_detect
-from high_speed import high_speed_detect
-from illegal_occupation import illegal_occupation_detect
-from incident_single_car import incident_single_car_detect
-from incident import incident_detect
-from intensive_speed_reduction import intensive_speed_reduction_detect
-from low_speed import low_speed_detect
-from spill import spill_detect
+# from crowd import crowd_detect
+# from high_speed import high_speed_detect
+# from illegal_occupation import illegal_occupation_detect
+# from incident_single_car import incident_single_car_detect
+# from incident import incident_detect
+# from intensive_speed_reduction import intensive_speed_reduction_detect
+# from low_speed import low_speed_detect
+# from spill import spill_detect
 
 
 # # 使得能够直接调用各函数
