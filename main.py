@@ -4,15 +4,22 @@ from calibration import calibrator
 from rsu_simulator import loadDataAsList
 from msg_driver import receive, send
 import pre_processing
-import incident_detection
+from event_detection import event_detection
 
 
 if __name__ == "__main__":
+    # 读取算法参数
+    # 得到param
+    with open('./param.json', 'r') as f:
+        param = json.load(f)
+
     # 模拟传输开启
+    # 得到allMessages
     filePath = './data/result.txt'
     allMessages = loadDataAsList(filePath)
     
     # 模拟标定过程
+    # 得到config
     if ~os.path.exists('./calibration/config.json'):    # 没有config则标定
         clb = calibrator()
         for msg in allMessages:
@@ -24,13 +31,14 @@ if __name__ == "__main__":
             config = json.load(f)
 
     # 模拟接受数据
+    traffic = []
     for msg in allMessages:
         # 接受数据
         msg = receive.recieve(msg)
         # 预处理
-        msg = pre_processing.pre_processing(msg)
+        msg, traffic = pre_processing.pre_processing(msg, traffic)
         # 事件检测
-        msg = incident_detection.incident_detection(msg)
+        msg = event_detection(msg)
         # 发送数据
         msg = send.send(msg)
         # print(msg)
