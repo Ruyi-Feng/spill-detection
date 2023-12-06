@@ -1,7 +1,7 @@
 import os
 import json
-from calibration import calibrator
-from rsu_simulator import loadDataAsList
+from calibration import Calibrator
+from rsu_simulator.dataloader import loadDataAsList
 from msg_driver import receive, send
 import pre_processing
 from event_detection import event_detection
@@ -21,7 +21,7 @@ if __name__ == "__main__":
     # 模拟标定过程
     # 得到config
     if ~os.path.exists('./calibration/config.json'):    # 没有config则标定
-        clb = calibrator()
+        clb = Calibrator()
         for msg in allMessages:
             clb.recieve(msg)
         config = clb.calibration
