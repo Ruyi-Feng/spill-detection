@@ -1,5 +1,5 @@
-def recieve(msg):
-    '''function recieve
+def receive(msg: list) -> list:
+    '''function receive
     
     input
     ------
@@ -16,7 +16,7 @@ def recieve(msg):
         msg[i]['a'] = 0
     return msg
 
-def send(msg):
+def send(msg: list) -> list:
     '''function send
     
     input
