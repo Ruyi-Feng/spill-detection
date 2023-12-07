@@ -28,7 +28,7 @@ class TrafficManager():
         存储车道级平均速度
     
     '''
-    def __init__(self, qd: float, itv: float, fps: float):
+    def __init__(self, fps: float, qd: float, itv: float):
         '''function __init__
         input
         -----
