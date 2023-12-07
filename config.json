@@ -1,5 +1,5 @@
 {
-    "FPS": 20, 
+    "fps": 20, 
     "if_recalibrate": false,
     "calibrate_seconds": 600, 
     "d_cell": 50,
@@ -8,6 +8,9 @@
     "smooth_alpha": 0.1,
     "q_cal_duration": 300,
     "cal_interval": 30,
+    "event_types": ["crowd", "high_speed", "illegal_occupation", 
+    "incident_single_car", "incident", "intensive_speed_reduction", 
+    "low_speed", "spill"],
     "v_low": 2.778,
     "v_high": 33.33,
     "t_tolerance": 300,
