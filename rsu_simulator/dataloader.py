@@ -50,6 +50,7 @@ def loadDataAsDict(path: str) -> dict:
                 allData[frame] = data
                 frame += 1
             except:
+                # print(type(line), line, end='')
                 pass
     print("总帧数", frame+1)
     return allData
@@ -80,8 +81,9 @@ def loadDataAsList(path: str) -> list:
                 allData.append(data)
                 frame += 1
             except:
+                # print(type(line), line, end='')
                 pass
-    print("总帧数", frame+1)
+    # print("总帧数", frame+1)
     return allData
 
 if __name__ == "__main__":
