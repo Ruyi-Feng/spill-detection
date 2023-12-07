@@ -5,7 +5,7 @@ from calibration import Calibrator
 from msg_driver import receive, send
 import pre_processing
 from traffic_calculate import TrafficManager
-from event_detection import event_detection
+from event_detection import EventDetector
 
 class Controller:
     '''class Controller
@@ -14,57 +14,70 @@ class Controller:
     ----------
     configPath: str
         算法参数文件路径
-    calibrationPath: str
+    clbPath: str
         标定参数文件路径
     dataPath: str
         传感器数据文件路径, 该参数仅在离线模拟时使用，用于读取离线数据。
 
+    methods
+    -------
+    receive(msg)
+        接受传感器数据，返回发送数据、交通流参数、事件检测结果。
+    calibrate(msg)
+        接受标定数据，更新标定器。
+    run(msg)
+        接受传感器数据，返回发送数据、交通流参数、事件检测结果。
+    _loadfile(path)
+        读取json文件, 返回dict。
+    _saveCalib()
+        保存标定结果到clbPath。
+
+    生成控制器，用于控制整个算法流程。
     '''
-    def __init__(self, configPath: str, calibrationPath: str, dataPath: str = None):
+    def __init__(self, configPath: str, clbPath: str):
         '''function __init__
         
         input
         -----
         configPath: str
             算法参数文件路径
-        calibrationPath: str
+        clbPath: str
             标定参数文件路径
-        dataPath: str
-            传感器数据文件路径, 该参数仅在离线模拟时使用，用于读取离线数据。
         
         '''
         # 控制器启动
         self.configPath = configPath
-        self.calibrationPath = calibrationPath
-        self.dataPath = dataPath
+        self.clbPath = clbPath
         # 算法参数
         config = self._loadfile(configPath)
         self.config = config
         # 是否标定
         self.needClb = False
-        if not(os.path.exists('./calibration/calib.json')) | self.config['if_recalibrate']:    # 没有config或者配置需要则标定
+        if not(os.path.exists(clbPath)) | self.config['if_recalibrate']:    # 没有config或者配置需要则标定
             self.needClb = True
-            clbtor = Calibrator()
+            clbtor = Calibrator(clbPath=clbPath)
             self.clbtor = clbtor
         else:   # 有config则读取, 不需要标定
-            clb = self._loadfile(calibrationPath)
+            clb = self._loadfile(clbPath)
             self.clb = clb
         # 运行管理器
-        tfm = TrafficManager()
+        tfm = TrafficManager(config['fps'], config['q_cal_duration'], config['cal_interval'])
         self.tfm = tfm
+        edt = EventDetector()
+        self.edt = edt
 
     def receive(self, msg):
         '''function receive
 
         input
         -----
-        msg: str
-            传感器数据, str格式。
+        msg: str | list
+            传感器数据, str | list格式。str为传输信息(不处理), list为传感器数据。
 
         return
         ------
-        msg: str
-            发送数据, str格式。
+        msg: str | list
+            发送数据, str | list格式。str为传输信息(不处理), list为传感器数据。
         traffic: dict
             交通流参数, dict格式。
         event: dict
@@ -72,10 +85,10 @@ class Controller:
 
         接受传感器数据，返回发送数据、交通流参数、事件检测结果。
         '''
-        try:
-            data = json.loads(data) # 接收到list数据
-        except:
-            pass    # 非检测信息则会接收到str数据
+        if type(msg) == str:
+            return msg, None, None
+        
+        
     
     def calibrate(self, msg: list):
         '''function calibrate
@@ -120,4 +133,4 @@ class Controller:
 
     def _saveCalib(self):
         config = self.clbtor.calibration
-        self.clbtor.save('./calibration/calib.json')
+        self.clbtor.save(self.clbPath)
