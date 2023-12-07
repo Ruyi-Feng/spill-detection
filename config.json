@@ -10,7 +10,7 @@
     "cal_interval": 30,
     "event_types": ["crowd", "high_speed", "illegal_occupation", 
     "incident_single_car", "incident", "intensive_speed_reduction", 
-    "low_speed", "spill"],
+    "low_speed"],
     "v_low": 2.778,
     "v_high": 33.33,
     "t_tolerance": 300,
