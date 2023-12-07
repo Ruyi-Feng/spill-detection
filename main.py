@@ -1,9 +1,11 @@
 import os
 import json
-from calibration import Calibrator
+
 from rsu_simulator.dataloader import loadDataAsList
+from calibration import Calibrator
 from msg_driver import receive, send
 import pre_processing
+from traffic_calculate import TrafficManager
 from event_detection import event_detection
 
 
@@ -31,12 +33,14 @@ if __name__ == "__main__":
             config = json.load(f)
 
     # 模拟接受数据
-    traffic = []
+    tfc = trafficManager()
     for msg in allMessages:
         # 接受数据
         msg = receive.recieve(msg)
         # 预处理
-        msg, traffic = pre_processing.pre_processing(msg, traffic)
+        msg, traffic = pre_processing.preProcess(msg, traffic)
+        # 交通流参数计算
+        traffic = pre_processing.traffic_calculate(msg, traffic)
         # 事件检测
         msg = event_detection(msg)
         # 发送数据
