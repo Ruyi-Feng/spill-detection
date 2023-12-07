@@ -24,7 +24,7 @@ class Calibrator():
     生成标定器，用于标定检测区域的有效行驶片区和应急车道。
     '''
 
-    def __init__(self):
+    def __init__(self, clbPath: str):
         self.xyByLane = {}                      # 按lane存储xy
         self.vxyCount = {'x': 0, 'y': 0}        # 存储所有vxy的正负计数
         self.calibration = {}                   # 存储标定结果
@@ -49,15 +49,10 @@ class Calibrator():
 
         self.calibration = {}
 
-    def save(self, path: str):
+    def save(self):
         '''class function save
-        
-        input
-        ----------
-        path: str
-            保存路径。
 
-        将标定结果保存到path。
+        将标定结果保存到self.clbPath。
         '''
-        with open(path, 'w') as f:
+        with open(self.clbPath, 'w') as f:
             json.dump(self.calibration, f)
