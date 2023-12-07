@@ -1,5 +1,21 @@
 
 
+
+def preProcess(msg: list, traffic):
+    '''function preProcess
+
+    input
+    ------
+    msg: list, 传感器数据
+    traffic:
+        存储交通流信息
+
+    output
+    ------
+    msg: list, 传感器数据
+    targets: list[dict], 存储单个目标的轨迹信息
+    '''
+
 class PreProcessing:
 
     def __init__(self) -> None:
