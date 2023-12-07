@@ -1,5 +1,7 @@
 {
     "FPS": 20, 
+    "if_recalibrate": false,
+    "calibrate_seconds": 600, 
     "d_cell": 50,
     "q_merge": 0,
     "max_complete_frames": 20,
