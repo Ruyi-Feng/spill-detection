@@ -2,8 +2,8 @@ import json
 from controller import Controller
 
 if __name__ == "__main__":
-    configPath = './config.json'
-    clbPath = './calibration/clb.json'
+    configPath = './config.yml'
+    clbPath = './calibration/clb.yml'
     dataPath = './data/result.txt'
     
     # 应在主代码开头生成控制器
