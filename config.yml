@@ -1,22 +1,26 @@
 
-"fps": 20
-"if_recalibrate": false
-"calibrate_seconds": 600
-"d_cell": 50
-"q_merge": 0
-"max_complete_frames": 20
-"smooth_alpha": 0.1
-"q_cal_duration": 300
-"cal_interval": 30
-"event_types": ["crowd", "high_speed", "illegal_occupation", "incident_single_car", "incident", "intensive_speed_reduction", "low_speed", "spill"]
-"v_low": 2.778
-"v_high": 33.33
-"t_tolerance": 300
-"rate2": 0.1
-"d_touch": 5
-"density_crowd": 18
-"v_crowd": 16.667
-"a_intense": 3
-"duration_intense": 1
-"duration_low": 5
-"duration_high": 5
+fps: 20
+calib:
+  if_recalib: false
+  calib_seconds: 600
+  d_cell: 50
+  q_merge: 0
+prepro:
+  max_complete_frames: 20
+  smooth_alpha: 0.1
+traffic:
+  q_cal_duration: 300
+  cal_interval: 30
+event:
+  event_types: ["crowd", "high_speed", "illegal_occupation", "incident_single_car", "incident", "intensive_speed_reduction", "low_speed", "spill"]
+  v_low: 2.778
+  v_high: 33.33
+  t_tolerance: 300
+  rate2: 0.1
+  d_touch: 5
+  density_crowd: 18
+  v_crowd: 16.667
+  a_intense: 3
+  duration_intense: 1
+  duration_low: 5
+  duration_high: 5
