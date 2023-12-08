@@ -1,5 +1,5 @@
 import os
-import json
+import yaml
 
 from calibration import Calibrator
 from msg_driver import receive, send
@@ -49,7 +49,7 @@ class Controller:
         self.configPath = configPath
         self.clbPath = clbPath
         # 算法参数
-        config = self._loadfile(configPath)
+        config = self._loadyaml(configPath)
         self.config = config
         # 是否标定
         self.needClb = False
@@ -58,13 +58,8 @@ class Controller:
             clbtor = Calibrator(clbPath=clbPath)
             self.clbtor = clbtor
         else:   # 有config则读取, 不需要标定
-            clb = self._loadfile(clbPath)
+            clb = self._loadyaml(clbPath)
             self.clb = clb
-        # 运行管理器
-        tfm = TrafficManager(config['fps'], config['q_cal_duration'], config['cal_interval'])
-        self.tfm = tfm
-        edt = EventDetector()
-        self.edt = edt
 
     def receive(self, msg):
         '''function receive
@@ -87,7 +82,8 @@ class Controller:
         '''
         if type(msg) == str:
             return msg, None, None
-        
+
+        return msg, None, None
         
     
     def calibrate(self, msg: list):
@@ -97,7 +93,26 @@ class Controller:
         
         self.clbtor.recieve(msg)
         
-            
+    def startManager(self):
+        '''function startManager
+        
+        在完成标定或读取标定后启动管理器。
+        '''
+        # 运行管理器
+        tfm = TrafficManager(self.config['fps'], 
+                             self.config['q_cal_duration'], 
+                             self.config['cal_interval'])
+        self.tfm = tfm
+        edt = EventDetector(self.config['fps'], self.clb, 
+                            self.config['event_types'], 
+                            self.config['vl'], self.config['vh'],
+                            self.config['tt'], self.config['r2'], 
+                            self.config['dt'], 
+                            self.config['dstc'], self.config['vc'], 
+                            self.config['ai'], self.config['di'],
+                            self.config['dl'], self.config['dh'])
+        self.edt = edt
+
     def run(self, msg: list):
         # 接受数据
         msg = receive.recieve(msg)
@@ -113,7 +128,7 @@ class Controller:
 
 
 
-    def _loadfile(self, path: str) -> dict:
+    def _loadyaml(self, path: str) -> dict:
         '''function _loadParam
         
         input
@@ -128,7 +143,7 @@ class Controller:
         
         '''
         with open(path, 'r') as f:
-            config = json.load(f)
+            config = yaml.load(f, Loader=yaml.FullLoader)
         return config
 
     def _saveCalib(self):
