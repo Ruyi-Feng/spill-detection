@@ -2,14 +2,14 @@ import os
 import yaml
 
 from calibration import Calibrator
-from msg_driver import receive, send
+from msg_driver import Driver
 import pre_processing
 from traffic_calculate import TrafficManager
 from event_detection import EventDetector
 
 class Controller:
     '''class Controller
-    
+
     properties
     ----------
     configPath: str
@@ -53,6 +53,7 @@ class Controller:
         self.config = config
         # 是否标定
         self.needClb = False
+        self.clbtor = None
         if not(os.path.exists(clbPath)) | self.config['calib']['if_recalib']:    # 没有config或者配置需要则标定
             self.needClb = True
             clbtor = Calibrator(clbPath=clbPath)
@@ -82,7 +83,6 @@ class Controller:
         '''
         if type(msg) == str:
             return msg, None, None
-
         return msg, None, None
         
     
@@ -99,6 +99,8 @@ class Controller:
         在完成标定或读取标定后启动管理器。
         '''
         # 运行管理器
+        drv = Driver()
+        self.drv = drv
         tfm = TrafficManager(self.config['fps'], 
                              self.config['q_cal_duration'], 
                              self.config['cal_interval'])
@@ -115,18 +117,16 @@ class Controller:
 
     def run(self, msg: list):
         # 接受数据
-        msg = receive.recieve(msg)
+        msg = self.drv.recieve(msg)
         # 预处理
-        msg, traffic = pre_processing.preProcess(msg, traffic)
+        msg, traffic = pre_processing.preProcess(msg, self.trm)
         # 交通流参数计算
-        traffic = pre_processing.traffic_calculate(msg, traffic)
+        traffic = pre_processing.traffic_calculate(msg, self.trm)
         # 事件检测
-        msg = event_detection(msg)
+        msg = self.edt.run(msg)
         # 发送数据
-        msg = send.send(msg)
+        msg = self.drv.send.send(msg)
         # print(msg)
-
-
 
     def _loadyaml(self, path: str) -> dict:
         '''function _loadParam
@@ -140,7 +140,6 @@ class Controller:
         ------
         config: dict
             配置参数
-        
         '''
         with open(path, 'r') as f:
             config = yaml.load(f, Loader=yaml.FullLoader)
