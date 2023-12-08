@@ -53,7 +53,7 @@ class Controller:
         self.config = config
         # 是否标定
         self.needClb = False
-        if not(os.path.exists(clbPath)) | self.config['if_recalibrate']:    # 没有config或者配置需要则标定
+        if not(os.path.exists(clbPath)) | self.config['calib']['if_recalib']:    # 没有config或者配置需要则标定
             self.needClb = True
             clbtor = Calibrator(clbPath=clbPath)
             self.clbtor = clbtor
