@@ -19,5 +19,5 @@ if __name__ == "__main__":
                 pass    # 非检测信息则会接收到str数据
     
             msg, traffic, event = controller.receive(msg)  # msg为控制器返回的需要发送的数据
-            # print(msg)
+            print(len(msg))
 
