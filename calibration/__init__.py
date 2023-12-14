@@ -1,5 +1,6 @@
 import json
 
+
 class Calibrator():
     '''class Calibrator
 
@@ -20,7 +21,7 @@ class Calibrator():
         根据存储的数据计算标定结果。
     save(path)
         将标定结果保存到path。
-        
+
     生成标定器，用于标定检测区域的有效行驶片区和应急车道。
     '''
 
@@ -28,7 +29,7 @@ class Calibrator():
         self.xyByLane = {}                      # 按lane存储xy
         self.vxyCount = {'x': 0, 'y': 0}        # 存储所有vxy的正负计数
         self.calibration = {}                   # 存储标定结果
-        
+
     def recieve(self, msg):
         '''class function recieve
 
@@ -36,17 +37,15 @@ class Calibrator():
         ----------
         msg: list
             list, 代码内流通的数据格式。msg元素为代表一个车辆目标的dict。
-        
+
         接受每帧传输来的目标信息, 更新给calibrator
         '''
 
-    
     def calibrate(self):
         '''class function calibrate
-        
+
         根据calibrator的属性计算标定结果。
         '''
-
         self.calibration = {}
 
     def save(self):

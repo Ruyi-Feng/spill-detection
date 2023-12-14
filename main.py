@@ -1,6 +1,7 @@
 import json
 from controller import Controller
 
+
 if __name__ == "__main__":
     configPath = './config.yml'
     clbPath = './calibration/clb.yml'
@@ -14,9 +15,8 @@ if __name__ == "__main__":
         for msg in f.readlines():
             # 接受数据
             try:
-                msg = json.loads(msg) # 接收到list数据
-            except:
+                msg = json.loads(msg)  # 接收到list数据
+            except AttributeError:
                 pass    # 非检测信息则会接收到str数据
 
             msg, traffic, event = controller.receive(msg)  # msg为控制器返回的需要发送的数据
-

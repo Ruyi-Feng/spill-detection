@@ -2,6 +2,7 @@ from pre_processing.pro_class.smooth import Smoother
 from pre_processing.pro_class.complete import Completer
 from pre_processing.pro_class.id_correct import IDCorrector
 
+
 class targetManager():
     def __init__(self) -> None:
         self.tgtInLastFrm = dict()      # 存储活跃状态的各ID车辆target, 按ID索引
@@ -13,21 +14,20 @@ class targetManager():
         self.crt = IDCorrector()        # ID跳变修正器, 可能要设置到completer之下的一个属性TODO
         self.cmp = Completer()          # 补全器
         self.smth = Smoother()          # 平滑器
-        
 
-    def run(self, curTgt: list) -> list: 
+    def run(self, curTgt: list) -> list:
         '''function run
 
         input
         -----
         curTgt: list
             当前帧车辆目标信息
-        
+
         return
         ------
         curTgt: list
             预处理后的当前帧车辆目标信息
-        
+
         接收当前帧的传感器数据:
         1. 更新除tgtInLastFrm, IDInLastFrm以外的所有属性。
         2. 进行补全, 平滑运算。
@@ -39,13 +39,13 @@ class targetManager():
         curTgt = self.__run_smooth(curTgt)
         self.__update_last(curTgt)
         return curTgt
-    
+
     def __update(self, curTgt):
         '''
         接受每帧传输来的目标信息, 更新targetList
         '''
         # 更新target
-    
+
     def __run_IDCorrect(self, curTgt):
         '''function __run_IDCorrect
 
@@ -65,13 +65,14 @@ class targetManager():
     def __run_complt(self, curTgt):
         '''
         '''
-        self.cmp.run()
+        curTgt = self.cmp.run(curTgt)
+        return curTgt
 
     def __run_smooth(self, curTgt):
         '''
         '''
-        x = msg["x"]
-        self.smth.run(hist, curr)
+        curTgt = self.smth.run(curTgt)
+        return curTgt
 
     def __update_last(self):
         '''
@@ -79,4 +80,3 @@ class targetManager():
         '''
         self.tgtInLastFrm = self.tgtInCurFrm
         self.IDInLastFrm = self.IDInCurFrm
-

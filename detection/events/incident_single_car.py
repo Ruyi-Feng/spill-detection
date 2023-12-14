@@ -1,6 +1,5 @@
-
-def illegalOccupationDetect(msg, traffic, config, clb):
-    '''function illegalOccupationDetect
+def incidentSingleCarDetect(msg, traffic, config, clb):
+    '''function incidentSingleCarDetect
 
     input
     ------
@@ -13,8 +12,8 @@ def illegalOccupationDetect(msg, traffic, config, clb):
     ------
     events: list, 事件列表, 元素为event的衍生类
 
-    检测非法占用应急车道事件, 输出并返回事件列表
+    检测单车事故事件, 输出并返回事件列表
     '''
-    events_o = []
+    events_is = []
 
-    return events_o
+    return events_is

@@ -1,6 +1,6 @@
 class Smoother():
     '''class Smoother
-    
+
     利用上一帧平滑轨迹计算当前帧的轨迹平滑结果。
     原理: 三次指数平滑。
     三次指数平滑公式
@@ -17,7 +17,7 @@ class Smoother():
 
         '''
         self.alpha = alpha
-    
+
     def run(self, curTgt: list, lastTgt: list) -> list:
         '''function run
 
@@ -38,7 +38,7 @@ class Smoother():
         for tgt in curTgt:
             tgt = self.__smooth(tgt, lastTgt)
             resultTgt.append(tgt)
-        
+
         return resultTgt
 
     def __smooth(self, tgt: dict, lastTgt: list) -> dict:
@@ -57,10 +57,13 @@ class Smoother():
             计算后的当前帧车辆目标信息
 
         '''
-        tgt['XDecx'] = exp3Smooth(tgt['XDecx'], self.alpha, lastTgt['smth']['x'])
-        tgt['YDecy'] = exp3Smooth(tgt['YDecy'], self.alpha, lastTgt['smth']['y'])
+        tgt['XDecx'] = exp3Smooth(tgt['XDecx'], self.alpha,
+                                  lastTgt['smth']['x'])
+        tgt['YDecy'] = exp3Smooth(tgt['YDecy'], self.alpha,
+                                  lastTgt['smth']['y'])
         return tgt
-    
+
+
 def exp3Smooth(now: float, alpha: float, last: list) -> float:
     '''function exp3Smooth
 
@@ -72,7 +75,7 @@ def exp3Smooth(now: float, alpha: float, last: list) -> float:
         平滑指数
     last: list
         上一时刻的1次平滑, 2次平滑, 3次平滑数值
-    
+
     return
     ------
     result: float

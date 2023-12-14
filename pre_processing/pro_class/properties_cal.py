@@ -1,4 +1,6 @@
 import math
+
+
 class PropCalculator:
     '''class PropCalculator
 
@@ -33,9 +35,9 @@ class PropCalculator:
             tgt = self.__run_speed(tgt)
             tgt = self.__run_cell(tgt, cellLine)
             resultTgt.append(tgt)
-        
+
         return resultTgt
-    
+
     def __run_acc(self, tgt: dict, lastTgt: list) -> dict:
         '''function __run_acc
 
@@ -52,7 +54,7 @@ class PropCalculator:
 
         '''
         return tgt
-    
+
     def __run_speed(self, tgt: dict) -> dict:
         '''function __run_speed
 

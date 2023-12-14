@@ -13,7 +13,8 @@ class TrafficManager():
         frequency per second, 传感器采样频率
 
     vcache: list
-        vehicle cache, 用于存储车辆目标信息, list每个元素代表一帧接收的数据, 元素格式为dict。每帧dict中, 按照lane索引, 存储对应车道上的speed构成的list。
+        vehicle cache, 用于存储车辆目标信息, list每个元素代表一帧接收的数据, 元素格式为dict。
+        每帧dict中, 按照lane索引, 存储对应车道上的speed构成的list。
     count: int
         接收计数, 计算时若未达到qd等其他计算需求, 手动进行比例计算
     KeyFrame: int
@@ -26,7 +27,7 @@ class TrafficManager():
         存储车道级密度
     v: dict
         存储车道级平均速度
-    
+
     '''
     def __init__(self, fps: float, qd: float, itv: float):
         '''function __init__
@@ -53,34 +54,32 @@ class TrafficManager():
         self.Q = 0     # 存储路段级交通流量
         self.q = dict()    # 存储车道级交通流量
         self.k = dict()    # 存储车道级密度
-        self.v = dict()    # 存储车道级平均速度 
-
+        self.v = dict()    # 存储车道级平均速度
 
     def receive(self, msg):
         '''function receive
-        
+
         input
         -----
         msg: list, 传感器数据, msg元素为代表一个车辆目标的dict。
-        
+
         接收传感器数据, 按照lane存储speed属性, 用于计算交通流参数。
         '''
         # 分缓存数据的长度是否达到了计算交通流参数的要求
 
-        
     def calculate(self, msg) -> tuple:
         '''function calculate
-        
+
         input
         -----
         msg: list
             传感器数据
-        
+
         return
         ------
         traffic:
             存储交通流信息
-        
+
         根据所传输来的检测信息，计算交通流信息：
         1. 路段级交通流量
         2. 车道级交通流量
@@ -89,5 +88,3 @@ class TrafficManager():
         '''
         traffic = []
         return traffic
-
-    
