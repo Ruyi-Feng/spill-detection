@@ -14,7 +14,21 @@ class Smltor():
             仿真数据文件路径
         '''
         self.dataPath = dataPath
+        self.f = open(self.dataPath, 'r')
 
     def run(self):
-        '''利用seek函数，每运行一次run()函数，读取一行数据，返回该行数据。并再下次运行时读取下一行数据。
+        '''每运行一次run()函数，读取一行数据，返回该行数据。并再下次运行时读取下一行数据。
         '''
+        return self.f.readline()
+
+if __name__ == "__main__":
+    from pathlib import Path
+    p = (Path(__file__) / './../../data/heartbeat.txt').resolve()
+    s = Smltor(str(p))
+    while True:
+        a = s.run()
+        if a == '':
+            break
+        print(a)
+
+
