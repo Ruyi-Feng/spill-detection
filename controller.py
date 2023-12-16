@@ -4,7 +4,7 @@ import yaml
 from calibration import Calibrator
 from msg_driver import Driver
 import pre_processing
-from traffic_calculate import TrafficManager
+from traffic import TrafficManager
 from detection import EventDetector
 
 
