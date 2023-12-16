@@ -32,3 +32,14 @@ v_i, i为车道号
 ## 5. 用不上的
 路段级的速度和密度
 
+<p>
+<img
+src="./trafficDataFormat.png"
+alt="交通数据格式"
+title="交通数据格式"
+width="100%"
+>
+</p>
+
+
+

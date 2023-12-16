@@ -1,4 +1,4 @@
-# 车辆数据格式
+# 1. 车辆数据格式
 数据传输msg:
 [
     {
@@ -31,54 +31,55 @@
     ...
 ]
 
-# 交通参数据格式
+
+# 2. 交通参数据格式
 trafficManager属性macro:    # 根据calib得到
 {
-    "len":{
-        laneid1: 200,   # 索引为int型
-        laneid2: 200,
-        ...
-    }
-    "q":{
-        laneid1: 100,
-        laneid2: 200,
-        ...
-    }
     "Q": 1000,
-    "k":{
-        laneid1: 100,
-        laneid2: 200,
+    "lnMng": LaneManager, 
+}
+
+laneManager属性:     # 根据calib得到
+{
+    id1: laneHandler1, 
+    id2: laneHandler2,
+    ...
+}
+
+laneHandler实例属性:    # 在calib中定义
+{
+    "id": 1,
+    "len": 100,
+    "emgc": False,
+    "q": 50,
+    "k": 50,
+    "v": 50,
+    "cell":{
+        cellorder0: cellHandler0,
+        cellorder1: cellHandler1,
         ...
     }
-    "v":{
-        laneid1: 100,
-        laneid2: 200,
-        ...
-    },
-    "V: 100, 
+    "coeff":{
+        "left": [1.1, 2.1, 1.5],
+        "right": [1.3, 2.5, 1.9],
+        "mid": [1.2, 2.3, 1.7],
+    }
 }
 
-trafficManager属性cell:     # 根据calib得到
+cellHandler实例属性:    # 在calib中定义
 {
-    laneid1: {
-        cellorder0: {
-            "vCache":[100, 110, ...],
-            "q": 100,
-            "k": 100,
-            "v": 100,
-            "danger": 0.1
-        },
-        cellorder1: {...},
-        ... 
-    }, 
-    laneid2: {
-        cellorder0: ...,
-        cellorder1: ...,
-        ... 
-    },
+    "order": 1,
+    "valid": True,
+    "vCache":[100, 110, ...],
+    "q": 100,
+    "k": 100,
+    "v": 100,
+    "danger": 0.1
 }
 
-标定文件calib:
+# 3. 标定数据格式
+
+标定暂存数据calib:
 {
     "emgcID": [1, 8],
     "laneCoeff": [
@@ -92,14 +93,17 @@ trafficManager属性cell:     # 根据calib得到
         ...
     ],
     "sliceLine":{
-        order0: [ABC / kb],  # ABC为直线方程系数, kb为斜率, 看代码情况待定
-        order1: [ABC / kb],
+        order0: [kb],  # ABC为直线方程系数, kb为斜率, 看代码情况待定
+        order1: [kb],
         ...
     }
-    "invalidCells":{
-        laneid1: [order0, order1, ...],
-        laneid2: [order0, order1, ...],
-        ...
-    }
+}
 
+标定文件存储格式
+LaneManager
++
+"sliceLine":{
+    order0: [kb],  # ABC为直线方程系数, kb为斜率, 看代码情况待定
+    order1: [kb],
+    ...
 }
