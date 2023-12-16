@@ -31,6 +31,10 @@
 TargetId | XDecx | YDecy | ZDecz | VDecVx | VDecVy | Xsize | Ysize | TargetType | Longitude | Latitude | Confidence | EventType | LineNum | Frame
 <br>
 
+#### 数据传输格式
+参见文档<a href="./docs/data_format.txt" >数据格式</a>
+
+
 #### 数据内容说明
 **targetType**：0-未定义目标，1-小车，2-大车，3-摩托，4-自行车，5-行人
 **距离单位**：m
