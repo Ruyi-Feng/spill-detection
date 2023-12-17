@@ -55,6 +55,8 @@ class Controller:
         # 是否标定
         self.needClb = False
         self.clbtor = None
+        self.calibFrames = config['calib']['calib_seconds'] * config['fps']
+        self.calibCount = 0
         if not (os.path.exists(clbPath)) | self.config['calib']['if_recalib']:
             # 没有config或者配置需要则标定
             self.needClb = True
@@ -82,9 +84,32 @@ class Controller:
             事件检测结果, dict格式。
 
         接受传感器数据，返回发送数据、交通流参数、事件检测结果。
+        根据条件判断是否需要标定，若需要则标定。
         '''
+
         if type(msg) == str:
             return msg, None, None
+
+        # 标定过程
+        if (self.needClb & (self.calibCount < self.calibFrames)):
+            self.calibrate(msg)
+            self.calibCount += 1
+
+            if self.calibCount == self.calibFrames:
+                # 标定完成
+                self.clbtor.calibrate()
+                self.clbtor.save()
+                # 读取标定结果
+                clb = self._loadyaml(self.clbPath)
+                self.clb = clb
+                # 启动管理器
+                self.startManager()
+                self.needClb = False
+
+        # 运行过程
+        if not self.needClb:
+            self.run(msg)
+
         return msg, None, None
 
     def calibrate(self, msg: list):
@@ -145,7 +170,3 @@ class Controller:
         with open(path, 'r') as f:
             config = yaml.load(f, Loader=yaml.FullLoader)
         return config
-
-    def _saveCalib(self):
-        # config = self.clbtor.calibration
-        self.clbtor.save(self.clbPath)
