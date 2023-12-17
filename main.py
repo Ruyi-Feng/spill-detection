@@ -1,6 +1,6 @@
 import json
 from controller import Controller
-
+from rsu_simulator import Smltor
 
 if __name__ == "__main__":
     configPath = './config.yml'
@@ -9,14 +9,13 @@ if __name__ == "__main__":
 
     # 应在主代码开头生成控制器
     controller = Controller(configPath, clbPath)
+    smltor = Smltor(dataPath)
 
     # 模拟接受数据
-    with open(dataPath) as f:
-        for msg in f.readlines():
-            # 接受数据
-            try:
-                msg = json.loads(msg)  # 接收到list数据
-            except AttributeError:
-                pass    # 非检测信息则会接收到str数据
+    while True:
+        msg = smltor.run()
+        if msg == '':   # 读取到文件末尾
+            break
 
-            msg, traffic, event = controller.receive(msg)  # msg为控制器返回的需要发送的数据
+        msg, traffic, event = controller.receive(msg)  # msg为控制器返回的需要发送的数据
+        print(msg[0])
