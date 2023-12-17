@@ -1,6 +1,5 @@
 from rsu_simulator.dataloader import loadDataAsList
 from msg_driver import Driver
-import json
 
 
 # 通过
@@ -25,5 +24,4 @@ def test_driver():
 
 
 if __name__ == "__main__":
-    json.load('kasdjf')
     test_driver()
