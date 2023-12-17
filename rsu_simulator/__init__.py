@@ -21,6 +21,7 @@ class Smltor():
         '''
         return self.f.readline()
 
+
 if __name__ == "__main__":
     from pathlib import Path
     p = (Path(__file__) / './../../data/heartbeat.txt').resolve()
@@ -30,5 +31,3 @@ if __name__ == "__main__":
         if a == '':
             break
         print(a)
-
-

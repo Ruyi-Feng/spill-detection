@@ -21,7 +21,7 @@ def loadDataByLine(path: str) -> None:
             try:
                 data = json.loads(line)
                 print(data[0])
-            except AttributeError:
+            except Exception:
                 pass
 
 
@@ -50,7 +50,7 @@ def loadDataAsDict(path: str) -> dict:
                 data = json.loads(line)
                 allData[frame] = data
                 frame += 1
-            except AttributeError:
+            except Exception:
                 # print(type(line), line, end='')
                 pass
     print("总帧数", frame+1)
@@ -82,7 +82,7 @@ def loadDataAsList(path: str) -> list:
                 data = json.loads(line)
                 allData.append(data)
                 frame += 1
-            except AttributeError:
+            except Exception:
                 # print(type(line), line, end='')
                 pass
     # print("总帧数", frame+1)
