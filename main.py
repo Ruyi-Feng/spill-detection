@@ -1,4 +1,3 @@
-import json
 from controller import Controller
 from rsu_simulator import Smltor
 
