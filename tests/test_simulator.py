@@ -7,11 +7,13 @@ def test_simulator():
     s = Smltor(str(p))
 
     while True:
-        a = s.run()
-        if a == '':
+        msg = s.run()
+        if msg == '':
             break
-        print(a)
+
+    return msg
 
 
 if __name__ == "__main__":
-    test_simulator()
+    msg = test_simulator()
+    assert type(msg) == str
