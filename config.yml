@@ -1,5 +1,7 @@
 
 fps: 20
+laneWidth: 3.75
+emgcWidth: 3.5
 calib:
   if_recalib: false
   calib_seconds: 600
