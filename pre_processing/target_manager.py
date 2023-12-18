@@ -3,7 +3,7 @@ from pre_processing.pro_class.complete import Completer
 from pre_processing.pro_class.id_correct import IDCorrector
 
 
-class targetManager():
+class TargetManager():
     def __init__(self) -> None:
         self.tgtInLastFrm = dict()      # 存储活跃状态的各ID车辆target, 按ID索引
         self.tgtInCurFrm = dict()       # 存储当前帧各ID车辆target, 按ID索引
