@@ -1,5 +1,4 @@
 import yaml
-import numpy as np
 from calibration.algorithms import dbi, calQuartiles
 
 
@@ -27,7 +26,7 @@ class Calibrator():
     生成标定器，用于标定检测区域的有效行驶片区和应急车道。
     '''
 
-    def __init__(self, clbPath: str, laneWidth: float = 3.75, 
+    def __init__(self, clbPath: str, laneWidth: float = 3.75,
                  emgcWidth: float = 3.5):
         '''class function __init__
 
@@ -118,6 +117,7 @@ class Calibrator():
         self.totalXYMinMax = totalXYMinMax
         # 标定车道线方程
         tmp = self.__calibLanes()
+        print(tmp)
 
     def __calibVDir(self) -> dict:
         '''class function __calibVDir
@@ -197,7 +197,7 @@ class Calibrator():
         # 考量紧急车道内侧的2个车道, 点分散程度大的的车道具有更明显的曲率
         lane2, laneN_1 = self.emgcIDs[0] + 1, self.emgcIDs[1] - 1
         DBI2, DBIN_1 = dbi(self.xyByLane[lane2]), dbi(self.xyByLane[laneN_1])
-        
+        print(DBI2, DBIN_1)
         # 拟合laneExt车道线方程
 
         # 拟合其他非应急车道的车道线方程
@@ -212,10 +212,9 @@ class Calibrator():
 
             DBI = dbi(self.xyByLane[id])
             print(id, DBI)
-        
+
         # 拟合应急车道的车道线方程
-            
-        
+
         return 0
 
     def save(self):
