@@ -1,17 +1,24 @@
-from rsu_simulator.dataloader import loadDataAsList
+from rsu_simulator import Smltor
 from msg_driver import Driver
+from pathlib import Path
 
 
 # 通过
 def test_driver():
     # 模拟传输开启
     # 得到allMessages
-    filePath = './data/result.txt'
-    allMessages = loadDataAsList(filePath)
-
+    p = (Path(__file__) / './../../data/result.txt').resolve()
+    s = Smltor(str(p))
     d = Driver()
-    # 模拟接受数据
-    for msg in allMessages:
+
+    while True:
+        msg = s.run()
+        if msg == '':
+            break
+        if type(msg) == str:    # 非目标信息
+            continue
+
+        # 模拟接受数据
         print('接收前', msg[0])
         # 接受数据
         msg = d.receive(msg)
@@ -22,6 +29,9 @@ def test_driver():
         # 断点
         print('------------------')
 
+    return msg
+
 
 if __name__ == "__main__":
-    test_driver()
+    msg = test_driver()
+    assert type(msg) == list
