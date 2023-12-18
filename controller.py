@@ -58,12 +58,14 @@ class Controller:
         self.calibFrames = config['calib']['calib_seconds'] * config['fps']
         self.calibCount = 0
         if not (os.path.exists(clbPath)) | self.config['calib']['if_recalib']:
+            print('开始标定过程')
             # 没有config或者配置需要则标定
             self.needClb = True
             clbtor = Calibrator(clbPath=clbPath, laneWidth=config['laneWidth'],
                                 emgcWidth=config['emgcWidth'])
             self.clbtor = clbtor
         else:   # 有config则读取, 不需要标定
+            print('开始接收数据')
             clb = self._loadyaml(clbPath)
             self.clb = clb
 
