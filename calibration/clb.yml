@@ -544,3 +544,6 @@ lnMng:
     len: 0
     q: 0
     v: 0
+vDir:
+  x: 1
+  y: -1
