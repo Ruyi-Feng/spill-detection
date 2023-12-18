@@ -73,6 +73,17 @@ class Calibrator():
         接受每帧传输来的目标信息, 更新给calibrator
         '''
         for target in msg:
+            # if target['TargetId'] == 7390:
+            #     # {'TargetId': 5087, 'XDecx': 2.57, 'YDecy': 7, 'ZDecz': 0,
+            #     # 'VDecVx': 0.13, 'VDecVy': -19.3, 'Xsize': 0.47, 'TargetType': 1,
+            #     # 'Longitude': 118.87387669811856, 'Latitude': 31.935760760137626,
+            #     # 'Confidence': 1, 'EventType': 0, 'LineNum': 1}
+            #     # 只保留id和xy与vxvy, 删除其他
+            #     keysToDelete = ['ZDecz', 'Xsize', 'Ysize', 'TargetType', 'Longitude', 'Latitude', 'Confidence', 'EventType']
+            #     for k in keysToDelete:
+            #         del target[k]
+            #     print(target, ',', sep='')
+
             if target['LineNum'] >= 100:
                 continue    # 换道过程中的车辆，非标准车道编号的不计入标定
 
@@ -224,7 +235,7 @@ class Calibrator():
         '''
         traffic = dict()
         traffic['Q'] = 0
-        traffic['vDir'] = self.calibration['dir']
+        traffic['vDir'] = self.vDir
         traffic['lnMng'] = dict()
 
         for id in range(self.emgcLanes[0], self.emgcLanes[1] + 1):
@@ -249,7 +260,9 @@ class Calibrator():
         with open(self.clbPath, 'w') as f:
             yaml.dump(traffic, f)
 
-    def __emptyCells(self, orders: list, valid: list) -> list:
+        return traffic
+
+    def __emptyCells(self, orders: list, valid: list) -> dict:
         '''class function __emptyCells
 
         input
@@ -263,9 +276,9 @@ class Calibrator():
         ----------
         返回一个空元胞列表。
         '''
-        cells = []
+        cells = dict()
         for i in range(len(orders)):
-            cells.append(self.__emptyCell(orders[i], valid[i]))
+            cells[orders[i]] = (self.__emptyCell(orders[i], valid[i]))
         return cells
 
     def __emptyCell(self, order: int = 0, valid: bool = True) -> dict:
