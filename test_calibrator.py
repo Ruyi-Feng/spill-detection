@@ -39,8 +39,11 @@ def test_calibrator():
     calibrator.calibrate()
 
     # 标定器保存
-    calibrator.save()
+    traffic = calibrator.save()
+
+    return traffic
 
 
 if __name__ == '__main__':
-    test_calibrator()
+    traffic = test_calibrator()
+    assert type(traffic) == dict
