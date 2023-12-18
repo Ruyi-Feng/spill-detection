@@ -75,13 +75,20 @@ class Calibrator():
         '''
         self.calibration = dict()
         # 确定运动正方向
-        dir = self.__calibDir()
+        dir = self.__calibVDir()
         self.calibration['dir'] = dir
+        # 确定车道ID
+        ids, emgc = self.__calibLaneIDs()
+        self.LaneIDs = ids
+        self.emgcLanes = emgc
         # 计算各lane的xy最大最小值
-        self.__calibXYMinMax()  # 赋值属性self.xyMinMax, self.totalXYMinMax
+        xyMinMax, totalXYMinMax = self.__calibXYMinMax()
+        self.xyMinMax = xyMinMax
+        self.totalXYMinMax = totalXYMinMax
+        # 汇总得到laneID
 
-    def __calibDir(self) -> dict:
-        '''class function __calibDir
+    def __calibVDir(self) -> dict:
+        '''class function __calibVDir
 
         return
         ----------
@@ -102,20 +109,50 @@ class Calibrator():
         并对所有lane得到的xyMinMax再次排序, 得到最大最小值, 存储到self.totalXYMinMax。
         self.totalXYMinMax值为[xmin, xmax, ymin, ymax]。
         '''
+        xyMinMax = dict()
+        totalXYMinMax = [0, 0, 0, 0]
         # 对各lane的xyByLane分别以x或y排序, 得到最大最小值, 存储到self.xyMinMax
         for lane in self.xyByLane:
-            # 以y排序
-            self.xyByLane[lane].sort(key=lambda x: x[1])
-            ymin, ymax = self.xyByLane[lane][0][1], self.xyByLane[lane][-1][1]
             # 以x排序
             self.xyByLane[lane].sort(key=lambda x: x[0])
             xmin, xmax = self.xyByLane[lane][0][0], self.xyByLane[lane][-1][0]
+            # 以y排序
+            self.xyByLane[lane].sort(key=lambda x: x[1])
+            ymin, ymax = self.xyByLane[lane][0][1], self.xyByLane[lane][-1][1]
             # 存储
-            self.xyMinMax[lane] = [xmin, xmax, ymin, ymax]
-            self.totalXYMinMax[0] = min(self.totalXYMinMax[0], xmin)
-            self.totalXYMinMax[1] = max(self.totalXYMinMax[1], xmax)
-            self.totalXYMinMax[2] = min(self.totalXYMinMax[2], ymin)
-            self.totalXYMinMax[3] = max(self.totalXYMinMax[3], ymax)
+            xyMinMax[lane] = [xmin, xmax, ymin, ymax]
+            totalXYMinMax[0] = min(totalXYMinMax[0], xmin)
+            totalXYMinMax[1] = max(totalXYMinMax[1], xmax)
+            totalXYMinMax[2] = min(totalXYMinMax[2], ymin)
+            totalXYMinMax[3] = max(totalXYMinMax[3], ymax)
+        return xyMinMax, totalXYMinMax
+
+    def __calibLaneIDs(self) -> (list, list):
+        '''class function __calibLanes
+
+        return
+        ----------
+        ids: list
+            返回车道ID号, list格式
+        emgc: list
+            返回应急车道号, list格式
+
+        返回车道ID号, list格式。返回应急车道号, list格式。
+        根据self.xyByLane统计车道ID号, 存为list。
+        考虑到应急车道, 常规情况下交通量可能为0, 没有对应记录:
+        若车道ID号不包含1号车道, 则将1号车道加入。
+        上述操作完成后, 将车道ID设为从1到记录的max。
+        若最大车道号为奇数, 则补充车道号加1。
+        应急车道为1号车道和最大号车道。
+        '''
+        ids = list(self.xyByLane.keys())
+        m = max(ids)
+        if m % 2 == 1:    # 若最大车道号为奇数, 则补充车道号加1
+            m += 1
+        ids = list(range(1, m+1))
+        emgc = [1, m]
+        return ids, emgc
+
 
     def save(self):
         '''class function save
@@ -124,6 +161,7 @@ class Calibrator():
         '''
         traffic = dict()
         traffic['Q'] = 0
+        traffic['vDir'] = self.calibration['dir']
         traffic['lnMng'] = dict()
 
         for id in range(self.emgcLanes[0], self.emgcLanes[1] + 1):
