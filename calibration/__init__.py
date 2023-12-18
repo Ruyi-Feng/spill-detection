@@ -1,4 +1,6 @@
 import yaml
+import numpy as np
+from calibration.algorithms import dbi, calQuartiles
 
 
 class Calibrator():
@@ -25,15 +27,40 @@ class Calibrator():
     生成标定器，用于标定检测区域的有效行驶片区和应急车道。
     '''
 
-    def __init__(self, clbPath: str):
+    def __init__(self, clbPath: str, laneWidth: float = 3.75, 
+                 emgcWidth: float = 3.5):
+        '''class function __init__
+
+        input
+        ----------
+        clbPath: str
+            标定结果保存路径。
+        laneWidth: float
+            车道宽度。
+        emgcWidth: float
+            应急车道宽度。
+
+        生成标定器，用于标定检测区域的有效行驶片区和应急车道。
+        '''
+        # 初始化属性
         self.clbPath = clbPath                  # 标定结果保存路径
+        self.laneWidth = laneWidth              # 车道宽度
+        self.emgcWidth = emgcWidth              # 应急车道宽度
+        # 暂存传感器数据
         self.xyByLane = dict()                      # 按lane存储xy
         self.vxyCount = {'x': 0, 'y': 0}        # 存储所有vxy的正负计数
         # 暂存标定结果
+        # 基础正方向与车道ID
+        self.vDir = dict()
+        self.LaneIDs = []
+        self.emgcIDs = []
+        self.laneEmgc = dict()                # id: bool
+        # 车道线方程
         self.xyMinMax = dict()                # 按lane存储xy的最大最小值
         self.totalXYMinMax = []           # 存储所有lane的xy最大最小值
-        self.LaneIDs = []
-        self.emgcLanes = []
+        # 车道暂存属性
+        self.laneProps = dict()                # 暂存lane的计算属性与结果
+        # cell切割线方程
         self.SliceLines = []
 
     def recieve(self, msg):
@@ -46,7 +73,6 @@ class Calibrator():
 
         接受每帧传输来的目标信息, 更新给calibrator
         '''
-        print(msg[0])
         for target in msg:
             if target['LineNum'] >= 100:
                 continue    # 换道过程中的车辆，非标准车道编号的不计入标定
@@ -76,16 +102,22 @@ class Calibrator():
         self.calibration = dict()
         # 确定运动正方向
         dir = self.__calibVDir()
-        self.calibration['dir'] = dir
+        self.vDir = dir
         # 确定车道ID
         ids, emgc = self.__calibLaneIDs()
         self.LaneIDs = ids
-        self.emgcLanes = emgc
+        self.emgcIDs = emgc
+        self.laneEmgc = {id: False for id in ids}
+        for id in emgc:
+            self.laneEmgc[id] = True
+
+        self.laneProps = {id: dict() for id in ids}
         # 计算各lane的xy最大最小值
         xyMinMax, totalXYMinMax = self.__calibXYMinMax()
         self.xyMinMax = xyMinMax
         self.totalXYMinMax = totalXYMinMax
-        # 汇总得到laneID
+        # 标定车道线方程
+        tmp = self.__calibLanes()
 
     def __calibVDir(self) -> dict:
         '''class function __calibVDir
@@ -100,32 +132,6 @@ class Calibrator():
         if self.vxyCount['y'] < 0:
             dir['y'] = -1
         return dir
-
-    def __calibXYMinMax(self):
-        '''class function __calibXYMinMax
-
-        对各lane的xyByLane分别以x或y排序, 得到最大最小值, 存储到self.xyMinMax。
-        self.xyMinMax索引为laneID, 值为[xmin, xmax, ymin, ymax]。
-        并对所有lane得到的xyMinMax再次排序, 得到最大最小值, 存储到self.totalXYMinMax。
-        self.totalXYMinMax值为[xmin, xmax, ymin, ymax]。
-        '''
-        xyMinMax = dict()
-        totalXYMinMax = [0, 0, 0, 0]
-        # 对各lane的xyByLane分别以x或y排序, 得到最大最小值, 存储到self.xyMinMax
-        for lane in self.xyByLane:
-            # 以x排序
-            self.xyByLane[lane].sort(key=lambda x: x[0])
-            xmin, xmax = self.xyByLane[lane][0][0], self.xyByLane[lane][-1][0]
-            # 以y排序
-            self.xyByLane[lane].sort(key=lambda x: x[1])
-            ymin, ymax = self.xyByLane[lane][0][1], self.xyByLane[lane][-1][1]
-            # 存储
-            xyMinMax[lane] = [xmin, xmax, ymin, ymax]
-            totalXYMinMax[0] = min(totalXYMinMax[0], xmin)
-            totalXYMinMax[1] = max(totalXYMinMax[1], xmax)
-            totalXYMinMax[2] = min(totalXYMinMax[2], ymin)
-            totalXYMinMax[3] = max(totalXYMinMax[3], ymax)
-        return xyMinMax, totalXYMinMax
 
     def __calibLaneIDs(self) -> (list, list):
         '''class function __calibLanes
@@ -153,6 +159,64 @@ class Calibrator():
         emgc = [1, m]
         return ids, emgc
 
+    def __calibXYMinMax(self):
+        '''class function __calibXYMinMax
+
+        对各lane的xyByLane分别以x或y排序, 得到最大最小值, 存储到self.xyMinMax。
+        self.xyMinMax索引为laneID, 值为[xmin, xmax, ymin, ymax]。
+        并对所有lane得到的xyMinMax再次排序, 得到最大最小值, 存储到self.totalXYMinMax。
+        self.totalXYMinMax值为[xmin, xmax, ymin, ymax]。
+        '''
+        xyMinMax = dict()
+        totalXYMinMax = [0, 0, 0, 0]
+        # 对各lane的xyByLane分别以x或y排序, 得到最大最小值, 存储到self.xyMinMax
+        for lane in self.xyByLane:
+            # 以x排序
+            self.xyByLane[lane].sort(key=lambda x: x[0])
+            xmin, xmax = self.xyByLane[lane][0][0], self.xyByLane[lane][-1][0]
+            # 以y排序
+            self.xyByLane[lane].sort(key=lambda x: x[1])
+            ymin, ymax = self.xyByLane[lane][0][1], self.xyByLane[lane][-1][1]
+            # 存储
+            xyMinMax[lane] = [xmin, xmax, ymin, ymax]
+            totalXYMinMax[0] = min(totalXYMinMax[0], xmin)
+            totalXYMinMax[1] = max(totalXYMinMax[1], xmax)
+            totalXYMinMax[2] = min(totalXYMinMax[2], ymin)
+            totalXYMinMax[3] = max(totalXYMinMax[3], ymax)
+        return xyMinMax, totalXYMinMax
+
+    def __calibLanes(self):
+        '''class function __calibLanes
+
+        return
+        ----------
+
+        利用存储的轨迹点信息, 计算车道特征点, 拟合出车道方程
+        '''
+        # 确定曲率最明显的车道编号
+        # 考量紧急车道内侧的2个车道, 点分散程度大的的车道具有更明显的曲率
+        lane2, laneN_1 = self.emgcIDs[0] + 1, self.emgcIDs[1] - 1
+        DBI2, DBIN_1 = dbi(self.xyByLane[lane2]), dbi(self.xyByLane[laneN_1])
+        
+        # 拟合laneExt车道线方程
+
+        # 拟合其他非应急车道的车道线方程
+        for id in self.xyByLane:
+            if id in self.emgcIDs:
+                continue
+            featPoints = calQuartiles(self.xyByLane[id])
+
+            self.laneProps[id].update({
+                'featPoints': featPoints,
+            })
+
+            DBI = dbi(self.xyByLane[id])
+            print(id, DBI)
+        
+        # 拟合应急车道的车道线方程
+            
+        
+        return 0
 
     def save(self):
         '''class function save
