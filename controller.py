@@ -60,7 +60,8 @@ class Controller:
         if not (os.path.exists(clbPath)) | self.config['calib']['if_recalib']:
             # 没有config或者配置需要则标定
             self.needClb = True
-            clbtor = Calibrator(clbPath=clbPath)
+            clbtor = Calibrator(clbPath=clbPath, laneWidth=config['laneWidth'],
+                                emgcWidth=config['emgcWidth'])
             self.clbtor = clbtor
         else:   # 有config则读取, 不需要标定
             clb = self._loadyaml(clbPath)
