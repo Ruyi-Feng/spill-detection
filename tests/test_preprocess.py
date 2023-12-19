@@ -1,16 +1,7 @@
 from pre_processing.target_manager import TargetManager
+from msg_driver import Driver
 
-
-def test_preprocess(test_data: list) -> list:
-    p = TargetManager()
-    for car in test_data:
-        car = [car]  # 模拟传输来的1条信息
-        car = p.run(car)
-
-    assert type(car) == list
-
-
-if __name__ == '__main__':
+def test_preprocess():
     test_data = [
         {'TargetId': 5087, 'XDecx': -2.55, 'YDecy': 259.7,
          'VDecVx': 0, 'VDecVy': -26.56, 'LineNum': 2},
@@ -503,4 +494,11 @@ if __name__ == '__main__':
         {'TargetId': 5087, 'XDecx': 2.75, 'YDecy': 0.25,
          'VDecVx': 0.13, 'VDecVy': -19.3, 'LineNum': 101}
     ]
-    test_preprocess(test_data)
+    d = Driver()
+    p = TargetManager(comMaxFrm=20, smthA=0.1)
+    for car in test_data:
+        car = [car]  # 模拟传输来的1条信息
+        car = d.receive(car)
+        car = p.run(car)
+
+    assert type(car) == list

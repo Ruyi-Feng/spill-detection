@@ -1,17 +1,8 @@
 from detection import EventDetector
 
 
-def test_detect(data, traffic):
-    d = EventDetector()
-    for car in test_data:
-        car = [car]   # 模拟传输来的1条信息
-        car = d.run(car, traffic)
-
-    assert type(car) == str  # 返回占道报警值
-
-
-if __name__ == "__main__":
-    test_data = [
+def test_detect():
+    data = [
         {'TargetId': 7390, 'XDecx': 27.25, 'YDecy': 75.55,
          'VDecVx': -0.17, 'VDecVy': 16.16, 'LineNum': 7},
         {'TargetId': 7390, 'XDecx': 27.15, 'YDecy': 76.35,
@@ -1627,7 +1618,7 @@ if __name__ == "__main__":
         {'TargetId': 7390, 'XDecx': 3.34, 'YDecy': 767.15,
          'VDecVx': -0.5, 'VDecVy': 17.77, 'LineNum': 8}
     ]
-    test_traffic = {
+    traffic = {
         1:
         {
             'cells':
@@ -1656,4 +1647,10 @@ if __name__ == "__main__":
         }
     }
 
-    test_detect(test_data, test_traffic)
+
+    d = EventDetector(fps=20, clb=None)
+    for car in data:
+        car = [car]   # 模拟传输来的1条信息
+        car = d.run(car, traffic)
+
+    assert type(car) == list  # 返回占道报警值

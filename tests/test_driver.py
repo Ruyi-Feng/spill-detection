@@ -29,7 +29,7 @@ def test_driver():
         # 断点
         # print('------------------')
 
-    assert type(msg) == list
+    assert type(msg) == str
 
 
 if __name__ == "__main__":
