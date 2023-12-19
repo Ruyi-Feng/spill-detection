@@ -2,62 +2,70 @@ Q: 0
 lnMng:
   1:
     cells:
-    - danger: 0.0
-      k: 0
-      order: 1
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 2
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 3
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 4
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 5
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 6
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 7
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 8
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
+      1:
+        danger: 0.0
+        k: 0
+        order: 1
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      2:
+        danger: 0.0
+        k: 0
+        order: 2
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      3:
+        danger: 0.0
+        k: 0
+        order: 3
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      4:
+        danger: 0.0
+        k: 0
+        order: 4
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      5:
+        danger: 0.0
+        k: 0
+        order: 5
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      6:
+        danger: 0.0
+        k: 0
+        order: 6
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      7:
+        danger: 0.0
+        k: 0
+        order: 7
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      8:
+        danger: 0.0
+        k: 0
+        order: 8
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
     coeff:
       left: []
       mid: []
@@ -70,62 +78,70 @@ lnMng:
     v: 0
   2:
     cells:
-    - danger: 0.0
-      k: 0
-      order: 1
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 2
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 3
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 4
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 5
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 6
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 7
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 8
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
+      1:
+        danger: 0.0
+        k: 0
+        order: 1
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      2:
+        danger: 0.0
+        k: 0
+        order: 2
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      3:
+        danger: 0.0
+        k: 0
+        order: 3
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      4:
+        danger: 0.0
+        k: 0
+        order: 4
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      5:
+        danger: 0.0
+        k: 0
+        order: 5
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      6:
+        danger: 0.0
+        k: 0
+        order: 6
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      7:
+        danger: 0.0
+        k: 0
+        order: 7
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      8:
+        danger: 0.0
+        k: 0
+        order: 8
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
     coeff:
       left: []
       mid: []
@@ -138,62 +154,70 @@ lnMng:
     v: 0
   3:
     cells:
-    - danger: 0.0
-      k: 0
-      order: 1
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 2
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 3
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 4
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 5
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 6
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 7
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 8
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
+      1:
+        danger: 0.0
+        k: 0
+        order: 1
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      2:
+        danger: 0.0
+        k: 0
+        order: 2
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      3:
+        danger: 0.0
+        k: 0
+        order: 3
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      4:
+        danger: 0.0
+        k: 0
+        order: 4
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      5:
+        danger: 0.0
+        k: 0
+        order: 5
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      6:
+        danger: 0.0
+        k: 0
+        order: 6
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      7:
+        danger: 0.0
+        k: 0
+        order: 7
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      8:
+        danger: 0.0
+        k: 0
+        order: 8
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
     coeff:
       left: []
       mid: []
@@ -206,62 +230,70 @@ lnMng:
     v: 0
   4:
     cells:
-    - danger: 0.0
-      k: 0
-      order: 1
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 2
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 3
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 4
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 5
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 6
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 7
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 8
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
+      1:
+        danger: 0.0
+        k: 0
+        order: 1
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      2:
+        danger: 0.0
+        k: 0
+        order: 2
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      3:
+        danger: 0.0
+        k: 0
+        order: 3
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      4:
+        danger: 0.0
+        k: 0
+        order: 4
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      5:
+        danger: 0.0
+        k: 0
+        order: 5
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      6:
+        danger: 0.0
+        k: 0
+        order: 6
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      7:
+        danger: 0.0
+        k: 0
+        order: 7
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      8:
+        danger: 0.0
+        k: 0
+        order: 8
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
     coeff:
       left: []
       mid: []
@@ -274,62 +306,70 @@ lnMng:
     v: 0
   5:
     cells:
-    - danger: 0.0
-      k: 0
-      order: 1
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 2
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 3
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 4
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 5
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 6
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 7
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 8
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
+      1:
+        danger: 0.0
+        k: 0
+        order: 1
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      2:
+        danger: 0.0
+        k: 0
+        order: 2
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      3:
+        danger: 0.0
+        k: 0
+        order: 3
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      4:
+        danger: 0.0
+        k: 0
+        order: 4
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      5:
+        danger: 0.0
+        k: 0
+        order: 5
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      6:
+        danger: 0.0
+        k: 0
+        order: 6
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      7:
+        danger: 0.0
+        k: 0
+        order: 7
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      8:
+        danger: 0.0
+        k: 0
+        order: 8
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
     coeff:
       left: []
       mid: []
@@ -342,62 +382,70 @@ lnMng:
     v: 0
   6:
     cells:
-    - danger: 0.0
-      k: 0
-      order: 1
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 2
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 3
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 4
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 5
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 6
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 7
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 8
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
+      1:
+        danger: 0.0
+        k: 0
+        order: 1
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      2:
+        danger: 0.0
+        k: 0
+        order: 2
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      3:
+        danger: 0.0
+        k: 0
+        order: 3
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      4:
+        danger: 0.0
+        k: 0
+        order: 4
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      5:
+        danger: 0.0
+        k: 0
+        order: 5
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      6:
+        danger: 0.0
+        k: 0
+        order: 6
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      7:
+        danger: 0.0
+        k: 0
+        order: 7
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      8:
+        danger: 0.0
+        k: 0
+        order: 8
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
     coeff:
       left: []
       mid: []
@@ -410,62 +458,70 @@ lnMng:
     v: 0
   7:
     cells:
-    - danger: 0.0
-      k: 0
-      order: 1
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 2
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 3
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 4
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 5
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 6
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 7
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 8
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
+      1:
+        danger: 0.0
+        k: 0
+        order: 1
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      2:
+        danger: 0.0
+        k: 0
+        order: 2
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      3:
+        danger: 0.0
+        k: 0
+        order: 3
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      4:
+        danger: 0.0
+        k: 0
+        order: 4
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      5:
+        danger: 0.0
+        k: 0
+        order: 5
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      6:
+        danger: 0.0
+        k: 0
+        order: 6
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      7:
+        danger: 0.0
+        k: 0
+        order: 7
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      8:
+        danger: 0.0
+        k: 0
+        order: 8
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
     coeff:
       left: []
       mid: []
@@ -478,62 +534,70 @@ lnMng:
     v: 0
   8:
     cells:
-    - danger: 0.0
-      k: 0
-      order: 1
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 2
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 3
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 4
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 5
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 6
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 7
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
-    - danger: 0.0
-      k: 0
-      order: 8
-      q: 0
-      v: 0
-      vCache: []
-      valid: true
+      1:
+        danger: 0.0
+        k: 0
+        order: 1
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      2:
+        danger: 0.0
+        k: 0
+        order: 2
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      3:
+        danger: 0.0
+        k: 0
+        order: 3
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      4:
+        danger: 0.0
+        k: 0
+        order: 4
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      5:
+        danger: 0.0
+        k: 0
+        order: 5
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      6:
+        danger: 0.0
+        k: 0
+        order: 6
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      7:
+        danger: 0.0
+        k: 0
+        order: 7
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
+      8:
+        danger: 0.0
+        k: 0
+        order: 8
+        q: 0
+        v: 0
+        vCache: []
+        valid: true
     coeff:
       left: []
       mid: []
