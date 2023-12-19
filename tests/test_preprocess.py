@@ -6,7 +6,7 @@ def test_preprocess(test_data: list) -> list:
     for car in test_data:
         car = [car]  # 模拟传输来的1条信息
         car = p.run(car)
-        print(car)
+
     assert type(car) == list
 
 

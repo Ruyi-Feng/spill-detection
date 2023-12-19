@@ -6,7 +6,6 @@ def test_detect(data, traffic):
     for car in test_data:
         car = [car]   # 模拟传输来的1条信息
         car = d.run(car, traffic)
-        print(car)
 
     assert type(car) == str  # 返回占道报警值
 

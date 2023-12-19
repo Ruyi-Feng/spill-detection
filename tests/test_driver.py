@@ -19,15 +19,15 @@ def test_driver():
             continue
 
         # 模拟接受数据
-        print('接收前', msg[0])
+        # print('接收前', msg[0])
         # 接受数据
         msg = d.receive(msg)
-        print('代码内', msg[0])
+        # print('代码内', msg[0])
         # 发送数据
         msg = d.send(msg)
-        print('发送', msg[0])
+        # print('发送', msg[0])
         # 断点
-        print('------------------')
+        # print('------------------')
 
     assert type(msg) == list
 
