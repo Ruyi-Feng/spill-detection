@@ -29,9 +29,8 @@ def test_driver():
         # 断点
         print('------------------')
 
-    return msg
+    assert type(msg) == list
 
 
 if __name__ == "__main__":
-    msg = test_driver()
-    assert type(msg) == list
+    test_driver()

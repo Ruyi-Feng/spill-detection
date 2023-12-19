@@ -11,9 +11,8 @@ def test_simulator():
         if msg == '':
             break
 
-    return msg
+    assert type(msg) == str
 
 
 if __name__ == "__main__":
-    msg = test_simulator()
-    assert type(msg) == str
+    test_simulator()
