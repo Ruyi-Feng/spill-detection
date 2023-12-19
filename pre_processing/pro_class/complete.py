@@ -31,6 +31,7 @@ class Completer():
             需要补全的ID
 
         '''
-        cmpltIDs = self.__get_cmpltIDs(curTgt)
-        curTgt = self.__cmplt(curTgt, cmpltIDs)
-        return curTgt, cmpltIDs
+        # cmpltIDs = self.__get_cmpltIDs(curTgt)
+        # curTgt = self.__cmplt(curTgt, cmpltIDs)
+        # return curTgt, cmpltIDs
+        return curTgt, []

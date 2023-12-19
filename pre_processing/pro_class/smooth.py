@@ -36,12 +36,12 @@ class Smoother():
         '''
         resultTgt = []
         for tgt in curTgt:
-            tgt = self.__smooth(tgt, lastTgt)
+            tgt = self.__smooth(tgt, lastTgt[0])
             resultTgt.append(tgt)
 
         return resultTgt
 
-    def __smooth(self, tgt: dict, lastTgt: list) -> dict:
+    def __smooth(self, tgt: dict, lastTgt: dict) -> dict:
         '''function __smooth
 
         input
@@ -57,6 +57,7 @@ class Smoother():
             计算后的当前帧车辆目标信息
 
         '''
+
         tgt['XDecx'] = exp3Smooth(tgt['XDecx'], self.alpha,
                                   lastTgt['smth']['x'])
         tgt['YDecy'] = exp3Smooth(tgt['YDecy'], self.alpha,
