@@ -1,6 +1,6 @@
 import yaml
-from calibration.algorithms import dbi, calQuartiles
-
+from calibration.algorithms import dbi, calQuartiles, polyfit2, polyfit2A0
+import numpy as np
 
 class Calibrator():
     '''class Calibrator
@@ -51,9 +51,8 @@ class Calibrator():
         # 暂存标定结果
         # 基础正方向与车道ID
         self.vDir = dict()
-        self.LaneIDs = []
+        self.laneIDs = []
         self.emgcIDs = []
-        self.laneEmgc = dict()                # id: bool
         # 车道线方程
         self.xyMinMax = dict()                # 按lane存储xy的最大最小值
         self.totalXYMinMax = []           # 存储所有lane的xy最大最小值
@@ -118,20 +117,21 @@ class Calibrator():
         self.vDir = dir
         # 确定车道ID
         ids, emgc = self.__calibLaneIDs()
-        self.LaneIDs = ids
+        self.laneIDs = ids
         self.emgcIDs = emgc
-        # self.laneEmgc = {id: False for id in ids}
-        # for id in emgc:
-        #     self.laneEmgc[id] = True
-
         self.laneProps = {id: dict() for id in ids}
         # 计算各lane的xy最大最小值
         xyMinMax, totalXYMinMax = self.__calibXYMinMax()
         self.xyMinMax = xyMinMax
         self.totalXYMinMax = totalXYMinMax
-        # 标定车道线方程
-        tmp = self.__calibLanes()
-        print(tmp)
+        # 标定内外侧车道线ID
+        intID, extID = self.__calibIELanes()
+        self.intID = intID
+        self.extID = extID
+        # 计算车道线方程
+        lanesCoeff = self.__calibLanes()
+        print(lanesCoeff)
+
 
     def __calibVDir(self) -> dict:
         '''class function __calibVDir
@@ -199,6 +199,30 @@ class Calibrator():
             totalXYMinMax[3] = max(totalXYMinMax[3], ymax)
         return xyMinMax, totalXYMinMax
 
+    def __calibIELanes(self):
+        '''class function __calibIELanes
+
+        return
+        ----------
+        intID: int
+            返回内侧车道ID号
+        extID: int
+            返回外侧车道ID号
+        
+        计算除应急车道的2个边界车道的轨迹点的分散程度, 
+        从而确定内侧车道ID号与外侧车道ID号。
+        一般来说, 内侧车道距离较短, 车辆轨迹点范围分布较集中, 
+        外侧车道距离较长, 车辆轨迹点范围分布较分散。
+        '''
+        # 考量紧急车道内侧的2个车道, 点分散程度大的的车道为外侧车道
+        lane2, laneN_1 = self.emgcIDs[0] + 1, self.emgcIDs[1] - 1
+        dbi2, dbiN_1 = dbi(self.xyByLane[lane2]), dbi(self.xyByLane[laneN_1])
+        if dbi2 < dbiN_1:
+            intID, extID = lane2, laneN_1
+        else:
+            intID, extID = laneN_1, lane2
+        return intID, extID
+
     def __calibLanes(self):
         '''class function __calibLanes
 
@@ -207,29 +231,51 @@ class Calibrator():
 
         利用存储的轨迹点信息, 计算车道特征点, 拟合出车道方程
         '''
-        # 确定曲率最明显的车道编号
-        # 考量紧急车道内侧的2个车道, 点分散程度大的的车道具有更明显的曲率
-        lane2, laneN_1 = self.emgcIDs[0] + 1, self.emgcIDs[1] - 1
-        DBI2, DBIN_1 = dbi(self.xyByLane[lane2]), dbi(self.xyByLane[laneN_1])
-        print(DBI2, DBIN_1)
-        # 拟合laneExt车道线方程
-
-        # 拟合其他非应急车道的车道线方程
-        for id in self.xyByLane:
+        # 计算非应急车道的特征点
+        for id in self.laneIDs:
             if id in self.emgcIDs:
                 continue
             featPoints = calQuartiles(self.xyByLane[id])
+            self.laneProps[id].update({'fp': featPoints})
+        
+        # 拟合laneExt车道线方程
+        lanesCoeff = dict()
+        extCoeff = polyfit2(np.array(self.laneProps[self.extID]['fp']))
+        lanesCoeff[self.extID] = extCoeff
 
-            self.laneProps[id].update({
-                'featPoints': featPoints,
-            })
-
-            DBI = dbi(self.xyByLane[id])
-            print(id, DBI)
-
+        # 拟合其他非应急车道的车道线方程
+        for id in self.laneIDs:
+            if (id in self.emgcIDs) | (id == self.extID):
+                continue
+            # 以extCoeff为初始值拟合
+            a = polyfit2A0(np.array(self.laneProps[id]['fp']), extCoeff[0:2])
+            lanesCoeff[id] = a
+        
         # 拟合应急车道的车道线方程
+        d = (self.laneWidth + self.emgcWidth) / 2   # 边界车道-应急车道距离
+        # 计算ext车道线方程系数的导数
+        diffCoeff = np.polyder(np.poly1d(extCoeff))
+        # 计算在x=0处的导数值（切线的k值）
+        k = np.polyval(diffCoeff, 0)
+        # 计算边界车道-应急车道距离在y轴上的投影距离
+        dY = d * np.sqrt(1 + k**2)
+        # 计算应急车道的车道线方程系数
+        if lanesCoeff[self.extID][2] > lanesCoeff[self.intID][2]:
+            aExtEmgc = [extCoeff[0], extCoeff[1], extCoeff[2] + dY]
+            aIntEmgc = [extCoeff[0], extCoeff[1], extCoeff[2] - dY]
+        else:
+            aExtEmgc = [extCoeff[0], extCoeff[1], extCoeff[2] - dY]
+            aIntEmgc = [extCoeff[0], extCoeff[1], extCoeff[2] + dY]
+        # 存储应急车道的车道线方程系数
+        if self.intID == self.emgcIDs[0] + 1:
+            lanesCoeff[self.emgcIDs[0]] = aIntEmgc
+            lanesCoeff[self.emgcIDs[1]] = aExtEmgc
+        else:
+            lanesCoeff[self.emgcIDs[0]] = aExtEmgc
+            lanesCoeff[self.emgcIDs[1]] = aIntEmgc
+        
+        return lanesCoeff
 
-        return 0
 
     def save(self):
         '''class function save
@@ -252,12 +298,8 @@ class Calibrator():
                 'v': 0,
                 'cells': self.__emptyCells(range(self.emgcIDs[0],
                                                  self.emgcIDs[1]+1),
-                                           [True]*len(self.LaneIDs)),   # 待写入
-                'coeff': {
-                    'left': [],   # 待写入
-                    'right': [],  # 待写入
-                    'mid': []      # 待写入
-                }
+                                           [True]*len(self.laneIDs)),   # 待写入
+                'coeff': []     # 待写入
             }
 
         with open(self.clbPath, 'w') as f:
@@ -312,7 +354,7 @@ if __name__ == '__main__':
     clbPath = './calibration/clb.yml'
     calibrator = Calibrator(clbPath)
     calibrator.emgcIDs = [1, 8]
-    calibrator.LaneIDs = [1, 2, 3, 4, 5, 6, 7, 8]
+    calibrator.laneIDs = [1, 2, 3, 4, 5, 6, 7, 8]
 
     # 标定器标定
     calibrator.calibrate()
