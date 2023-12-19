@@ -38,3 +38,12 @@
 **低速持续时间duration_low(s)**：5s<br>
 ### 6. 超速行驶
 **超速持续时间duration_high(s)**：5s<br>
+
+<p>
+<img
+src="./docs/algorithms_logic.png"
+alt="算法逻辑"
+title="算法逻辑"
+width="100%"
+>
+</p>

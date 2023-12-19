@@ -1,6 +1,3 @@
-
-
-
 def preProcess(msg: list, traffic):
     '''function preProcess
 
@@ -16,11 +13,11 @@ def preProcess(msg: list, traffic):
     targets: list[dict], 存储单个目标的轨迹信息
     '''
 
+
 class PreProcessing:
 
     def __init__(self) -> None:
         pass
-
 
 
 class Smooth(PreProcessing):
@@ -54,4 +51,3 @@ class Complement:
 
     def _get_track(self, track: dict) -> dict:
         pass
-

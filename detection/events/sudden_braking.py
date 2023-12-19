@@ -1,7 +1,7 @@
 
-def intensiveSpeedReductionDetect(msg, traffic, config, clb):
+def SuddenBrakingDetect(msg, traffic, config, clb):
     '''function intensiveSpeedReductionDetect
-    
+
     input
     ------
     msg: list, 传感器数据

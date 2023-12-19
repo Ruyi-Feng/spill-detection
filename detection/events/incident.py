@@ -1,8 +1,7 @@
 
+def incidentDetect(msg, traffic, config, clb):
+    '''function incidentDetect
 
-def incidentSingleCarDetect(msg, traffic, config, clb):
-    '''function incidentSingleCarDetect
-    
     input
     ------
     msg: list, 传感器数据
@@ -14,8 +13,8 @@ def incidentSingleCarDetect(msg, traffic, config, clb):
     ------
     events: list, 事件列表, 元素为event的衍生类
 
-    检测单车事故事件, 输出并返回事件列表
+    检测多车事故事件, 输出并返回事件列表
     '''
-    events_is = []
+    events_i = []
 
-    return events_is
+    return events_i

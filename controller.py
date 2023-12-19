@@ -2,14 +2,15 @@ import os
 import yaml
 
 from calibration import Calibrator
-from msg_driver import receive, send
+from msg_driver import Driver
 import pre_processing
-from traffic_calculate import TrafficManager
-from event_detection import EventDetector
+from traffic import TrafficManager
+from detection import EventDetector
+
 
 class Controller:
     '''class Controller
-    
+
     properties
     ----------
     configPath: str
@@ -36,14 +37,14 @@ class Controller:
     '''
     def __init__(self, configPath: str, clbPath: str):
         '''function __init__
-        
+
         input
         -----
         configPath: str
             算法参数文件路径
         clbPath: str
             标定参数文件路径
-        
+
         '''
         # 控制器启动
         self.configPath = configPath
@@ -53,11 +54,18 @@ class Controller:
         self.config = config
         # 是否标定
         self.needClb = False
-        if not(os.path.exists(clbPath)) | self.config['if_recalibrate']:    # 没有config或者配置需要则标定
+        self.clbtor = None
+        self.calibFrames = config['calib']['calib_seconds'] * config['fps']
+        self.calibCount = 0
+        if not (os.path.exists(clbPath)) | self.config['calib']['if_recalib']:
+            print('开始标定过程')
+            # 没有config或者配置需要则标定
             self.needClb = True
-            clbtor = Calibrator(clbPath=clbPath)
+            clbtor = Calibrator(clbPath=clbPath, laneWidth=config['laneWidth'],
+                                emgcWidth=config['emgcWidth'])
             self.clbtor = clbtor
         else:   # 有config则读取, 不需要标定
+            print('开始接收数据')
             clb = self._loadyaml(clbPath)
             self.clb = clb
 
@@ -79,73 +87,89 @@ class Controller:
             事件检测结果, dict格式。
 
         接受传感器数据，返回发送数据、交通流参数、事件检测结果。
+        根据条件判断是否需要标定，若需要则标定。
         '''
+
         if type(msg) == str:
             return msg, None, None
 
+        # 标定过程
+        if (self.needClb & (self.calibCount < self.calibFrames)):
+            self.calibrate(msg)
+            self.calibCount += 1
+
+            if self.calibCount == self.calibFrames:
+                # 标定完成
+                self.clbtor.calibrate()
+                self.clbtor.save()
+                # 读取标定结果
+                clb = self._loadyaml(self.clbPath)
+                self.clb = clb
+                # 启动管理器
+                self.startManager()
+                self.needClb = False
+
+        # 运行过程
+        if not self.needClb:
+            self.run(msg)
+
         return msg, None, None
-        
-    
+
     def calibrate(self, msg: list):
         '''function calibrate
-        
+
         '''
-        
+
         self.clbtor.recieve(msg)
-        
+
     def startManager(self):
         '''function startManager
-        
+
         在完成标定或读取标定后启动管理器。
         '''
         # 运行管理器
-        tfm = TrafficManager(self.config['fps'], 
-                             self.config['q_cal_duration'], 
+        drv = Driver()
+        self.drv = drv
+        tfm = TrafficManager(self.config['fps'],
+                             self.config['q_cal_duration'],
                              self.config['cal_interval'])
         self.tfm = tfm
-        edt = EventDetector(self.config['fps'], self.clb, 
-                            self.config['event_types'], 
+        edt = EventDetector(self.config['fps'], self.clb,
+                            self.config['event_types'],
                             self.config['vl'], self.config['vh'],
-                            self.config['tt'], self.config['r2'], 
-                            self.config['dt'], 
-                            self.config['dstc'], self.config['vc'], 
+                            self.config['tt'], self.config['r2'],
+                            self.config['dt'],
+                            self.config['dstc'], self.config['vc'],
                             self.config['ai'], self.config['di'],
                             self.config['dl'], self.config['dh'])
         self.edt = edt
 
     def run(self, msg: list):
         # 接受数据
-        msg = receive.recieve(msg)
+        msg = self.drv.recieve(msg)
         # 预处理
-        msg, traffic = pre_processing.preProcess(msg, traffic)
+        msg, traffic = pre_processing.preProcess(msg, self.trm)
         # 交通流参数计算
-        traffic = pre_processing.traffic_calculate(msg, traffic)
+        traffic = pre_processing.traffic_calculate(msg, self.trm)
         # 事件检测
-        msg = event_detection(msg)
+        msg = self.edt.run(msg, traffic)
         # 发送数据
-        msg = send.send(msg)
+        msg = self.drv.send.send(msg)
         # print(msg)
-
-
 
     def _loadyaml(self, path: str) -> dict:
         '''function _loadParam
-        
+
         input
         -----
         path: str
             文件路径
-        
+
         return
         ------
         config: dict
             配置参数
-        
         '''
         with open(path, 'r') as f:
             config = yaml.load(f, Loader=yaml.FullLoader)
         return config
-
-    def _saveCalib(self):
-        config = self.clbtor.calibration
-        self.clbtor.save(self.clbPath)

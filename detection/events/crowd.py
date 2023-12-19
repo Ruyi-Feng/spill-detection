@@ -1,7 +1,7 @@
 
 def crowdDetect(traffic: dict, dstc: float, vc: float):
     '''function crowdDetect
-    
+
     input
     ------
     traffic: dict, 交通流数据
