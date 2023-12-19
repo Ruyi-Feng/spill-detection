@@ -79,3 +79,50 @@ if __name__ == '__main__':
     xys = np.array([[1, 1], [1, 1], [1, 1]])
     d = dbi(xys)
     print(d)
+
+
+def polyfit2(data: np.ndarray) -> np.ndarray:
+    '''func polyfit2
+
+    input
+    ----------
+    data: np.ndarray
+        一组数据点的坐标, shape=(n, 2)
+    
+    return
+    ----------
+    a: np.ndarray
+        拟合曲线的系数, shape=(3,), 系数分别代表x^2, x, 1的系数
+    
+    计算一组数据点的二次拟合曲线的系数, 系数分别代表x^2, x, 1的系数。
+    '''
+    x = data[:, 0]
+    y = data[:, 1]
+    a = np.polyfit(x, y, 2)
+    return a
+
+
+def polyfit2A0(data: np.ndarray, a21: np.ndarray) -> np.ndarray:
+    '''func polyfit2A0
+
+    input
+    ----------
+    data: np.ndarray
+        一组数据点的坐标, shape=(n, 2)
+    a21: np.ndarray
+        二次拟合曲线的前两项系数, shape=(2,), 系数分别代表x^2, x的系数
+    
+    return
+    ----------
+    a: np.ndarray
+        拟合曲线的系数, shape=(3,), 系数分别代表x^2, x, 1的系数
+    
+    对一组数据点进行二次曲线拟合, 给定x^2, x的系数, 
+    通过最小二乘法确定常数项系数, 返回系数为x^2, x, 1的系数。
+    '''
+    x = data[:, 0]
+    y = data[:, 1]
+    a = np.zeros(3)
+    a[0:2] = a21
+    a[2] = np.mean(y - a[0] * x * x - a[1] * x)
+    return a
