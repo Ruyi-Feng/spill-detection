@@ -1,6 +1,7 @@
 from pre_processing.target_manager import TargetManager
 from msg_driver import Driver
 
+
 def test_preprocess():
     test_data = [
         {'TargetId': 5087, 'XDecx': -2.55, 'YDecy': 259.7,

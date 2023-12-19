@@ -88,12 +88,12 @@ def polyfit2(data: np.ndarray) -> np.ndarray:
     ----------
     data: np.ndarray
         一组数据点的坐标, shape=(n, 2)
-    
+
     return
     ----------
     a: np.ndarray
         拟合曲线的系数, shape=(3,), 系数分别代表x^2, x, 1的系数
-    
+
     计算一组数据点的二次拟合曲线的系数, 系数分别代表x^2, x, 1的系数。
     '''
     x = data[:, 0]
@@ -111,13 +111,13 @@ def polyfit2A0(data: np.ndarray, a21: np.ndarray) -> np.ndarray:
         一组数据点的坐标, shape=(n, 2)
     a21: np.ndarray
         二次拟合曲线的前两项系数, shape=(2,), 系数分别代表x^2, x的系数
-    
+
     return
     ----------
     a: np.ndarray
         拟合曲线的系数, shape=(3,), 系数分别代表x^2, x, 1的系数
-    
-    对一组数据点进行二次曲线拟合, 给定x^2, x的系数, 
+
+    对一组数据点进行二次曲线拟合, 给定x^2, x的系数,
     通过最小二乘法确定常数项系数, 返回系数为x^2, x, 1的系数。
     '''
     x = data[:, 0]

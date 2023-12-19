@@ -1647,7 +1647,6 @@ def test_detect():
         }
     }
 
-
     d = EventDetector(fps=20, clb=None)
     for car in data:
         car = [car]   # 模拟传输来的1条信息
