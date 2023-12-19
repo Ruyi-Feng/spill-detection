@@ -120,9 +120,9 @@ class Calibrator():
         ids, emgc = self.__calibLaneIDs()
         self.LaneIDs = ids
         self.emgcIDs = emgc
-        self.laneEmgc = {id: False for id in ids}
-        for id in emgc:
-            self.laneEmgc[id] = True
+        # self.laneEmgc = {id: False for id in ids}
+        # for id in emgc:
+        #     self.laneEmgc[id] = True
 
         self.laneProps = {id: dict() for id in ids}
         # 计算各lane的xy最大最小值
@@ -241,7 +241,7 @@ class Calibrator():
         traffic['vDir'] = self.vDir
         traffic['lnMng'] = dict()
 
-        for id in range(self.emgcLanes[0], self.emgcLanes[1] + 1):
+        for id in range(self.emgcIDs[0], self.emgcIDs[1] + 1):
 
             traffic['lnMng'][id] = {
                 'id': id,
@@ -250,8 +250,8 @@ class Calibrator():
                 'q': 0,
                 'k': 0,
                 'v': 0,
-                'cells': self.__emptyCells(range(self.emgcLanes[0],
-                                                 self.emgcLanes[1]+1),
+                'cells': self.__emptyCells(range(self.emgcIDs[0],
+                                                 self.emgcIDs[1]+1),
                                            [True]*len(self.LaneIDs)),   # 待写入
                 'coeff': {
                     'left': [],   # 待写入
@@ -311,7 +311,7 @@ if __name__ == '__main__':
     # 生成标定器
     clbPath = './calibration/clb.yml'
     calibrator = Calibrator(clbPath)
-    calibrator.emgcLanes = [1, 8]
+    calibrator.emgcIDs = [1, 8]
     calibrator.LaneIDs = [1, 2, 3, 4, 5, 6, 7, 8]
 
     # 标定器标定
