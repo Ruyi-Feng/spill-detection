@@ -1,5 +1,5 @@
 import yaml
-from calibration.algorithms import dbi, calQuartiles, polyfit2, polyfit2A0
+from road_calibration.algorithms import dbi, calQuartiles, polyfit2, polyfit2A0
 import numpy as np
 
 
