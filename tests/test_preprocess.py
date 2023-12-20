@@ -1,5 +1,5 @@
 from pre_processing.target_manager import TargetManager
-from msg_driver import Driver
+from message_driver import Driver
 
 
 def test_preprocess():

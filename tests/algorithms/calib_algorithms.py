@@ -1,6 +1,6 @@
 # import matplotlib.pyplot as plt
 import numpy as np
-from calibration.algorithms import polyfit2, polyfit2A0
+from road_calibration.algorithms import polyfit2, polyfit2A0
 
 
 def test_polyfit2():
