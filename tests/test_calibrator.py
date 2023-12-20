@@ -1,5 +1,5 @@
 from rsu_simulator import Smltor
-from calibration import Calibrator
+from road_calibration import Calibrator
 
 
 def test_calibrator():
