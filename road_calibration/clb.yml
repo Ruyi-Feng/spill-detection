@@ -66,7 +66,7 @@ lnMng:
         v: 0
         vCache: []
         valid: true
-    coeff: []
+    coef: []
     emgc: false
     id: 1
     k: 0
@@ -139,7 +139,7 @@ lnMng:
         v: 0
         vCache: []
         valid: true
-    coeff: []
+    coef: []
     emgc: false
     id: 2
     k: 0
@@ -212,7 +212,7 @@ lnMng:
         v: 0
         vCache: []
         valid: true
-    coeff: []
+    coef: []
     emgc: false
     id: 3
     k: 0
@@ -285,7 +285,7 @@ lnMng:
         v: 0
         vCache: []
         valid: true
-    coeff: []
+    coef: []
     emgc: false
     id: 4
     k: 0
@@ -358,7 +358,7 @@ lnMng:
         v: 0
         vCache: []
         valid: true
-    coeff: []
+    coef: []
     emgc: false
     id: 5
     k: 0
@@ -431,7 +431,7 @@ lnMng:
         v: 0
         vCache: []
         valid: true
-    coeff: []
+    coef: []
     emgc: false
     id: 6
     k: 0
@@ -504,7 +504,7 @@ lnMng:
         v: 0
         vCache: []
         valid: true
-    coeff: []
+    coef: []
     emgc: false
     id: 7
     k: 0
@@ -577,7 +577,7 @@ lnMng:
         v: 0
         vCache: []
         valid: true
-    coeff: []
+    coef: []
     emgc: false
     id: 8
     k: 0
