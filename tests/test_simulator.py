@@ -1,10 +1,9 @@
 from rsu_simulator import Smltor
-from pathlib import Path
 
 
 def test_simulator():
-    p = (Path(__file__) / './../../data/result.txt').resolve()
-    s = Smltor(str(p))
+    p = './data/result.txt'
+    s = Smltor(p)
 
     while True:
         msg = s.run()
@@ -12,7 +11,3 @@ def test_simulator():
             break
 
     assert type(msg) == str
-
-
-if __name__ == "__main__":
-    test_simulator()

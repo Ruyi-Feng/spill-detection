@@ -1,14 +1,13 @@
 from rsu_simulator import Smltor
 from msg_driver import Driver
-from pathlib import Path
 
 
 # 通过
 def test_driver():
     # 模拟传输开启
     # 得到allMessages
-    p = (Path(__file__) / './../../data/result.txt').resolve()
-    s = Smltor(str(p))
+    p = './data/result.txt'
+    s = Smltor(p)
     d = Driver()
 
     while True:
@@ -30,7 +29,3 @@ def test_driver():
         # print('------------------')
 
     assert type(msg) == str
-
-
-if __name__ == "__main__":
-    test_driver()
