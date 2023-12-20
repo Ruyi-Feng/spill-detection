@@ -126,3 +126,32 @@ def poly2fitFrozen(data: np.ndarray, a21: np.ndarray) -> np.ndarray:
     a[0:2] = a21
     a[2] = np.mean(y - a[0] * x * x - a[1] * x)
     return a
+
+
+def poly2fitFrozenNew(data: np.ndarray, a2: float) -> np.ndarray:
+    '''func poly2fitFrozen
+
+    input
+    ----------
+    data: np.ndarray
+        一组数据点的坐标, shape=(n, 2)
+    a2: float
+        二次拟合曲线的x^2系数
+
+    return
+    ----------
+    a: np.ndarray
+        拟合曲线的系数, shape=(3,), 系数分别代表x^2, x, 1的系数
+
+    对一组数据点进行二次曲线拟合, 给定x^2的系数,
+    通过最小二乘法确定x系数和常数项, 返回系数为x^2, x, 1的系数。
+    方法: 将数据中y先减去x^2*a2, 再进行一次线性拟合。
+    '''
+    x = data[:, 0]
+    y = data[:, 1]
+    a = np.zeros(3)
+    a[0] = a2
+    bc = np.polyfit(x, y - a[0] * x * x, 1)
+    a[1] = bc[0]
+    a[2] = bc[1]
+    return a
