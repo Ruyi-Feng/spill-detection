@@ -3,7 +3,7 @@ from rsu_simulator import Smltor
 
 if __name__ == "__main__":
     configPath = './config.yml'
-    clbPath = './calibration/clb.yml'
+    clbPath = './road_calibration/clb.yml'
     dataPath = './data/result.txt'
 
     # 应在主代码开头生成控制器

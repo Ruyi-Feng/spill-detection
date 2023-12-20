@@ -17,7 +17,7 @@ def test_calibrator():
     '''
 
     # 生成标定器
-    clbPath = './calibration/clb.yml'
+    clbPath = './road_calibration/clb.yml'
     calibrator = Calibrator(clbPath)
 
     # 生成仿真器
