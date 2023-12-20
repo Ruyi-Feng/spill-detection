@@ -81,8 +81,8 @@ if __name__ == '__main__':
     print(d)
 
 
-def polyfit2(data: np.ndarray) -> np.ndarray:
-    '''func polyfit2
+def poly2fit(data: np.ndarray) -> np.ndarray:
+    '''func poly2fit
 
     input
     ----------
@@ -102,8 +102,8 @@ def polyfit2(data: np.ndarray) -> np.ndarray:
     return a
 
 
-def polyfit2A0(data: np.ndarray, a21: np.ndarray) -> np.ndarray:
-    '''func polyfit2A0
+def poly2fitFrozen(data: np.ndarray, a21: np.ndarray) -> np.ndarray:
+    '''func poly2fitFrozen
 
     input
     ----------

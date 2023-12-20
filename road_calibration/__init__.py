@@ -1,5 +1,5 @@
 import yaml
-from road_calibration.algorithms import dbi, calQuartiles, polyfit2, polyfit2A0
+from road_calibration.algorithms import dbi, calQuartiles, poly2fit, poly2fitFrozen
 import numpy as np
 
 
@@ -241,7 +241,7 @@ class Calibrator():
         
         # 拟合laneExt车道线方程
         lanesCoeff = dict()
-        extCoeff = polyfit2(np.array(self.laneProps[self.extID]['fp']))
+        extCoeff = poly2fit(np.array(self.laneProps[self.extID]['fp']))
         lanesCoeff[self.extID] = extCoeff
 
         # 拟合其他非应急车道的车道线方程
@@ -249,7 +249,7 @@ class Calibrator():
             if (id in self.emgcIDs) | (id == self.extID):
                 continue
             # 以extCoeff为初始值拟合
-            a = polyfit2A0(np.array(self.laneProps[id]['fp']), extCoeff[0:2])
+            a = poly2fitFrozen(np.array(self.laneProps[id]['fp']), extCoeff[0:2])
             lanesCoeff[id] = a
         
         # 拟合应急车道的车道线方程
