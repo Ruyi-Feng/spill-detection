@@ -3,7 +3,7 @@ from msg_driver import Driver
 
 
 def test_preprocess():
-    test_data = [
+    data = [
         {'TargetId': 5087, 'XDecx': -2.55, 'YDecy': 259.7,
          'VDecVx': 0, 'VDecVy': -26.56, 'LineNum': 2},
         {'TargetId': 5087, 'XDecx': -2.55, 'YDecy': 258.35,
@@ -496,10 +496,10 @@ def test_preprocess():
          'VDecVx': 0.13, 'VDecVy': -19.3, 'LineNum': 101}
     ]
     d = Driver()
-    p = TargetManager(comMaxFrm=20, smthA=0.1)
-    for car in test_data:
+    t = TargetManager(comMaxFrm=20, smthA=0.1)
+    for car in data:
         car = [car]  # 模拟传输来的1条信息
         car = d.receive(car)
-        car = p.run(car)
+        car = t.run(car)
 
     assert type(car) == list

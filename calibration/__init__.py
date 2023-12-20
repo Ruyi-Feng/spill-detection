@@ -2,6 +2,7 @@ import yaml
 from calibration.algorithms import dbi, calQuartiles, polyfit2, polyfit2A0
 import numpy as np
 
+
 class Calibrator():
     '''class Calibrator
 

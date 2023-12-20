@@ -66,6 +66,7 @@ class TrafficManager():
         接收传感器数据, 按照lane存储speed属性, 用于计算交通流参数。
         '''
         # 分缓存数据的长度是否达到了计算交通流参数的要求
+        pass
 
     def calculate(self, msg) -> tuple:
         '''function calculate
