@@ -102,7 +102,7 @@ def poly2fit(data: np.ndarray) -> np.ndarray:
     return a
 
 
-def poly2fitFrozen(data: np.ndarray, a21: np.ndarray) -> np.ndarray:
+def poly2fitFrozenOld(data: np.ndarray, a21: np.ndarray) -> np.ndarray:
     '''func poly2fitFrozen
 
     input
@@ -128,7 +128,7 @@ def poly2fitFrozen(data: np.ndarray, a21: np.ndarray) -> np.ndarray:
     return a
 
 
-def poly2fitFrozenNew(data: np.ndarray, a2: float) -> np.ndarray:
+def poly2fitFrozen(data: np.ndarray, a2: float) -> np.ndarray:
     '''func poly2fitFrozen
 
     input
