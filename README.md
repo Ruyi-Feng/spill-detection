@@ -81,3 +81,42 @@ traffic变量
 
 ### 4.5 文件名尽量用英文
 
+```python
+
+    info1: dict = {
+        "a": 1,
+        "b": 2,
+        "c": 3,
+    }
+
+    info2 = [1, 2]
+
+    def func1(**kws):
+        pass
+        xxx = a
+
+    def func2(a, b):
+        pass
+
+    func1(**info)
+    func2(*info2)
+
+# **keywords 按dict展开赋值
+# *keywords 按list展开复制
+
+```
+
+
+```python
+
+args = parser()
+
+self.args = args
+
+self.args.kw1
+self.args.kw2
+
+self.conditions.speed
+
+
+```
