@@ -268,12 +268,12 @@ class Calibrator():
             aIntEmgc = [extCoeff[0], extCoeff[1], extCoeff[2] + dY]
         # 存储应急车道的车道线方程系数
         if self.intID == self.emgcIDs[0] + 1:
-            lanesCoeff[self.emgcIDs[0]] = aIntEmgc
-            lanesCoeff[self.emgcIDs[1]] = aExtEmgc
+            lanesCoeff[self.emgcIDs[0]] = np.array(aIntEmgc)
+            lanesCoeff[self.emgcIDs[1]] = np.array(aExtEmgc)
         else:
-            lanesCoeff[self.emgcIDs[0]] = aExtEmgc
-            lanesCoeff[self.emgcIDs[1]] = aIntEmgc
-        
+            lanesCoeff[self.emgcIDs[0]] = np.array(aExtEmgc)
+            lanesCoeff[self.emgcIDs[1]] = np.array(aIntEmgc)
+
         return lanesCoeff
 
 
