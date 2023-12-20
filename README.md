@@ -101,8 +101,8 @@ traffic变量
     func1(**info)
     func2(*info2)
 
-# **keywords 按dict展开赋值
-# *keywords 按list展开复制
+	# **keywords 按dict展开赋值
+	# *keywords 按list展开复制
 
 ```
 
@@ -120,3 +120,8 @@ self.conditions.speed
 
 
 ```
+
+# note!
+车道线将不再用于确定cell等功能。<br>
+cell将直接根据y坐标确定。<br>
+横向速度将直接根据x计算。<br>
