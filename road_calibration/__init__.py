@@ -249,10 +249,11 @@ class Calibrator():
             if (id in self.emgcIDs) | (id == self.extID):
                 continue
             # 以extCoeff为初始值拟合
-            a = poly2fitFrozen(np.array(self.laneProps[id]['fp']), extCoeff[0:2])
+            a = poly2fitFrozen(np.array(self.laneProps[id]['fp']), extCoeff[0])
             lanesCoeff[id] = a
         
         # 拟合应急车道的车道线方程
+        intCoeff = lanesCoeff[self.intID]
         d = (self.laneWidth + self.emgcWidth) / 2   # 边界车道-应急车道距离
         # 计算ext车道线方程系数的导数
         diffCoeff = np.polyder(np.poly1d(extCoeff))
@@ -263,10 +264,10 @@ class Calibrator():
         # 计算应急车道的车道线方程系数
         if lanesCoeff[self.extID][2] > lanesCoeff[self.intID][2]:
             aExtEmgc = [extCoeff[0], extCoeff[1], extCoeff[2] + dY]
-            aIntEmgc = [extCoeff[0], extCoeff[1], extCoeff[2] - dY]
+            aIntEmgc = [intCoeff[0], intCoeff[1], intCoeff[2] - dY]
         else:
             aExtEmgc = [extCoeff[0], extCoeff[1], extCoeff[2] - dY]
-            aIntEmgc = [extCoeff[0], extCoeff[1], extCoeff[2] + dY]
+            aIntEmgc = [intCoeff[0], intCoeff[1], intCoeff[2] + dY]
         # 存储应急车道的车道线方程系数
         if self.intID == self.emgcIDs[0] + 1:
             lanesCoeff[self.emgcIDs[0]] = np.array(aIntEmgc)
