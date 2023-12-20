@@ -1,11 +1,11 @@
 import os
 import yaml
 
-from calibration import Calibrator
-from msg_driver import Driver
+from road_calibration import Calibrator
+from message_driver import Driver
 import pre_processing
-from traffic import TrafficManager
-from detection import EventDetector
+from traffic_manager import TrafficManager
+from event_detection import EventDetector
 
 
 class Controller:
