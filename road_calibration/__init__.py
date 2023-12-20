@@ -130,8 +130,8 @@ class Calibrator():
         self.intID = intID
         self.extID = extID
         # 计算车道线方程
-        lanesCoeff = self.__calibLanes()
-        print(lanesCoeff)
+        lanesCoef = self.__calibLanes()
+        print(lanesCoef)
 
 
     def __calibVDir(self) -> dict:
@@ -240,43 +240,47 @@ class Calibrator():
             self.laneProps[id].update({'fp': featPoints})
         
         # 拟合laneExt车道线方程
-        lanesCoeff = dict()
-        extCoeff = poly2fit(np.array(self.laneProps[self.extID]['fp']))
-        lanesCoeff[self.extID] = extCoeff
+        lanesCoef = dict()
+        # extCoef = poly2fit(np.array(self.laneProps[self.extID]['fp']))
+        # TODO
+        extCoef = poly2fit(np.array(self.xyByLane[self.extID]))
+        lanesCoef[self.extID] = extCoef
 
         # 拟合其他非应急车道的车道线方程
         for id in self.laneIDs:
             if (id in self.emgcIDs) | (id == self.extID):
                 continue
-            # 以extCoeff为初始值拟合
-            a = poly2fitFrozen(np.array(self.laneProps[id]['fp']), extCoeff[0])
-            lanesCoeff[id] = a
+            # 以extCoef为初始值拟合
+            # a = poly2fitFrozen(np.array(self.laneProps[id]['fp']), extCoef[0])
+            # TODO
+            a = poly2fitFrozen(np.array(self.xyByLane[id]), extCoef[0])
+            lanesCoef[id] = a
         
         # 拟合应急车道的车道线方程
-        intCoeff = lanesCoeff[self.intID]
+        intCoef = lanesCoef[self.intID]
         d = (self.laneWidth + self.emgcWidth) / 2   # 边界车道-应急车道距离
         # 计算ext车道线方程系数的导数
-        diffCoeff = np.polyder(np.poly1d(extCoeff))
+        diffCoef = np.polyder(np.poly1d(extCoef))
         # 计算在x=0处的导数值（切线的k值）
-        k = np.polyval(diffCoeff, 0)
+        k = np.polyval(diffCoef, 0)
         # 计算边界车道-应急车道距离在y轴上的投影距离
         dY = d * np.sqrt(1 + k**2)
         # 计算应急车道的车道线方程系数
-        if lanesCoeff[self.extID][2] > lanesCoeff[self.intID][2]:
-            aExtEmgc = [extCoeff[0], extCoeff[1], extCoeff[2] + dY]
-            aIntEmgc = [intCoeff[0], intCoeff[1], intCoeff[2] - dY]
+        if lanesCoef[self.extID][2] > lanesCoef[self.intID][2]:
+            aExtEmgc = [extCoef[0], extCoef[1], extCoef[2] + dY]
+            aIntEmgc = [intCoef[0], intCoef[1], intCoef[2] - dY]
         else:
-            aExtEmgc = [extCoeff[0], extCoeff[1], extCoeff[2] - dY]
-            aIntEmgc = [intCoeff[0], intCoeff[1], intCoeff[2] + dY]
+            aExtEmgc = [extCoef[0], extCoef[1], extCoef[2] - dY]
+            aIntEmgc = [intCoef[0], intCoef[1], intCoef[2] + dY]
         # 存储应急车道的车道线方程系数
         if self.intID == self.emgcIDs[0] + 1:
-            lanesCoeff[self.emgcIDs[0]] = np.array(aIntEmgc)
-            lanesCoeff[self.emgcIDs[1]] = np.array(aExtEmgc)
+            lanesCoef[self.emgcIDs[0]] = np.array(aIntEmgc)
+            lanesCoef[self.emgcIDs[1]] = np.array(aExtEmgc)
         else:
-            lanesCoeff[self.emgcIDs[0]] = np.array(aExtEmgc)
-            lanesCoeff[self.emgcIDs[1]] = np.array(aIntEmgc)
+            lanesCoef[self.emgcIDs[0]] = np.array(aExtEmgc)
+            lanesCoef[self.emgcIDs[1]] = np.array(aIntEmgc)
 
-        return lanesCoeff
+        return lanesCoef
 
 
     def save(self):
@@ -301,7 +305,7 @@ class Calibrator():
                 'cells': self.__emptyCells(range(self.emgcIDs[0],
                                                  self.emgcIDs[1]+1),
                                            [True]*len(self.laneIDs)),   # 待写入
-                'coeff': []     # 待写入
+                'coef': []     # 待写入
             }
 
         with open(self.clbPath, 'w') as f:
