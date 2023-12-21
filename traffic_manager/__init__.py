@@ -1,35 +1,30 @@
-class TrafficManager():
+from traffic_manager.lane_manager import LaneMng
+
+
+class TrafficMng():
     '''class TrafficManager
 
     交通流计算类，根据传感器信息计算交通流
 
     Attributes
     ----------
-    qd: float
-        QDuration, 用于计算小时交通流量的流量采样时长
-    itv: float
-        interval, 更新计算交通参数的间隔时间
     fps: float
         frequency per second, 传感器采样频率
-
-    vcache: list
-        vehicle cache, 用于存储车辆目标信息, list每个元素代表一帧接收的数据, 元素格式为dict。
-        每帧dict中, 按照lane索引, 存储对应车道上的speed构成的list。
-    count: int
-        接收计数, 计算时若未达到qd等其他计算需求, 手动进行比例计算
-    KeyFrame: int
-        关键帧，标记小时交通流量的计算点
+    qd: float
+        QDuration, 用于计算小时交通流量的流量采样时长, 单位: 帧(config中为s)
+    itv: float
+        interval, 更新计算交通参数的间隔时间, 单位: 帧(config中为s)
     Q: float
-        存储路段级交通流量
-    q: dict
-        存储车道级交通流量
-    k: dict
-        存储车道级密度
-    v: dict
-        存储车道级平均速度
+        存储整个路段的交通流量(单位: 辆/h)
+    count: int
+        接收计数。计算时若持续时间小于qd, 则通过count进行比例计算。
+        TODO count不能一直累加, 达到某一足够大的数值后应当进行清理？
+        如果能拿到时间戳，利用时间戳计算会方便一些。
+    lanes: dict
+        车道管理器, 按照车道管理车道属性和交通流参数
 
     '''
-    def __init__(self, fps: float, qd: float, itv: float):
+    def __init__(self, fps: float, qd: float, itv: float, clb: dict):
         '''function __init__
         input
         -----
@@ -39,53 +34,80 @@ class TrafficManager():
             interval, 更新计算交通参数的间隔时间
         fps: float
             frequency per second, 传感器采样频率
-
+        clb: dict
+            raod calibration, 标定的车道配置信息
         '''
         # 参数
-        self.qd = qd        # 用于计算小时交通流量的流量采样时长
-        self.itv = itv      # 更新计算交通参数的间隔时间
-        self.fps = fps      # 传感器采样频率
+        self.fps = fps           # 传感器采样频率
+        self.qd = qd * fps       # 用于计算小时交通流量的流量采样时长
+        self.itv = itv * fps     # 更新计算交通参数的间隔时间
+        self.clearItv = max(self.qd, self.itv)  # 清理周期, 保障数据清理前的计算
         # 状态属性
+        self.Q = 0          # 存储整个路段的交通流量(单位: 辆/h)
         self.count = 0      # 接收计数，计算时若未达到qd等其他计算需求，手动进行比例计算
-        # 车辆目标暂存属性
-        self.vcache = []      # 车辆目标暂存属性，用于存储车辆目标信息
-        # 交通流属性
-        self.KeyFrame = 0   # 关键帧，标记小时交通流量的计算点
-        self.Q = 0     # 存储路段级交通流量
-        self.q = dict()    # 存储车道级交通流量
-        self.k = dict()    # 存储车道级密度
-        self.v = dict()    # 存储车道级平均速度
+        self.lanes = self._initLanes(clb)  # 车道管理器, 按照车道管理车道属性和交通流参数
 
-    def receive(self, msg):
-        '''function receive
+    def _initLanes(self, clb: dict) -> dict:
+        '''function _initLanes
 
         input
         -----
-        msg: list, 传感器数据, msg元素为代表一个车辆目标的dict。
-
-        接收传感器数据, 按照lane存储speed属性, 用于计算交通流参数。
-        '''
-        # 分缓存数据的长度是否达到了计算交通流参数的要求
-        pass
-
-    def calculate(self, msg) -> tuple:
-        '''function calculate
-
-        input
-        -----
-        msg: list
-            传感器数据
-
-        return
+        clb: dict
+            raod calibration, 标定的车道配置信息
+        
+        output
         ------
-        traffic:
-            存储交通流信息
-
-        根据所传输来的检测信息，计算交通流信息：
-        1. 路段级交通流量
-        2. 车道级交通流量
-        3. 车道级平均速度
-        4. 车道级密度
+        lanes: dict
+            车道管理器, 按照车道管理车道属性和交通流参数
         '''
-        traffic = []
-        return traffic
+
+    def update(self, cars):
+        '''function update
+
+        input
+        -----
+        cars: list, 传感器数据, cars元素为代表一个车辆目标的dict。
+
+        接收传感器数据, 更新缓存, 一定时间更新交通流参数。
+        '''
+        self.count += 1
+        # 更新缓存数据
+        self._updateCache(cars)
+        if self.count % self.itv == 0:
+            self._updateTraffic()
+        
+
+    def _updateCache(self, cars: list):
+        '''function _updateCache
+
+        input
+        -----
+        cars: list, 传感器数据, cars元素为代表一个车辆目标的dict。
+
+        仅更新缓存数据, 增加新数据, 删除过期数据。
+        '''
+        # 更新至各车道缓存
+        for id in self.lanes:
+            self.lanes[id].updateCache(cars)
+
+
+    def _updateTraffic(self):
+        '''function _updateTraffic
+
+        根据已更新的实例缓存的交通数据属性, 更新计算交通流参数。
+        '''
+        # 更新交通流参数
+        for id in self.lanes:
+            self.lanes[id].updateTraffic()
+        # 更新整个路段的交通流量
+        self._updateQ()
+    
+    def _updateQ(self):
+        '''function _updateQ
+
+        更新整个路段的交通流量
+        '''
+        # 计算路段交通流量
+        self.Q = 0
+        for id in self.lanes:
+            self.Q += self.lanes[id].q
