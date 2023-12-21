@@ -60,6 +60,7 @@ class TrafficMng():
         lanes: dict
             车道管理器, 按照车道管理车道属性和交通流参数
         '''
+        pass
 
     def update(self, cars):
         '''function update
@@ -88,6 +89,7 @@ class TrafficMng():
         '''
         # 更新至各车道缓存
         for id in self.lanes:
+            # TODO 对cars按照车道划分好再更新给lanes
             self.lanes[id].updateCache(cars)
 
 
