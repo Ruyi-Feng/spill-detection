@@ -18,6 +18,7 @@ event:
   v_low: 2.778
   v_high: 33.33
   t_tolerance: 300
+  q_standard: 10000
   rate2: 0.1
   d_touch: 5
   density_crowd: 18
