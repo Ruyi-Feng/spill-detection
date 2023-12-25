@@ -1,4 +1,5 @@
 from traffic_manager.lane_manager import LaneMng
+from typing import Dict
 
 
 class TrafficMng():
@@ -47,19 +48,20 @@ class TrafficMng():
         self.count = 0      # 接收计数，计算时若未达到qd等其他计算需求，手动进行比例计算
         self.lanes = self._initLanes(clb)  # 车道管理器, 按照车道管理车道属性和交通流参数
 
-    def _initLanes(self, clb: dict) -> dict:
+    def _initLanes(self, clb: dict) -> Dict[int, LaneMng]:
         '''function _initLanes
 
         input
         -----
         clb: dict
             raod calibration, 标定的车道配置信息
-        
+
         output
         ------
         lanes: dict
             车道管理器, 按照车道管理车道属性和交通流参数
         '''
+        
         pass
 
     def update(self, cars):
@@ -76,7 +78,6 @@ class TrafficMng():
         self._updateCache(cars)
         if self.count % self.itv == 0:
             self._updateTraffic()
-        
 
     def _updateCache(self, cars: list):
         '''function _updateCache
@@ -87,11 +88,11 @@ class TrafficMng():
 
         仅更新缓存数据, 增加新数据, 删除过期数据。
         '''
+        # 按车道组织车辆
+        carsByLane = self._carsByLane(cars)  # dict按车道组织, 无车则空列表
         # 更新至各车道缓存
         for id in self.lanes:
-            # TODO 对cars按照车道划分好再更新给lanes
-            self.lanes[id].updateCache(cars)
-
+            self.lanes[id].updateCache(carsByLane[id])
 
     def _updateTraffic(self):
         '''function _updateTraffic
@@ -113,3 +114,25 @@ class TrafficMng():
         self.Q = 0
         for id in self.lanes:
             self.Q += self.lanes[id].q
+
+    def _carsByLane(self, cars: list) -> dict:
+        '''function carsByLane
+
+        input
+        -----
+        cars: list
+            车辆列表, 每个元素为一个dict, 代表一个车辆目标
+
+        return
+        ------
+        carsByLane: dict
+            键为车道id, 值为所分配车辆的列表, 无车辆则为空列表
+        
+        确定车辆所在车道, 按车道组织车辆, 车道号大于100则减去100。
+        '''
+        carsByLane = {i.ID: [] for i in self.lanes}
+        for car in cars:
+            laneID = car['LineNum'] - 100 if car['LineNum'] > 100 \
+                else car['LineNum']     # 大于100的减去100
+            carsByLane[laneID].append(car)
+        return carsByLane
