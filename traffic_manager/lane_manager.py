@@ -1,18 +1,18 @@
 from traffic_manager.cell_manager import CellMng
-
+from typing import Dict
 
 class LaneMng:
     '''class Lane
     按照车道管理车道属性和交通流参数
     '''
-    def __init__(self, id: int, emg: bool,
+    def __init__(self, ID: int, emg: bool,
                  len: float, start: float, end: float, vdir: int,
                  coef: dict,
                  cellLen: float, clbCell: dict):
         ''' function __init__
         input
         -----
-        id: int
+        ID: int
             车道ID
         emg: bool
             是否为应急车道
@@ -32,7 +32,7 @@ class LaneMng:
             元胞标定参数
         '''
         # 基础属性
-        self.id = id
+        self.ID = ID
         self.emg = emg
         self.len = len          # 暂无使用
         self.start = start
@@ -47,7 +47,7 @@ class LaneMng:
         self.cellLen = cellLen
         self.cells = self._initCells(clbCell)
 
-    def _initCells(self, clbCell: dict) -> dict:
+    def _initCells(self, clbCell: dict) -> Dict[int, CellMng]:
         '''function _initCells
         初始化车道元胞
         '''
@@ -58,7 +58,7 @@ class LaneMng:
         更新车道元胞缓存
         '''
         # 确定车辆所在元胞, 按元胞组织车辆
-        carsByCell = self._carsLocCell(cars)
+        carsByCell = self._carsByCell(cars)
         # 按元胞更新缓存
         for order in self.cells:
             self.cells[order].updateCache(carsByCell[order])
@@ -71,8 +71,8 @@ class LaneMng:
         for order in self.cells:
             self.cells[order].updateTraffic()
 
-    def _carsLocCell(self, cars: list) -> dict:
-        '''function _carsLocCell
+    def _carsByCell(self, cars: list) -> dict:
+        '''function _carsByCell
 
         input
         -----
@@ -81,7 +81,7 @@ class LaneMng:
 
         return
         ------
-        carsLocCell: dict
+        carsByCell: dict
             键为元胞序号order, 值为所分配车辆的列表, 无车辆则为空列表
 
         按照车道的start, end, cellLen,与车辆的YDecy属性,
@@ -107,7 +107,7 @@ class LaneMng:
         ------
         order: int
             车辆所在元胞序号
-        
+
         根据车道的start, end, cellLen,与车辆的YDecy属性,
         确定车辆所在元胞序号。
         '''
