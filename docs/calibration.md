@@ -10,7 +10,19 @@
 cell将直接根据y坐标确定。<br>
 横向速度将直接根据x计算。<br>
 
-
+# clb.yml格式
+range:
+    start: 200
+    len: 200
+    end: 0
+lanes:
+  1:
+    emgc: False
+    vDir:
+      x: 1
+      y: -1
+    coef: [1, 2, 3]
+    cells: [True, True, True, True]
 
 # 车道线计算分析
 **车道线计算是为了划分元胞。**暂无其他用途<br>
