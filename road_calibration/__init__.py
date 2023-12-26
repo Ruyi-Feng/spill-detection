@@ -1,5 +1,6 @@
 import yaml
-from road_calibration.algorithms import dbi, calQuartiles, poly2fit, poly2fitFrozen
+from road_calibration.algorithms import (
+    dbi, calQuartiles, poly2fit, poly2fitFrozen)
 import numpy as np
 
 
@@ -133,7 +134,6 @@ class Calibrator():
         lanesCoef = self.__calibLanes()
         print(lanesCoef)
 
-
     def __calibVDir(self) -> dict:
         '''class function __calibVDir
 
@@ -209,10 +209,10 @@ class Calibrator():
             返回内侧车道ID号
         extID: int
             返回外侧车道ID号
-        
-        计算除应急车道的2个边界车道的轨迹点的分散程度, 
+
+        计算除应急车道的2个边界车道的轨迹点的分散程度,
         从而确定内侧车道ID号与外侧车道ID号。
-        一般来说, 内侧车道距离较短, 车辆轨迹点范围分布较集中, 
+        一般来说, 内侧车道距离较短, 车辆轨迹点范围分布较集中,
         外侧车道距离较长, 车辆轨迹点范围分布较分散。
         '''
         # 考量紧急车道内侧的2个车道, 点分散程度大的的车道为外侧车道
@@ -238,12 +238,12 @@ class Calibrator():
                 continue
             featPoints = calQuartiles(self.xyByLane[id])
             self.laneProps[id].update({'fp': featPoints})
-        
+
         # 拟合laneExt车道线方程
         lanesCoef = dict()
-        # extCoef = poly2fit(np.array(self.laneProps[self.extID]['fp']))
-        # TODO
-        extCoef = poly2fit(np.array(self.xyByLane[self.extID]))
+        # 实验验证: 采用四分位特征点拟合效果优于直接用轨迹点拟合
+        extCoef = poly2fit(np.array(self.laneProps[self.extID]['fp']))
+        # extCoef = poly2fit(np.array(self.xyByLane[self.extID]))
         lanesCoef[self.extID] = extCoef
 
         # 拟合其他非应急车道的车道线方程
@@ -251,11 +251,11 @@ class Calibrator():
             if (id in self.emgcIDs) | (id == self.extID):
                 continue
             # 以extCoef为初始值拟合
-            # a = poly2fitFrozen(np.array(self.laneProps[id]['fp']), extCoef[0])
-            # TODO
-            a = poly2fitFrozen(np.array(self.xyByLane[id]), extCoef[0])
+            # 实验验证: 采用四分位特征点拟合效果优于直接用轨迹点拟合
+            a = poly2fitFrozen(np.array(self.laneProps[id]['fp']), extCoef[0])
+            # a = poly2fitFrozen(np.array(self.xyByLane[id]), extCoef[0])
             lanesCoef[id] = a
-        
+
         # 拟合应急车道的车道线方程
         intCoef = lanesCoef[self.intID]
         d = (self.laneWidth + self.emgcWidth) / 2   # 边界车道-应急车道距离
@@ -281,7 +281,6 @@ class Calibrator():
             lanesCoef[self.emgcIDs[1]] = np.array(aIntEmgc)
 
         return lanesCoef
-
 
     def save(self):
         '''class function save

@@ -16,10 +16,10 @@ def trajXYPlot():
     # 画图
     plt.figure(figsize=(16, 16))
     plt.scatter([0], [0], s=100, c="red", marker="o")  # 标注雷达原点
-    # plt.scatter(data[data.columns[xIndex]], data[data.columns[yIndex]], s = 1)
-    for group, df_group in data.groupby(colLane):
+    # plt.scatter(data[data.columns[xIndex]], data[data.columns[yIndex]], s=1)
+    for group, dfLane in data.groupby(colLane):
         # 加alpha会变糊
-        plt.scatter(df_group[colX], df_group[colY], label=group, s=1, alpha=0.5)
+        plt.scatter(dfLane[colX], dfLane[colY], label=group, s=1, alpha=0.5)
 
     # 添加元素
     plt.xlabel("x/m")

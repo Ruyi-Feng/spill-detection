@@ -1,6 +1,7 @@
 from traffic_manager.cell_manager import CellMng
 from typing import Dict
 
+
 class LaneMng:
     '''class Lane
     按照车道管理车道属性和交通流参数

@@ -12,7 +12,7 @@ class CellMng:
         元胞是否有效
     len : float
         元胞长度
-    start : float   
+    start : float
         元胞起始位置
     end : float
         元胞结束位置
@@ -35,7 +35,7 @@ class CellMng:
     maxCache: int
         max cache, 缓存最长时间, 超出此时间的缓存被清除
     '''
-    def __init__(self, laneID: int, order: int, valid: bool, 
+    def __init__(self, laneID: int, order: int, valid: bool,
                  len: float, start: float, end: float,
                  tt: float, fps: float, qs: float, r2: float,
                  maxCache: float):
@@ -49,7 +49,7 @@ class CellMng:
             元胞在车道中的序号
         valid : bool
             元胞是否有效
-        len : float 
+        len : float
             元胞长度
         start : float
             元胞起始位置
@@ -100,7 +100,7 @@ class CellMng:
         1. 更新元胞缓存, 将已确定归属于该元胞的车辆目标, 更新到vCache中。
         2. 要更新danger。
         若当前帧没有车辆处于该cell, 则以空占位,
-        保证在没有时间戳索引的情况下, 能够用list自身的索引代替时间戳, 
+        保证在没有时间戳索引的情况下, 能够用list自身的索引代替时间戳,
         空数据能够占位代表过去了1个时间戳。
         '''
         # 缓存

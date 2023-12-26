@@ -61,7 +61,7 @@ class TrafficMng():
         lanes: dict
             车道管理器, 按照车道管理车道属性和交通流参数
         '''
-        
+
         pass
 
     def update(self, cars):
@@ -104,7 +104,7 @@ class TrafficMng():
             self.lanes[id].updateTraffic()
         # 更新整个路段的交通流量
         self._updateQ()
-    
+
     def _updateQ(self):
         '''function _updateQ
 
@@ -127,7 +127,7 @@ class TrafficMng():
         ------
         carsByLane: dict
             键为车道id, 值为所分配车辆的列表, 无车辆则为空列表
-        
+
         确定车辆所在车道, 按车道组织车辆, 车道号大于100则减去100。
         '''
         carsByLane = {i.ID: [] for i in self.lanes}
