@@ -1,7 +1,7 @@
 import yaml
+import numpy as np
 from road_calibration.algorithms import (
     dbi, calQuartiles, poly2fit, poly2fitFrozen)
-import numpy as np
 
 
 class Calibrator():
@@ -49,19 +49,16 @@ class Calibrator():
         self.emgcWidth = emgcWidth              # 应急车道宽度
         # 暂存传感器数据
         self.xyByLane = dict()                      # 按lane存储xy
-        self.vxyCount = {'x': 0, 'y': 0}        # 存储所有vxy的正负计数
-        # 暂存标定结果
-        # 基础正方向与车道ID
-        self.vDir = dict()
+        self.vxyCount = dict()        # 按lane存储所有vxy的正负计数
+        # 车道ID与运动正方向
         self.laneIDs = []
         self.emgcIDs = []
+        self.vDir = dict()
         # 车道线方程
         self.xyMinMax = dict()                # 按lane存储xy的最大最小值
-        self.totalXYMinMax = []           # 存储所有lane的xy最大最小值
-        # 车道暂存属性
-        self.laneProps = dict()                # 暂存lane的计算属性与结果
-        # cell切割线方程
-        self.SliceLines = []
+        self.globalXYMinMax = []            # 存储所有lane的xy最大最小值
+        self.polyPts = dict()                   # 暂存lane的四分位特征点
+        self.coef = dict()                      # 暂存lane的曲线方程系数
 
     def recieve(self, msg):
         '''class function recieve
@@ -88,68 +85,45 @@ class Calibrator():
             #         del target[k]
             #     print(target, ',', sep='')
 
-            if target['LineNum'] >= 100:
-                continue    # 换道过程中的车辆，非标准车道编号的不计入标定
+            laneID = target['LineNum'] - 100 if target['LineNum'] > 100 \
+                else target['LineNum']
 
-            # 更新xyByLane
-            if target['LineNum'] not in self.xyByLane:
-                self.xyByLane[target['LineNum']] = []
-
-            self.xyByLane[target['LineNum']].append(
-                [target['XDecx'], target['YDecy']])
-
+            # 分配dict索引
+            if laneID not in self.xyByLane:
+                self.xyByLane[laneID] = []
+                self.vxyCount[laneID] = {'x': 0, 'y': 0}
+            # 存储vxy
+            self.xyByLane[laneID].append([target['XDecx'], target['YDecy']])
             # 更新vxyCount
             if target['VDecVx'] > 0:
-                self.vxyCount['x'] += 1
+                self.vxyCount[laneID]['x'] += 1
             elif target['VDecVx'] < 0:
-                self.vxyCount['x'] -= 1
+                self.vxyCount[laneID]['x'] -= 1
             if target['VDecVy'] > 0:
-                self.vxyCount['y'] += 1
+                self.vxyCount[laneID]['y'] += 1
             elif target['VDecVy'] < 0:
-                self.vxyCount['y'] -= 1
+                self.vxyCount[laneID]['y'] -= 1
 
     def calibrate(self):
         '''class function calibrate
 
         根据calibrator的属性计算标定结果。
         '''
-        self.calibration = dict()
-        # 确定运动正方向
-        dir = self.__calibVDir()
-        self.vDir = dir
         # 确定车道ID
-        ids, emgc = self.__calibLaneIDs()
-        self.laneIDs = ids
-        self.emgcIDs = emgc
-        self.laneProps = {id: dict() for id in ids}
-        # 计算各lane的xy最大最小值
-        xyMinMax, totalXYMinMax = self.__calibXYMinMax()
-        self.xyMinMax = xyMinMax
-        self.totalXYMinMax = totalXYMinMax
+        self.laneIDs, self.emgcIDs = self._calibLaneIDs()
         # 标定内外侧车道线ID
-        intID, extID = self.__calibIELanes()
-        self.intID = intID
-        self.extID = extID
+        self.intID, self.extID = self._calibIELaneID()
+        # 确定运动正方向
+        self.vDir = self._calibVDir()
+        # 计算各lane的xy最大最小值
+        self.xyMinMax, self.globalXYMinMax = self._calibXYMinMax()
+        # 计算各lane轨迹四分位特征点
+        self.polyPts = self._calibPolyPts()
         # 计算车道线方程
-        lanesCoef = self.__calibLanes()
-        print(lanesCoef)
+        self.coef = self._calibLanes()
 
-    def __calibVDir(self) -> dict:
-        '''class function __calibVDir
-
-        return
-        ----------
-        返回运动正方向, dict格式, {'x': 1, 'y': 1}。
-        '''
-        dir = {'x': 1, 'y': 1}
-        if self.vxyCount['x'] < 0:
-            dir['x'] = -1
-        if self.vxyCount['y'] < 0:
-            dir['y'] = -1
-        return dir
-
-    def __calibLaneIDs(self) -> (list, list):
-        '''class function __calibLanes
+    def _calibLaneIDs(self) -> (list, list):
+        '''class function _calibLanes
 
         return
         ----------
@@ -174,34 +148,8 @@ class Calibrator():
         emgc = [1, m]
         return ids, emgc
 
-    def __calibXYMinMax(self):
-        '''class function __calibXYMinMax
-
-        对各lane的xyByLane分别以x或y排序, 得到最大最小值, 存储到self.xyMinMax。
-        self.xyMinMax索引为laneID, 值为[xmin, xmax, ymin, ymax]。
-        并对所有lane得到的xyMinMax再次排序, 得到最大最小值, 存储到self.totalXYMinMax。
-        self.totalXYMinMax值为[xmin, xmax, ymin, ymax]。
-        '''
-        xyMinMax = dict()
-        totalXYMinMax = [0, 0, 0, 0]
-        # 对各lane的xyByLane分别以x或y排序, 得到最大最小值, 存储到self.xyMinMax
-        for lane in self.xyByLane:
-            # 以x排序
-            self.xyByLane[lane].sort(key=lambda x: x[0])
-            xmin, xmax = self.xyByLane[lane][0][0], self.xyByLane[lane][-1][0]
-            # 以y排序
-            self.xyByLane[lane].sort(key=lambda x: x[1])
-            ymin, ymax = self.xyByLane[lane][0][1], self.xyByLane[lane][-1][1]
-            # 存储
-            xyMinMax[lane] = [xmin, xmax, ymin, ymax]
-            totalXYMinMax[0] = min(totalXYMinMax[0], xmin)
-            totalXYMinMax[1] = max(totalXYMinMax[1], xmax)
-            totalXYMinMax[2] = min(totalXYMinMax[2], ymin)
-            totalXYMinMax[3] = max(totalXYMinMax[3], ymax)
-        return xyMinMax, totalXYMinMax
-
-    def __calibIELanes(self):
-        '''class function __calibIELanes
+    def _calibIELaneID(self):
+        '''class function _calibIELaneID
 
         return
         ----------
@@ -224,8 +172,77 @@ class Calibrator():
             intID, extID = laneN_1, lane2
         return intID, extID
 
-    def __calibLanes(self):
-        '''class function __calibLanes
+    def _calibVDir(self) -> dict:
+        '''class function _calibVDir
+
+        return
+        ----------
+        返回运动正方向, dict格式, {'x': 1, 'y': 1}。
+        '''
+        dirDict = dict()
+        # 确定非应急车道速度正方向
+        for id in self.laneIDs:
+            if id in self.emgcIDs:
+                continue    # 跳过应急车道, 轨迹点数量少不具有代表性
+            dir = {'x': 1, 'y': 1}
+            if self.vxyCount[id]['x'] < 0:
+                dir['x'] = -1
+            if self.vxyCount[id]['y'] < 0:
+                dir['y'] = -1
+            dirDict[id] = dir
+        # 确定应急车道速度正方向
+        for id in self.emgcIDs:
+            if id == 1:
+                dirDict[id] = dirDict[id+1]  # 1号车道与2号车道同向
+            else:
+                dirDict[id] = dirDict[id-1]  # 最大车道与倒数第二车道同向    
+        return dirDict
+
+    def _calibXYMinMax(self):
+        '''class function _calibXYMinMax
+
+        对各lane的xyByLane分别以x或y排序, 得到最大最小值, 存储到self.xyMinMax。
+        self.xyMinMax索引为laneID, 值为[xmin, xmax, ymin, ymax]。
+        并对所有lane得到的xyMinMax再次排序, 得到最大最小值, 存储到self.globalXYMinMax。
+        self.globalXYMinMax值为[xmin, xmax, ymin, ymax]。
+        '''
+        xyMinMax = dict()
+        globalXYMinMax = [0, 0, 0, 0]
+        # 对各lane的xyByLane分别以x或y排序, 得到最大最小值, 存储到self.xyMinMax
+        for lane in self.xyByLane:
+            # 以x排序
+            self.xyByLane[lane].sort(key=lambda x: x[0])
+            xmin, xmax = self.xyByLane[lane][0][0], self.xyByLane[lane][-1][0]
+            # 以y排序
+            self.xyByLane[lane].sort(key=lambda x: x[1])
+            ymin, ymax = self.xyByLane[lane][0][1], self.xyByLane[lane][-1][1]
+            # 存储
+            xyMinMax[lane] = [xmin, xmax, ymin, ymax]
+            globalXYMinMax[0] = min(globalXYMinMax[0], xmin)
+            globalXYMinMax[1] = max(globalXYMinMax[1], xmax)
+            globalXYMinMax[2] = min(globalXYMinMax[2], ymin)
+            globalXYMinMax[3] = max(globalXYMinMax[3], ymax)
+        return xyMinMax, globalXYMinMax
+
+    def _calibPolyPts(self) -> dict:
+        '''class function _calibPolyPts
+
+        return
+        ----------
+        polyPts: dict
+            返回车道特征点, dict格式, {laneID: [list]}。
+            元素为一个lane轨迹点的四分位特征点, shape=(5, 2)。
+        '''
+        polyPts = dict()
+        for id in self.laneIDs:
+            if id in self.emgcIDs:
+                continue
+            featPoints = calQuartiles(self.xyByLane[id])
+            polyPts.update({id: featPoints})
+        return polyPts
+
+    def _calibLanes(self):
+        '''class function _calibLanes
 
         return
         ----------
@@ -233,16 +250,12 @@ class Calibrator():
         利用存储的轨迹点信息, 计算车道特征点, 拟合出车道方程
         '''
         # 计算非应急车道的特征点
-        for id in self.laneIDs:
-            if id in self.emgcIDs:
-                continue
-            featPoints = calQuartiles(self.xyByLane[id])
-            self.laneProps[id].update({'fp': featPoints})
+        
 
         # 拟合laneExt车道线方程
         lanesCoef = dict()
         # 实验验证: 采用四分位特征点拟合效果优于直接用轨迹点拟合
-        extCoef = poly2fit(np.array(self.laneProps[self.extID]['fp']))
+        extCoef = poly2fit(np.array(self.polyPts[self.extID]))
         # extCoef = poly2fit(np.array(self.xyByLane[self.extID]))
         lanesCoef[self.extID] = extCoef
 
@@ -252,7 +265,7 @@ class Calibrator():
                 continue
             # 以extCoef为初始值拟合
             # 实验验证: 采用四分位特征点拟合效果优于直接用轨迹点拟合
-            a = poly2fitFrozen(np.array(self.laneProps[id]['fp']), extCoef[0])
+            a = poly2fitFrozen(np.array(self.polyPts[id]), extCoef[0])
             # a = poly2fitFrozen(np.array(self.xyByLane[id]), extCoef[0])
             lanesCoef[id] = a
 
@@ -288,70 +301,21 @@ class Calibrator():
         将标定结果保存到self.clbPath。
         '''
         traffic = dict()
-        traffic['Q'] = 0
-        traffic['vDir'] = self.vDir
-        traffic['lnMng'] = dict()
+        traffic['range'] = {'start': 0, 'len': 0, 'end': 0}
+        traffic['lanes'] = dict()
 
-        for id in range(self.emgcIDs[0], self.emgcIDs[1] + 1):
-
-            traffic['lnMng'][id] = {
-                'id': id,
-                'len': 0,   # 待写入
-                'emgc': False,  # 待写入
-                'q': 0,
-                'k': 0,
-                'v': 0,
-                'cells': self.__emptyCells(range(self.emgcIDs[0],
-                                                 self.emgcIDs[1]+1),
-                                           [True]*len(self.laneIDs)),   # 待写入
-                'coef': []     # 待写入
-            }
+        for id in self.laneIDs:
+            laneClb = { 'emgc': False,
+                       'vDir': {'x': 0, 'y': 0},
+                       'coef': [0, 0, 0],
+                       'cells': [True]}
+            if id in self.emgcIDs:
+                laneClb['emgc'] = True
 
         with open(self.clbPath, 'w') as f:
             yaml.dump(traffic, f)
 
         return traffic
-
-    def __emptyCells(self, orders: list, valid: list) -> dict:
-        '''class function __emptyCells
-
-        input
-        ----------
-        orders: list
-            元胞编号。
-        valid: list
-            元胞是否有效。
-
-        return
-        ----------
-        返回一个空元胞列表。
-        '''
-        cells = dict()
-        for i in range(len(orders)):
-            cells[orders[i]] = (self.__emptyCell(orders[i], valid[i]))
-        return cells
-
-    def __emptyCell(self, order: int = 0, valid: bool = True) -> dict:
-        '''class function __emptyCell
-
-        input
-        ----------
-        order: int
-            元胞编号。
-
-        return
-        ----------
-        返回一个空元胞。
-        '''
-        return {
-            'order': order,
-            'valid': valid,
-            'q': 0,
-            'k': 0,
-            'v': 0,
-            'vCache': [],
-            'danger': 0.0
-        }
 
 
 if __name__ == '__main__':
