@@ -4,7 +4,7 @@ import yaml
 from road_calibration import Calibrator
 from message_driver import Driver
 import pre_processing
-from traffic_manager import TrafficManager
+from traffic_manager import TrafficMng
 from event_detection import EventDetector
 
 
@@ -133,9 +133,9 @@ class Controller:
         # 运行管理器
         drv = Driver()
         self.drv = drv
-        tfm = TrafficManager(self.config['fps'],
-                             self.config['q_cal_duration'],
-                             self.config['cal_interval'])
+        tfm = TrafficMng(self.config['fps'],
+                         self.config['q_cal_duration'],
+                         self.config['cal_interval'])
         self.tfm = tfm
         edt = EventDetector(self.config['fps'], self.clb,
                             self.config['event_types'],

@@ -64,6 +64,7 @@ def dbi(xys: np.ndarray):
     dbi = math.sqrt(avgDist)
     return dbi
 
+
 def poly2fit(data: np.ndarray) -> np.ndarray:
     '''func poly2fit
 

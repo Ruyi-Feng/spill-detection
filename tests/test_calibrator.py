@@ -24,7 +24,7 @@ def test_calibrator():
 
     # 生成标定器
     clbPath = './road_calibration/clb.yml'
-    calibrator = Calibrator(clbPath, 
+    calibrator = Calibrator(clbPath,
                             fps=config['fps'],
                             laneWidth=config['calib']['lane_width'],
                             emgcWidth=config['calib']['emgc_width'],

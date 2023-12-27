@@ -214,7 +214,7 @@ class Calibrator():
                 dirDict[id] = tmp  # 1号车道与2号车道同向
             else:
                 tmp = dirDict[id-1].copy()  # 为保存文件不出现乱码, 使用copy
-                dirDict[id] = tmp  # 最大车道与倒数第二车道同向    
+                dirDict[id] = tmp  # 最大车道与倒数第二车道同向
         return dirDict
 
     def _calibXYMinMax(self):
@@ -355,12 +355,11 @@ class Calibrator():
         将标定结果保存到self.clbPath。
         '''
         traffic = dict()
-        traffic['range'] = {'start': self.globalXYMinMax[2],
-                            'len': self.globalXYMinMax[3] - self.globalXYMinMax[2],
-                            'end': self.globalXYMinMax[3]}
+        ymin, ymax = self.globalXYMinMax[2], self.globalXYMinMax[3]
+        traffic['range'] = {'start': ymin, 'len': ymax - ymin, 'end': ymax}
         traffic['lanes'] = dict()
         for id in self.laneIDs:
-            laneClb = { 'emgc': False if id not in self.emgcIDs else True,
+            laneClb = {'emgc': False if id not in self.emgcIDs else True,
                        'vDir': self.vDir[id],
                        'coef': [round(x*1000)/1000 for x in self.coef[id]],
                        'cells': self.cells[id]
