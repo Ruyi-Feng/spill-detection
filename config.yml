@@ -1,11 +1,11 @@
 
 fps: 20
-laneWidth: 3.75
-emgcWidth: 3.5
 calib:
   if_recalib: false
   calib_seconds: 600
-  d_cell: 50
+  laneWidth: 3.75
+  emgcWidth: 3.5
+  cell_len: 50
   q_merge: 0
 prepro:
   max_complete_frames: 20
