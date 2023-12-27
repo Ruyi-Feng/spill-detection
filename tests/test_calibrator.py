@@ -1,5 +1,6 @@
 from rsu_simulator import Smltor
 from road_calibration import Calibrator
+import yaml
 
 
 def test_calibrator():
@@ -16,9 +17,19 @@ def test_calibrator():
     6. 标定器保存
     '''
 
+    # 读取配置文件
+    configPath = './config.yml'
+    with open(configPath, 'r') as f:
+        config = yaml.load(f, Loader=yaml.FullLoader)
+
     # 生成标定器
     clbPath = './road_calibration/clb.yml'
-    calibrator = Calibrator(clbPath)
+    calibrator = Calibrator(clbPath, 
+                            fps=config['fps'],
+                            laneWidth=config['calib']['lane_width'],
+                            emgcWidth=config['calib']['emgc_width'],
+                            cellLen=config['calib']['cell_len'],
+                            qMerge=config['calib']['q_merge'])
 
     # 生成仿真器
     dataPath = './data/result.txt'
