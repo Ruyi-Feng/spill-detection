@@ -1,7 +1,7 @@
 import yaml
 import numpy as np
 from road_calibration.algorithms import (
-    dbi, calQuartiles, poly2fit, poly2fitFrozen)
+    dbi, calQuartiles, poly2fit, poly2fitFrozen, cutPts)
 
 
 class Calibrator():
@@ -28,37 +28,50 @@ class Calibrator():
     生成标定器，用于标定检测区域的有效行驶片区和应急车道。
     '''
 
-    def __init__(self, clbPath: str, laneWidth: float = 3.75,
-                 emgcWidth: float = 3.5):
+    def __init__(self, clbPath: str, fps: float,
+                 laneWidth: float = 3.75, emgcWidth: float = 3.5,
+                 cellLen: float = 50.0, qMerge: float = 0):
         '''class function __init__
 
         input
         ----------
         clbPath: str
             标定结果保存路径。
+        fps: float
+            帧率。
         laneWidth: float
             车道宽度。
         emgcWidth: float
             应急车道宽度。
+        cellLen: float
+            元胞长度。
+        qMerge: float
+            判定元胞为合流区域的流量, 小于qMerge判定该cell不可用。
 
         生成标定器，用于标定检测区域的有效行驶片区和应急车道。
         '''
         # 初始化属性
         self.clbPath = clbPath                  # 标定结果保存路径
+        self.fps = fps                          # 帧率
         self.laneWidth = laneWidth              # 车道宽度
         self.emgcWidth = emgcWidth              # 应急车道宽度
+        self.cellLen = cellLen                  # 元胞长度
+        self.qMerge = qMerge                    # 判定元胞为合流区域的流量
+        self.count = 0                          # 计数
         # 暂存传感器数据
-        self.xyByLane = dict()                      # 按lane存储xy
-        self.vxyCount = dict()        # 按lane存储所有vxy的正负计数
+        self.xyByLane = dict()                  # lane索引的xy
+        self.vxyCount = dict()                  # lane索引的vxy的正负计数
         # 车道ID与运动正方向
         self.laneIDs = []
         self.emgcIDs = []
         self.vDir = dict()
         # 车道线方程
-        self.xyMinMax = dict()                # 按lane存储xy的最大最小值
-        self.globalXYMinMax = []            # 存储所有lane的xy最大最小值
-        self.polyPts = dict()                   # 暂存lane的四分位特征点
-        self.coef = dict()                      # 暂存lane的曲线方程系数
+        self.xyMinMax = dict()                  # lane索引的xy的最大最小值
+        self.globalXYMinMax = []    # 全局xy最大最小值[xmin,max, ymin,max]
+        self.polyPts = dict()                     # lane索引的四分位特征点
+        self.coef = dict()                        # lane索引的曲线方程系数
+        # 元胞
+        self.cells = dict()                       # lane索引的元胞有效无效列表
 
     def recieve(self, msg):
         '''class function recieve
@@ -70,6 +83,7 @@ class Calibrator():
 
         接受每帧传输来的目标信息, 更新给calibrator
         '''
+        self.count += 1
         for target in msg:
             # if target['TargetId'] == 7390:
             #     # {'TargetId': 5087, 'XDecx': 2.57, 'YDecy': 7, 'ZDecz': 0,
@@ -88,7 +102,7 @@ class Calibrator():
             laneID = target['LineNum'] - 100 if target['LineNum'] > 100 \
                 else target['LineNum']
 
-            # 分配dict索引
+            # 分配dict索引()
             if laneID not in self.xyByLane:
                 self.xyByLane[laneID] = []
                 self.vxyCount[laneID] = {'x': 0, 'y': 0}
@@ -121,6 +135,8 @@ class Calibrator():
         self.polyPts = self._calibPolyPts()
         # 计算车道线方程
         self.coef = self._calibLanes()
+        # 划分元胞
+        self.cells = self._calibCells()
 
     def _calibLaneIDs(self) -> (list, list):
         '''class function _calibLanes
@@ -249,9 +265,6 @@ class Calibrator():
 
         利用存储的轨迹点信息, 计算车道特征点, 拟合出车道方程
         '''
-        # 计算非应急车道的特征点
-        
-
         # 拟合laneExt车道线方程
         lanesCoef = dict()
         # 实验验证: 采用四分位特征点拟合效果优于直接用轨迹点拟合
@@ -295,6 +308,44 @@ class Calibrator():
 
         return lanesCoef
 
+    def _calibCells(self):
+        '''class function _calibCells
+
+        return
+        ----------
+        cells: dict
+            返回元胞有效无效列表, dict格式, {laneID: [list]}。
+            元素为一个lane的元胞有效无效列表,如[True, True, False]。
+            对于双向道路, 标定出的cells有效否的顺序, 为沿着车道向前行驶的正方向。
+        '''
+        # 按全局y最大最小值与元胞长度划分元胞
+        ymin, ymax = self.globalXYMinMax[2], self.globalXYMinMax[3]
+        pts = cutPts(ymin, ymax, self.cellLen)   # 元胞划分点包括起点终点
+        cellNum = len(pts) - 1                   # 元胞数量
+
+        # 各lane将xy点分配到元胞顺序计数
+        cellCount = dict()
+        for id in self.laneIDs:
+            count = [0] * cellNum
+            for xy in self.xyByLane[id]:
+                # 根据y大于等于划分点的数量, 确定元胞编号
+                order = np.sum(xy[1] >= pts)
+                count[order] += 1
+            cellCount[id] = count
+
+        cells = dict()
+        for id in self.laneIDs:
+            # 计算各元胞在一小时内的经过车辆数
+            valid = []
+            for i in range(cellNum):
+                q = cellCount[id][i] / (self.count / self.fps) * 3600
+                valid.append(True if q >= self.qMerge else False)
+            # 对于y运动方向为负的车道, 元胞列表反向(默认从ymin到ymax划分为正向)
+            if self.vDir[id]['y'] < 0:
+                valid.reverse()
+            cells[id] = valid
+        return cells
+
     def save(self):
         '''class function save
 
@@ -303,14 +354,13 @@ class Calibrator():
         traffic = dict()
         traffic['range'] = {'start': 0, 'len': 0, 'end': 0}
         traffic['lanes'] = dict()
-
         for id in self.laneIDs:
-            laneClb = { 'emgc': False,
-                       'vDir': {'x': 0, 'y': 0},
-                       'coef': [0, 0, 0],
-                       'cells': [True]}
-            if id in self.emgcIDs:
-                laneClb['emgc'] = True
+            laneClb = { 'emgc': False if id not in self.emgcIDs else True,
+                       'vDir': self.vDir[id],
+                       'coef': self.coef[id],
+                       'cells': self.cells[id]
+                       }
+            traffic['lanes'].update({id: laneClb})
 
         with open(self.clbPath, 'w') as f:
             yaml.dump(traffic, f)
@@ -321,7 +371,7 @@ class Calibrator():
 if __name__ == '__main__':
     # 生成标定器
     clbPath = './calibration/clb.yml'
-    calibrator = Calibrator(clbPath)
+    calibrator = Calibrator(clbPath, 20)
     calibrator.emgcIDs = [1, 8]
     calibrator.laneIDs = [1, 2, 3, 4, 5, 6, 7, 8]
 
