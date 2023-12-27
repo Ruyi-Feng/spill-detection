@@ -61,8 +61,11 @@ class Controller:
             print('开始标定过程')
             # 没有config或者配置需要则标定
             self.needClb = True
-            clbtor = Calibrator(clbPath=clbPath, laneWidth=config['laneWidth'],
-                                emgcWidth=config['emgcWidth'])
+            clbtor = Calibrator(clbPath=clbPath, fps=config['fps'],
+                                laneWidth=config['calib']['laneWidth'],
+                                emgcWidth=config['calib']['emgcWidth'],
+                                cellLen=config['calib']['cell_len'],
+                                qMerge=config['calib']['q_merge'])
             self.clbtor = clbtor
         else:   # 有config则读取, 不需要标定
             print('开始接收数据')
