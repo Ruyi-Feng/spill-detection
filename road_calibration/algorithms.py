@@ -64,23 +64,6 @@ def dbi(xys: np.ndarray):
     dbi = math.sqrt(avgDist)
     return dbi
 
-
-if __name__ == '__main__':
-    # 测试calQuartiles
-    points = [[i, i] for i in range(21, 0, -2)]
-    q = calQuartiles(points)
-    print(q)
-
-    # 测试dbi
-    xys = np.array([[1, 1], [2, 2], [3, 3]])
-    d = dbi(xys)
-    print(d)
-
-    xys = np.array([[1, 1], [1, 1], [1, 1]])
-    d = dbi(xys)
-    print(d)
-
-
 def poly2fit(data: np.ndarray) -> np.ndarray:
     '''func poly2fit
 
@@ -155,3 +138,49 @@ def poly2fitFrozen(data: np.ndarray, a2: float) -> np.ndarray:
     a[1] = bc[0]
     a[2] = bc[1]
     return a
+
+
+def cutPts(start: float, end: float, len: float) -> np.ndarray:
+    '''func cutPts
+
+    input
+    ----------
+    start: float
+        起始位置
+    end: float
+        终止位置
+    len: float
+        元胞长度
+
+    return
+    ----------
+    pts: list
+        切割点, shape=(n,)
+
+    给定起始位置、终止位置、元胞长度, 返回切割点。
+    若最后一个切割点到end的长度不足len, 会从该位置继续增加len长度,
+    不受到end的限制。返回list中包括start和end。
+    '''
+    pts = []
+    pt = start
+    while pt < end:
+        pts.append(pt)
+        pt += len
+    pts.append(pt)
+    return np.array(pts)
+
+
+if __name__ == '__main__':
+    # 测试calQuartiles
+    points = [[i, i] for i in range(21, 0, -2)]
+    q = calQuartiles(points)
+    print(q)
+
+    # 测试dbi
+    xys = np.array([[1, 1], [2, 2], [3, 3]])
+    d = dbi(xys)
+    print(d)
+
+    xys = np.array([[1, 1], [1, 1], [1, 1]])
+    d = dbi(xys)
+    print(d)
