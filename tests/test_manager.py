@@ -1,5 +1,4 @@
 import yaml
-from message_driver import Driver
 from rsu_simulator import Smltor
 from traffic_manager import TrafficMng
 

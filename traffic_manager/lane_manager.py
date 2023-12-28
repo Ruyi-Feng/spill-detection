@@ -9,7 +9,7 @@ class LaneMng:
     def __init__(self, ID: int, emg: bool,
                  len: float, start: float, end: float,
                  vdir: int, coef: dict,
-                 cellLen: float, cellsValid: list, 
+                 cellLen: float, cellsValid: list,
                  config: dict, cacheRet: int):
         ''' function __init__
         input

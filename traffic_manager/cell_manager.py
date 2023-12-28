@@ -121,11 +121,10 @@ class CellMng:
 
         # 计算danger
         pass
-    
+
     def _updateDanger(self):
         '''function _updateDanger
 
         更新元胞存在抛洒物的危险性
         '''
         pass
-
