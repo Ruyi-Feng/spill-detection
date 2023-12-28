@@ -32,13 +32,13 @@ class CellMng:
         元胞存在抛洒物的危险性
     vCache : list
         元胞速度缓存, 按接收顺序索引
-    maxCache: int
-        max cache, 缓存最长时间, 超出此时间的缓存被清除
+    cacheRet: int
+        cache retention, 缓存最长时间, 超出此时间的缓存被清除, 单位: 帧
     '''
     def __init__(self, laneID: int, order: int, valid: bool,
                  len: float, start: float, end: float,
                  tt: float, fps: float, qs: float, r2: float,
-                 maxCache: float):
+                 cacheRet: float):
         '''function __init__
 
         input
@@ -56,15 +56,15 @@ class CellMng:
         end : float
             元胞结束位置
         tt : float
-            time interval, 元胞更新时间间隔, 单位: s
+            t tolerance, 用于影响元胞置信度时间增长率r1的时间容忍度, 单位: s
         fps : float
             frequency per second, 传感器采样频率
         qs : float
             q standard, 用于影响元胞置信度时间增长率r1的标准流量, 单位: veh/h
         r2 : float
             rate2, 过大横向速度和换道导致的前向元胞置信度增加值
-        maxCache: float
-            clear interval, 缓存最长时间, 超出此时间的缓存被清除
+        cacheRet: int
+            cache retention, 缓存最长时间, 超出此时间的缓存被清除, 单位: 帧
         '''
         # 基础属性
         self.laneID = laneID
@@ -85,7 +85,7 @@ class CellMng:
         self.danger = 0.0
         # 缓存
         self.vCache = []    # list内按顺序索引, 用dict反而会有遍历的消耗
-        self.maxCache = maxCache
+        self.cacheRet = cacheRet
 
     def updateCache(self, cars: list, t: int):
         '''function update
@@ -106,7 +106,7 @@ class CellMng:
         # 缓存
         self.vCache.append(cars)
         # 检查缓存长度, 清除过期缓存
-        if len(self.vCache) > self.maxCache:
+        if len(self.vCache) > self.cacheRet:
             self.vCache.pop(0)
         # 更新danger
         self.updateDanger()
