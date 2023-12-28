@@ -7,9 +7,10 @@ class LaneMng:
     按照车道管理车道属性和交通流参数
     '''
     def __init__(self, ID: int, emg: bool,
-                 len: float, start: float, end: float, vdir: int,
-                 coef: dict,
-                 cellLen: float, clbCell: dict):
+                 len: float, start: float, end: float,
+                 vdir: int, coef: dict,
+                 cellLen: float, cellsValid: list, 
+                 config: dict, cacheRet: int):
         ''' function __init__
         input
         -----
@@ -29,8 +30,12 @@ class LaneMng:
             车道标定参数
         cellLen: float
             元胞长度
-        clbCell: dict
-            元胞标定参数
+        cellsValid: list
+            元胞是否可用列表
+        config: dict
+            算法配置参数, 主要应用于cell生成
+        cacheRet: int
+            cache retention, 缓存保存时长, 单位: 帧
         '''
         # 基础属性
         self.ID = ID
@@ -46,13 +51,40 @@ class LaneMng:
         self.v = 0
         # 元胞属性
         self.cellLen = cellLen
-        self.cells = self._initCells(clbCell)
+        self.cellsValid = cellsValid
+        self.cacheRet = cacheRet
+        self.cells = self._initCells(config)
 
-    def _initCells(self, clbCell: dict) -> Dict[int, CellMng]:
+    def _initCells(self, config: dict) -> Dict[int, CellMng]:
         '''function _initCells
+
+        input
+        -----
+        config: dict
+            算法配置参数
+
+        return
+        ------
+        cells: dict
+            键为元胞序号order, 值为CellMng实例
+
         初始化车道元胞
         '''
-        pass
+        cells = {}
+        start = self.start
+        end = start + self.cellLen * self.vdir
+        for i in range(len(self.cellsValid)):
+            cells[i] = CellMng(self.ID, i, self.cellsValid[i],
+                               self.cellLen, start, end,
+                               config['event']['t_tolerance'],
+                               config['event']['fps'],
+                               config['event']['q_standard'],
+                               config['event']['rate2'],
+                               self.cacheRet)
+            start = end
+            end = start + self.cellLen * self.vdir
+            print(cells[i])
+        return cells
 
     def updateCache(self, cars: list):
         '''function updateCache
