@@ -38,14 +38,14 @@ class TrafficMng():
         '''
         # 参数
         self.fps = config['fps']
-        self.qd = config['traffic']['q_duraiton'] * self.fps        # 单位帧
+        self.qd = config['traffic']['q_duration'] * self.fps        # 单位帧
         self.itv = config['traffic']['cal_interval'] * self.fps     # 单位帧
         self.cacheRet = max(self.qd, self.itv)  # 缓存保存时长(/frame)
         self.cellLen = config['calib']['cell_len']   # 元胞长度
         # 状态属性
         self.Q = 0          # 存储整个路段的交通流量(单位: 辆/h)
         self.count = 0      # 接收计数，计算时若未达到qd等其他计算需求，手动进行比例计算
-        self.lanes = self._initLanes(clb)  # 车道管理器, 按照车道管理车道属性和交通流参数
+        self.lanes = self._initLanes(clb, config)  # 车道管理器, 按照车道管理车道属性和交通流参数
 
     def _initLanes(self, clb: dict, config: dict) -> Dict[int, LaneMng]:
         '''function _initLanes
@@ -54,26 +54,16 @@ class TrafficMng():
         -----
         clb: dict
             raod calibration, 标定的车道配置信息, 格式如下
-        {
-        1:
-            emgc: False
-            start: 200
-            len: 200
-            end: 0
-            vDir:
-                x: 1
-                y: -1
-            coef: [1, 2, 3]
-            cells: [True, True, True, True]
-        }
         config: dict
             算法配置参数
 
-        output
+        return
         ------
         lanes: dict
             车道管理器, 按照车道管理车道属性和交通流参数, 
             键为车道id, 值为LaneMng车道管理器实例
+        
+        生成车道管理器, 按照车道管理车道属性和交通流参数。
         '''
         lanes = {}
         for laneID in clb:
@@ -81,7 +71,8 @@ class TrafficMng():
             lm = LaneMng(laneID, lc['emgc'],
                          lc['len'], lc['start'], lc['end'],
                          lc['vDir']['y'], lc['coef'],
-                         lc['cells'], config, self.cacheRet)
+                         self.cellLen, lc['cells'],
+                         config, self.cacheRet)
             lanes[laneID] = lm
         return lanes
 
@@ -93,6 +84,7 @@ class TrafficMng():
         cars: list, 传感器数据, cars元素为代表一个车辆目标的dict。
 
         接收传感器数据, 更新缓存, 一定时间更新交通流参数。
+        该方法不直接返回数据, 各层次的交通数据通过直接调用实例本身获取。
         '''
         self.count += 1
         # 更新缓存数据
@@ -113,7 +105,7 @@ class TrafficMng():
         carsByLane = self._carsByLane(cars)  # dict按车道组织, 无车则空列表
         # 更新至各车道缓存
         for id in self.lanes:
-            self.lanes[id].updateCache(carsByLane[id])
+            self.lanes[id].updateCache(carsByLane[id], self.count)
 
     def _updateTraffic(self):
         '''function _updateTraffic
@@ -151,7 +143,7 @@ class TrafficMng():
 
         确定车辆所在车道, 按车道组织车辆, 车道号大于100则减去100。
         '''
-        carsByLane = {i.ID: [] for i in self.lanes}
+        carsByLane = {id: [] for id in self.lanes}
         for car in cars:
             laneID = car['LineNum'] - 100 if car['LineNum'] > 100 \
                 else car['LineNum']     # 大于100的减去100
