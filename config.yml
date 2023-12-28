@@ -11,7 +11,7 @@ prepro:
   max_complete_frames: 20
   smooth_alpha: 0.1
 traffic:
-  q_cal_duration: 300
+  q_duration: 300
   cal_interval: 30
 event:
   event_types: ["crowd", "high_speed", "illegal_occupation", "incident_single_car", "incident", "intensive_speed_reduction", "low_speed", "spill"]
