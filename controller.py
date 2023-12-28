@@ -130,32 +130,40 @@ class Controller:
 
         在完成标定或读取标定后启动管理器。
         '''
-        # 运行管理器
+        # 生成数据驱动器
         drv = Driver()
         self.drv = drv
-        tfm = TrafficMng(self.config)
-        self.tfm = tfm
+        # 生成交通管理器
+        tm = TrafficMng(self.clb, self.config)
+        self.tm = tm
+        # 生成事件检测器
         edt = EventDetector(self.config['fps'], self.clb,
-                            self.config['event_types'],
-                            self.config['vl'], self.config['vh'],
-                            self.config['tt'], self.config['r2'],
-                            self.config['dt'],
-                            self.config['dstc'], self.config['vc'],
-                            self.config['ai'], self.config['di'],
-                            self.config['dl'], self.config['dh'])
+                            self.config['event']['event_types'],
+                            self.config['event']['v_low'],
+                            self.config['event']['v_high'],
+                            self.config['event']['t_tolerance'],
+                            self.config['event']['q_standard'],
+                            self.config['event']['rate2'],
+                            self.config['event']['d_touch'],
+                            self.config['event']['density_crowd'],
+                            self.config['event']['v_crowd'],
+                            self.config['event']['a_intense'],
+                            self.config['event']['duration_intense'],
+                            self.config['event']['duration_low'],
+                            self.config['event']['duration_high'])
         self.edt = edt
 
     def run(self, msg: list):
         # 接受数据
-        msg = self.drv.recieve(msg)
+        cars = self.drv.recieve(msg)
         # 预处理
-        msg, traffic = pre_processing.preProcess(msg, self.trm)
+        cars = pre_processing.preProcess(cars, self.trm)
         # 交通流参数计算
-        traffic = pre_processing.traffic_calculate(msg, self.trm)
+        traffic = self.tm.update(cars)
         # 事件检测
-        msg = self.edt.run(msg, traffic)
+        cars = self.edt.run(cars, traffic)
         # 发送数据
-        msg = self.drv.send.send(msg)
+        msg = self.drv.send(cars)
         # print(msg)
 
     def _loadyaml(self, path: str) -> dict:
