@@ -133,9 +133,7 @@ class Controller:
         # 运行管理器
         drv = Driver()
         self.drv = drv
-        tfm = TrafficMng(self.config['fps'],
-                         self.config['q_cal_duration'],
-                         self.config['cal_interval'])
+        tfm = TrafficMng(self.config)
         self.tfm = tfm
         edt = EventDetector(self.config['fps'], self.clb,
                             self.config['event_types'],
