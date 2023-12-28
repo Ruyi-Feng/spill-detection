@@ -325,7 +325,7 @@ class Calibrator():
         ymin, ymax = self.globalXYMinMax[2], self.globalXYMinMax[3]
         pts = cutPts(ymin, ymax, self.cellLen)   # 元胞划分点包括起点终点
         cellNum = len(pts) - 1                   # 元胞数量
-        print('ymin, ymax, cellNum==',ymin, ymax, cellNum)
+
         # 各lane将xy点分配到元胞顺序计数
         cellCount = dict()
         for id in self.laneIDs:
@@ -335,8 +335,7 @@ class Calibrator():
                 order = np.sum(xy[1] >= pts) - 1
                 count[order] += 1
             cellCount[id] = count
-        print(self.xyMinMax)
-        print(cellCount)
+
         cells = dict()
         for id in self.laneIDs:
             # 计算各元胞在一小时内的经过车辆数
