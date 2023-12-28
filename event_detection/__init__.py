@@ -45,7 +45,8 @@ class EventDetector:
     '''
     def __init__(self, fps, clb, event_types=default_event_types,
                  vl: float = 2.778, vh: float = 33.33,
-                 tt: float = 300, r2: float = 0.1, dt: float = 5,
+                 tt: float = 300, qs: float = 10000,
+                 r2: float = 0.1, dt: float = 5,
                  dstc: float = 18, vc: float = 16.67,
                  ai: float = 3, di: float = 1,
                  dl: float = 5, dh: float = 5):
@@ -65,6 +66,8 @@ class EventDetector:
             v_high, 高速阈值, 单位m/s
         tt: float
             t_tolerance, 事件持续时间容忍度, 单位s
+        qs: float
+            q standard, 标准情况的道路通行流量, 单位v/h
         r2: float
             rate2, 抛洒物横向运动置信度增长率
         dt: float
@@ -86,7 +89,7 @@ class EventDetector:
         '''
         self.fps = fps
         self.clb = clb
-        self.config = {'vl': vl, 'vh': vh, 'tt': tt, 'r1': 1/tt,
+        self.config = {'vl': vl, 'vh': vh, 'tt': tt, 'qs': qs, 'r1': 1/tt,
                        'r2': r2, 'dt': dt, 'dstc': dstc, 'vc': vc,
                        'ai': ai, 'di': di, 'dl': dl, 'dh': dh}
         self.types = event_types
