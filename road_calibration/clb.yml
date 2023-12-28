@@ -1,18 +1,18 @@
 lanes:
   1:
     cells:
-    - true
-    - true
-    - true
-    - true
-    - true
-    - true
-    - true
-    - true
-    - true
-    - true
-    - true
-    - true
+    - false
+    - false
+    - false
+    - false
+    - false
+    - false
+    - false
+    - false
+    - false
+    - false
+    - false
+    - false
     - true
     - true
     - true
@@ -27,10 +27,10 @@ lanes:
       y: -1
   2:
     cells:
-    - true
-    - true
-    - true
-    - true
+    - false
+    - false
+    - false
+    - false
     - true
     - true
     - true
@@ -53,9 +53,9 @@ lanes:
       y: -1
   3:
     cells:
-    - true
-    - true
-    - true
+    - false
+    - false
+    - false
     - true
     - true
     - true
@@ -79,11 +79,11 @@ lanes:
       y: -1
   4:
     cells:
-    - true
-    - true
-    - true
-    - true
-    - true
+    - false
+    - false
+    - false
+    - false
+    - false
     - true
     - true
     - true
@@ -105,7 +105,7 @@ lanes:
       y: -1
   5:
     cells:
-    - true
+    - false
     - true
     - true
     - true
@@ -131,7 +131,7 @@ lanes:
       y: 1
   6:
     cells:
-    - true
+    - false
     - true
     - true
     - true
@@ -157,7 +157,7 @@ lanes:
       y: 1
   7:
     cells:
-    - true
+    - false
     - true
     - true
     - true
@@ -183,18 +183,18 @@ lanes:
       y: 1
   8:
     cells:
+    - false
+    - false
+    - true
+    - false
+    - false
+    - false
+    - true
+    - false
     - true
     - true
     - true
-    - true
-    - true
-    - true
-    - true
-    - true
-    - true
-    - true
-    - true
-    - true
+    - false
     - true
     - true
     - true
