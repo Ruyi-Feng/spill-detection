@@ -109,7 +109,7 @@ class CellMng:
         if len(self.vCache) > self.cacheRet:
             self.vCache.pop(0)
         # 更新danger
-        self.updateDanger()
+        self._updateDanger()
 
     def updateTraffic(self):
         # TODO 每次更新交通参数, 更新rate1数值
@@ -121,3 +121,11 @@ class CellMng:
 
         # 计算danger
         pass
+    
+    def _updateDanger(self):
+        '''function _updateDanger
+
+        更新元胞存在抛洒物的危险性
+        '''
+        pass
+
