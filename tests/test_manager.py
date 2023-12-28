@@ -16,11 +16,9 @@ def testManager():
     with open(clbPath, 'r') as f:
         clb = yaml.load(f, Loader=yaml.FullLoader)
 
-    # 检查点1
-    # 生成驱动器
-    dr = Driver()
     # 生成仿真器
     sm = Smltor(dataPath)
+    # 检查点1
     # 生成交通管理器
     tm = TrafficMng(clb, config)
     # 开始运行
@@ -30,6 +28,7 @@ def testManager():
             break
         if type(msg) == str:
             continue
+        # TODO 检查点2
         # 交通管理器接受数据
         tm.update(msg)
 
