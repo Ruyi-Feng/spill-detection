@@ -11,12 +11,11 @@ cell将直接根据y坐标确定。<br>
 横向速度将直接根据x计算。<br>
 
 # clb.yml格式
-range:
+lanes:
+  1:
     start: 200
     len: 200
     end: 0
-lanes:
-  1:
     emgc: False
     vDir:
       x: 1

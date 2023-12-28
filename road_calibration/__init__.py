@@ -357,15 +357,22 @@ class Calibrator():
         '''
         traffic = dict()
         ymin, ymax = self.globalXYMinMax[2], self.globalXYMinMax[3]
-        traffic['range'] = {'start': ymin, 'len': ymax - ymin, 'end': ymax}
-        traffic['lanes'] = dict()
+        traffic = dict()
         for id in self.laneIDs:
+            # 确定起点终点
+            start, end = ymin, ymax
+            if self.vDir[id]['y'] < 0:
+                start, end = ymax, ymin
+            # 生成实例
             laneClb = {'emgc': False if id not in self.emgcIDs else True,
                        'vDir': self.vDir[id],
+                       'start': start,
+                       'len': abs(start - end),
+                       'end': end,
                        'coef': [round(x*1000)/1000 for x in self.coef[id]],
                        'cells': self.cells[id]
                        }
-            traffic['lanes'].update({id: laneClb})
+            traffic.update({id: laneClb})
 
         with open(self.clbPath, 'w') as f:
             yaml.dump(traffic, f)
