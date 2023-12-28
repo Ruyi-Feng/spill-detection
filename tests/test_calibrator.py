@@ -3,6 +3,7 @@ from road_calibration import Calibrator
 import yaml
 
 
+# 通过
 def test_calibrator():
     '''test function calibrator
 

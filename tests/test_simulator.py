@@ -1,6 +1,7 @@
 from rsu_simulator import Smltor
 
 
+# 通过
 def test_simulator():
     p = './data/result.txt'
     s = Smltor(p)
