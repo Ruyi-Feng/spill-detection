@@ -1,5 +1,5 @@
 from traffic_manager.lane_manager import LaneMng
-from typing import Dict
+from typing import Dict     # 引入以方便调用类方法
 
 
 class TrafficMng():
@@ -23,46 +23,67 @@ class TrafficMng():
         如果能拿到时间戳，利用时间戳计算会方便一些。
     lanes: dict
         车道管理器, 按照车道管理车道属性和交通流参数
+    cacheRet: int
+        cache retention, 缓存保存时长, 单位: 帧
 
     '''
-    def __init__(self, fps: float, qd: float, itv: float, clb: dict):
+    def __init__(self, clb: dict, config: dict):
         '''function __init__
         input
         -----
-        qd: float
-            QDuration, 用于计算小时交通流量的流量采样时长
-        itv: float
-            interval, 更新计算交通参数的间隔时间
-        fps: float
-            frequency per second, 传感器采样频率
         clb: dict
             raod calibration, 标定的车道配置信息
+        config: dict
+            算法配置参数
         '''
         # 参数
-        self.fps = fps           # 传感器采样频率
-        self.qd = qd * fps       # 用于计算小时交通流量的流量采样时长
-        self.itv = itv * fps     # 更新计算交通参数的间隔时间
-        self.clearItv = max(self.qd, self.itv)  # 清理周期, 保障数据清理前的计算
+        self.fps = config['fps']
+        self.qd = config['traffic']['q_duraiton'] * self.fps        # 单位帧
+        self.itv = config['traffic']['cal_interval'] * self.fps     # 单位帧
+        self.cacheRet = max(self.qd, self.itv)  # 缓存保存时长(/frame)
+        self.cellLen = config['calib']['cell_len']   # 元胞长度
         # 状态属性
         self.Q = 0          # 存储整个路段的交通流量(单位: 辆/h)
         self.count = 0      # 接收计数，计算时若未达到qd等其他计算需求，手动进行比例计算
         self.lanes = self._initLanes(clb)  # 车道管理器, 按照车道管理车道属性和交通流参数
 
-    def _initLanes(self, clb: dict) -> Dict[int, LaneMng]:
+    def _initLanes(self, clb: dict, config: dict) -> Dict[int, LaneMng]:
         '''function _initLanes
 
         input
         -----
         clb: dict
-            raod calibration, 标定的车道配置信息
+            raod calibration, 标定的车道配置信息, 格式如下
+        {
+        1:
+            emgc: False
+            start: 200
+            len: 200
+            end: 0
+            vDir:
+                x: 1
+                y: -1
+            coef: [1, 2, 3]
+            cells: [True, True, True, True]
+        }
+        config: dict
+            算法配置参数
 
         output
         ------
         lanes: dict
-            车道管理器, 按照车道管理车道属性和交通流参数
+            车道管理器, 按照车道管理车道属性和交通流参数, 
+            键为车道id, 值为LaneMng车道管理器实例
         '''
-
-        pass
+        lanes = {}
+        for laneID in clb:
+            lc = clb[laneID]    # lane calibration
+            lm = LaneMng(laneID, lc['emgc'],
+                         lc['len'], lc['start'], lc['end'],
+                         lc['vDir']['y'], lc['coef'],
+                         lc['cells'], config, self.cacheRet)
+            lanes[laneID] = lm
+        return lanes
 
     def update(self, cars):
         '''function update
