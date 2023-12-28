@@ -72,29 +72,40 @@ class LaneMng:
         '''
         cells = {}
         start = self.start
+        if self.vdir == -1:    # 若为反向, 则start设置为超出yamx范围的cellLen整数倍
+            start = (self.start // self.cellLen + 1) * self.cellLen
         end = start + self.cellLen * self.vdir
         for i in range(len(self.cellsValid)):
             cells[i] = CellMng(self.ID, i, self.cellsValid[i],
                                self.cellLen, start, end,
                                config['event']['t_tolerance'],
-                               config['event']['fps'],
+                               config['fps'],
                                config['event']['q_standard'],
                                config['event']['rate2'],
                                self.cacheRet)
+            # print([self.ID, i, self.cellsValid[i],
+            #                    self.cellLen, start, end])
             start = end
             end = start + self.cellLen * self.vdir
-            print(cells[i])
         return cells
 
-    def updateCache(self, cars: list):
+    def updateCache(self, cars: list, t: int):
         '''function updateCache
+
+        input
+        -----
+        cars: list
+            车辆列表, 每个元素为一个dict, 代表一个车辆目标
+        t: int
+            接收到该数据的帧号, 作为键值索引缓存数据
+
         更新车道元胞缓存
         '''
         # 确定车辆所在元胞, 按元胞组织车辆
         carsByCell = self._carsByCell(cars)
         # 按元胞更新缓存
         for order in self.cells:
-            self.cells[order].updateCache(carsByCell[order])
+            self.cells[order].updateCache(carsByCell[order], t)
 
     def updateTraffic(self):
         '''function updateTraffic
