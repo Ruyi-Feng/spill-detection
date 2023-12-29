@@ -22,13 +22,17 @@ class Driver():
         3. 增加所在元胞属性cell
         4. 增加三次指数平滑值属性smth
         '''
+        valid = self._ifValid(msg)
+        if not valid:
+            return False, msg
+        # 可用的目标数据信息
         for i in range(len(msg)):
             msg[i]['a'] = 0
             msg[i]['speed'] = 0
             msg[i]['cell'] = {'lane': -1, 'order': -1}
             msg[i]['smth'] = {'x': {1: 0, 2: 0, 3: 0},
                               'y': {1: 0, 2: 0, 3: 0}}     # 存储三次指数平滑值
-        return msg
+        return True, msg
 
     def send(self, msg: list) -> list:
         '''function send
@@ -53,3 +57,19 @@ class Driver():
             del msg[i]['cell']
             del msg[i]['smth']
         return msg
+
+    def _ifValid(self, msg) -> bool:
+        '''function _ifValid
+
+        input
+        -----
+        msg: list | str
+            传感器数据, list | str格式。list为传感器数据, str为传输信息。
+
+        return
+        ------
+        bool
+
+        判断数据是否有效, 若为str信息则返回False。
+        '''
+        return type(msg) == str
