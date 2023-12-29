@@ -31,7 +31,8 @@ class CellMng:
     danger : float
         元胞存在抛洒物的危险性
     cache : list
-        元胞速度缓存, 按接收顺序索引
+        元胞缓存车辆实例, 按接收顺序索引
+        TODO: 直接缓存车辆整个信息会不会炸内存? 还是只缓存必要信息?
     cacheRet: int
         cache retention, 缓存最长时间, 超出此时间的缓存被清除, 单位: 帧
     '''
