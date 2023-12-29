@@ -78,6 +78,7 @@ class CellMng:
         self.q = 0
         self.k = 0
         self.v = 0
+        self.aveCarNum = 0  # 帧平均车辆数
         # 置信度
         self.r1s = 1 / tt / fps
         self.qs = qs
@@ -113,19 +114,26 @@ class CellMng:
         self._updateDanger()
 
     def updateTraffic(self):
+        # 确定缓存数据量
+        baseT = len(self.cache) if len(self.cache) < self.cacheRet \
+            else self.cacheRet
+        # 合并各帧目标数据
+        cars = [car for frame in self.cache for car in frame]
+        aveCarNum = len(cars) / baseT
+        self.aveCarNum = aveCarNum
+        # 计算k(单位: veh/km)
+        self.k = aveCarNum / self.len * 1000
+        # 计算v(单位: m/s)
+        self.v = 0 if aveCarNum == 0 else \
+            abs(sum([car['VDecVy'] for car in cars])) / n
+        # 计算q(单位: veh/h)
+        self.q = self.k * self.v * 3.6
         # TODO 每次更新交通参数, 更新rate1数值
-        # 计算k
-
-        # 计算v
-
-        # 计算q
-
-        # 计算danger
-        pass
 
     def _updateDanger(self):
         '''function _updateDanger
 
         更新元胞存在抛洒物的危险性
         '''
+        # TODO 计算danger
         pass
