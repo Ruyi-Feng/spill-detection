@@ -69,11 +69,14 @@ class Controller:
             self.clbtor = clbtor
         else:   # 有config则读取, 不需要标定
             print('开始接收数据')
-            clb = self._loadyaml(clbPath)
-            self.clb = clb
+            self.clb = self._loadyaml(clbPath)
+            self.startManager()
 
-    def receive(self, msg):
-        '''function receive
+    def _ifNotValid(self, msg) -> bool:
+        return (type(msg) == str)
+
+    def calibration(self, msg):
+        '''function calibration
 
         input
         -----
@@ -84,46 +87,28 @@ class Controller:
         ------
         msg: str | list
             发送数据, str | list格式。str为传输信息(不处理), list为传感器数据。
-        traffic: dict
+        ? traffic: dict
             交通流参数, dict格式。
-        event: dict
+        ? event: dict
             事件检测结果, dict格式。
 
         接受传感器数据，返回发送数据、交通流参数、事件检测结果。
         根据条件判断是否需要标定，若需要则标定。
         '''
 
-        if type(msg) == str:
-            return msg, None, None
+        if self._ifNotValid(msg):
+            return
 
-        # 标定过程
-        if (self.needClb & (self.calibCount < self.calibFrames)):
-            self.calibrate(msg)
-            self.calibCount += 1
-
-            if self.calibCount == self.calibFrames:
-                # 标定完成
-                self.clbtor.calibrate()
-                self.clbtor.save()
-                # 读取标定结果
-                clb = self._loadyaml(self.clbPath)
-                self.clb = clb
-                # 启动管理器
-                self.startManager()
-                self.needClb = False
-
-        # 运行过程
-        if not self.needClb:
-            self.run(msg)
-
-        return msg, None, None
-
-    def calibrate(self, msg: list):
-        '''function calibrate
-
-        '''
-
-        self.clbtor.recieve(msg)
+        if self.clbtor.count < self.calibFrames:
+            self.clbtor.recieve(msg)
+        else:
+            self.clbtor.calibrate()
+            self.clbtor.save()
+            print('开始接收数据')
+            self.clb = self._loadyaml(self.clbPath)
+            # 启动管理器
+            self.startManager()
+            self.needClb = False
 
     def startManager(self):
         '''function startManager
@@ -131,13 +116,11 @@ class Controller:
         在完成标定或读取标定后启动管理器。
         '''
         # 生成数据驱动器
-        drv = Driver()
-        self.drv = drv
+        self.drv = Driver()
         # 生成交通管理器
-        tm = TrafficMng(self.clb, self.config)
-        self.tm = tm
+        self.tm = TrafficMng(self.clb, self.config)
         # 生成事件检测器
-        edt = EventDetector(self.config['fps'], self.clb,
+        self.edt = EventDetector(self.config['fps'], self.clb,
                             self.config['event']['event_types'],
                             self.config['event']['v_low'],
                             self.config['event']['v_high'],
@@ -151,11 +134,13 @@ class Controller:
                             self.config['event']['duration_intense'],
                             self.config['event']['duration_low'],
                             self.config['event']['duration_high'])
-        self.edt = edt
 
-    def run(self, msg: list):
+    def recieve(self, msg: list):
         # 接受数据
         cars = self.drv.recieve(msg)
+        # calibration road cells
+        if self.needClb:
+            self.calibration(cars)
         # 预处理
         cars = pre_processing.preProcess(cars, self.trm)
         # 交通流参数计算
