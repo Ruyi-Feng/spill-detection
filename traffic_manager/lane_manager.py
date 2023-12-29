@@ -116,12 +116,12 @@ class LaneMng:
             self.cells[order].updateTraffic()
         # 更新车道交通流参数
         aveCarNum = 0   # 按帧的平均车辆数
-        v = 0   # 车道平均速度
+        vSum = 0   # 车道平均速度
         for order in self.cells:
             aveCarNum += self.cells[order].aveCarNum
-            aveV += self.cells[order].v * self.cells[order].aveCarNum
+            vSum += self.cells[order].v * self.cells[order].aveCarNum
         self.k = aveCarNum / self.len * 1000
-        self.v = aveV / aveCarNum if aveCarNum != 0 else 0  # 加权求速度
+        self.v = vSum / aveCarNum if aveCarNum != 0 else 0  # 加权求速度
         self.q = self.k * self.v * 3.6
 
     def _carsByCell(self, cars: list) -> dict:
