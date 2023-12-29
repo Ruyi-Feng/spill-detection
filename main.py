@@ -16,5 +16,5 @@ if __name__ == "__main__":
         if msg == '':   # 读取到文件末尾
             break
 
-        msg, traffic, event = controller.receive(msg)  # msg为控制器返回的需要发送的数据
+        msg, event = controller.run(msg)  # msg为控制器返回的需要发送的数据
         print(msg[0])

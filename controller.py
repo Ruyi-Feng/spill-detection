@@ -71,9 +71,6 @@ class Controller:
             self.clb = self._loadyaml(clbPath)
             self.startManager()
 
-    def _ifNotValid(self, msg) -> bool:
-        return (type(msg) == str)
-
     def calibration(self, msg):
         '''function calibration
 
@@ -94,10 +91,6 @@ class Controller:
         接受传感器数据，返回发送数据、交通流参数、事件检测结果。
         根据条件判断是否需要标定，若需要则标定。
         '''
-
-        if self._ifNotValid(msg):
-            return
-
         if self.clbtor.count < self.calibFrames:
             self.clbtor.receive(msg)
         else:
@@ -134,9 +127,11 @@ class Controller:
                                  self.config['event']['duration_low'],
                                  self.config['event']['duration_high'])
 
-    def receive(self, msg: list):
+    def run(self, msg: list) -> (list, list):
         # 接受数据
-        cars = self.drv.receive(msg)
+        valid, cars = self.drv.receive(msg)
+        if not valid:
+            return
         # calibration road cells
         if self.needClb:
             self.calibration(cars)
@@ -145,10 +140,11 @@ class Controller:
         # 交通流参数计算
         traffic = self.tm.receive(cars)
         # 事件检测
-        cars = self.edt.run(cars, traffic)
+        event = self.edt.run(cars, traffic)
         # 发送数据
         msg = self.drv.send(cars)
         # print(msg)
+        return msg, event
 
     def _loadyaml(self, path: str) -> dict:
         '''function _loadParam
