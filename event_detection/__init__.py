@@ -1,11 +1,11 @@
-from detection.events.crowd import crowdDetect
-from detection.events.incident import incidentDetect
-from detection.events.high_speed import highSpeedDetect
-from detection.events.illegal_occupation import illegalOccupationDetect
-from detection.events.incident_single_car import incidentSingleCarDetect
-from detection.events.sudden_braking import SuddenBrakingDetect
-from detection.events.low_speed import lowSpeedDetect
-from detection.events.spill import spillDetect
+from event_detection.events.crowd import crowdDetect
+from event_detection.events.incident import incidentDetect
+from event_detection.events.high_speed import highSpeedDetect
+from event_detection.events.illegal_occupation import illegalOccupationDetect
+from event_detection.events.incident_single_car import incidentSingleCarDetect
+from event_detection.events.sudden_braking import SuddenBrakingDetect
+from event_detection.events.low_speed import lowSpeedDetect
+from event_detection.events.spill import spillDetect
 
 
 default_event_types = ['crowd', 'high_speed', 'illegal_occupation',
