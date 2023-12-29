@@ -32,7 +32,7 @@ def testManager():
         tm.receive(msg)
         # 检验是否成功计算路段流量Q
         if tm.count > tm.itv:
-            assert tm.Q > 0    
+            assert tm.Q > 0
         else:
             assert tm.Q == 0
 

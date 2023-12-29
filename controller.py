@@ -120,19 +120,19 @@ class Controller:
         self.tm = TrafficMng(self.clb, self.config)
         # 生成事件检测器
         self.edt = EventDetector(self.config['fps'], self.clb,
-                            self.config['event']['event_types'],
-                            self.config['event']['v_low'],
-                            self.config['event']['v_high'],
-                            self.config['event']['t_tolerance'],
-                            self.config['event']['q_standard'],
-                            self.config['event']['rate2'],
-                            self.config['event']['d_touch'],
-                            self.config['event']['density_crowd'],
-                            self.config['event']['v_crowd'],
-                            self.config['event']['a_intense'],
-                            self.config['event']['duration_intense'],
-                            self.config['event']['duration_low'],
-                            self.config['event']['duration_high'])
+                                 self.config['event']['event_types'],
+                                 self.config['event']['v_low'],
+                                 self.config['event']['v_high'],
+                                 self.config['event']['t_tolerance'],
+                                 self.config['event']['q_standard'],
+                                 self.config['event']['rate2'],
+                                 self.config['event']['d_touch'],
+                                 self.config['event']['density_crowd'],
+                                 self.config['event']['v_crowd'],
+                                 self.config['event']['a_intense'],
+                                 self.config['event']['duration_intense'],
+                                 self.config['event']['duration_low'],
+                                 self.config['event']['duration_high'])
 
     def receive(self, msg: list):
         # 接受数据
