@@ -1,6 +1,5 @@
 import os
 import yaml
-
 from road_calibration import Calibrator
 from message_driver import Driver
 import pre_processing
@@ -100,7 +99,7 @@ class Controller:
             return
 
         if self.clbtor.count < self.calibFrames:
-            self.clbtor.recieve(msg)
+            self.clbtor.receive(msg)
         else:
             self.clbtor.calibrate()
             self.clbtor.save()
@@ -135,9 +134,9 @@ class Controller:
                             self.config['event']['duration_low'],
                             self.config['event']['duration_high'])
 
-    def recieve(self, msg: list):
+    def receive(self, msg: list):
         # 接受数据
-        cars = self.drv.recieve(msg)
+        cars = self.drv.receive(msg)
         # calibration road cells
         if self.needClb:
             self.calibration(cars)

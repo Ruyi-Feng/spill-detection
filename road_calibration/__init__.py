@@ -18,7 +18,7 @@ class Calibrator():
 
     methods
     -------
-    recieve(msg)
+    receive(msg)
         接受每帧传输来的目标信息, 更新给calibrator
     calibrate()
         根据存储的数据计算标定结果。
@@ -73,8 +73,8 @@ class Calibrator():
         # 元胞
         self.cells = dict()                       # lane索引的元胞有效无效列表
 
-    def recieve(self, msg):
-        '''class function recieve
+    def receive(self, msg):
+        '''class function receive
 
         input
         ----------
