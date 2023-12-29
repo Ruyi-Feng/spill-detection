@@ -91,7 +91,6 @@ class TrafficMng():
         self._updateCache(cars)
         if self.count % self.itv == 0:
             self._updateTraffic()
-            print('road section Q = ', self.Q, 'veh/h')
 
     def _updateCache(self, cars: list):
         '''function _updateCache
@@ -118,6 +117,11 @@ class TrafficMng():
             self.lanes[id].updateTraffic()
         # 更新整个路段的交通流量
         self._updateQ()
+        # 输出检查
+        # print('t=', self.count, end='\t')
+        # for id in self.lanes:
+        #     print('lane',id, '=', int(self.lanes[id].q), end=' ')
+        # print('Q=', int(self.Q))
 
     def _updateQ(self):
         '''function _updateQ
