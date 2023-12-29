@@ -18,7 +18,7 @@ class Calibrator():
 
     methods
     -------
-    receive(msg)
+    run(msg)
         接受每帧传输来的目标信息, 更新给calibrator
     calibrate()
         根据存储的数据计算标定结果。
@@ -73,7 +73,7 @@ class Calibrator():
         # 元胞
         self.cells = dict()                       # lane索引的元胞有效无效列表
 
-    def receive(self, msg):
+    def run(self, msg):
         '''class function receive
 
         input
@@ -372,6 +372,7 @@ class Calibrator():
 
 
 if __name__ == '__main__':
+    # 未更新
     # 生成标定器
     clbPath = './calibration/clb.yml'
     calibrator = Calibrator(clbPath, 20)

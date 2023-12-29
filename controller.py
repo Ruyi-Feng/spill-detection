@@ -92,7 +92,7 @@ class Controller:
         根据条件判断是否需要标定，若需要则标定。
         '''
         if self.clbtor.count < self.calibFrames:
-            self.clbtor.receive(msg)
+            self.clbtor.run(msg)
         else:
             self.clbtor.calibrate()
             self.clbtor.save()

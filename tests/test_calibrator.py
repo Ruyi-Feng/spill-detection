@@ -45,7 +45,7 @@ def test_calibrator():
             continue
 
         # 标定器接受数据
-        calibrator.receive(msg)
+        calibrator.run(msg)
 
     # 标定器标定
     calibrator.calibrate()
