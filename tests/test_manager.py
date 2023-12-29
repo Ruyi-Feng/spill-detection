@@ -27,10 +27,10 @@ def testManager():
             break
         if type(msg) == str:
             continue
-        # TODO 检查点2
+        # 检查点2
         # 交通管理器接受数据
         tm.receive(msg)
-        # 检验是否成功计算路段流量Q
+        # 检查点3 检验是否成功计算路段流量Q
         if tm.count > tm.itv:
             assert tm.Q > 0
         else:
