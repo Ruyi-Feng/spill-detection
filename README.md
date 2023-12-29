@@ -34,7 +34,9 @@ TargetId | XDecx | YDecy | ZDecz | VDecVx | VDecVy | Xsize | Ysize | TargetType 
 
 #### 数据内容说明
 **targetType**：0-未定义目标，1-小车，2-大车，3-摩托，4-自行车，5-行人
+
 **距离单位**：m
+
 **速度单位**：m/s
 
 ## 2. 思维导图
@@ -66,6 +68,7 @@ cellOrder从0开始（方便调用不用再做处理）
 <p>
 traffic变量
 </p>
+
 ### 4.2 数据准备
 
  源于组内轨迹数据。从组内轨迹数据写一个直接对接内部数据格式的转换文件。

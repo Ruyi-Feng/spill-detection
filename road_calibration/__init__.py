@@ -124,22 +124,22 @@ class Calibrator():
         根据calibrator的属性计算标定结果。
         '''
         # 确定车道ID
-        self.laneIDs, self.emgcIDs = self._calibLaneIDs()
+        self._distinguishNormalAndEmgcLanes()
         # 标定内外侧车道线ID
-        self.intID, self.extID = self._calibIELaneID()
+        self._distinguishInnerAndOutboardLaneID()
         # 确定运动正方向
-        self.vDir = self._calibVDir()
+        self._distinguishLaneDirection()
         # 计算各lane的xy最大最小值
-        self.xyMinMax, self.globalXYMinMax = self._calibXYMinMax()
+        self._calibXYMinMax()
         # 计算各lane轨迹四分位特征点
-        self.polyPts = self._calibPolyPts()
+        self._getLaneQuartilesPoints()
         # 计算车道线方程
-        self.coef = self._calibLanes()
+        self._calculateLanesFunction()
         # 划分元胞
-        self.cells = self._calibCells()
+        self._calibCells()
 
-    def _calibLaneIDs(self) -> (list, list):
-        '''class function _calibLanes
+    def _distinguishNormalAndEmgcLanes(self):
+        '''class function _distinguishNormalAndEmgcLanes
 
         return
         ----------
@@ -160,12 +160,11 @@ class Calibrator():
         m = max(ids)
         if m % 2 == 1:    # 若最大车道号为奇数, 则补充车道号加1
             m += 1
-        ids = list(range(1, m+1))
-        emgc = [1, m]
-        return ids, emgc
+        self.ids = list(range(1, m+1))
+        self.emgc = [1, m]
 
-    def _calibIELaneID(self):
-        '''class function _calibIELaneID
+    def _distinguishInnerAndOutboardLaneID(self):
+        '''class function _distinguishInnerAndOutboardLaneID
 
         return
         ----------
@@ -183,19 +182,18 @@ class Calibrator():
         lane2, laneN_1 = self.emgcIDs[0] + 1, self.emgcIDs[1] - 1
         dbi2, dbiN_1 = dbi(self.xyByLane[lane2]), dbi(self.xyByLane[laneN_1])
         if dbi2 < dbiN_1:
-            intID, extID = lane2, laneN_1
+            self.intID, self.extID = lane2, laneN_1
         else:
-            intID, extID = laneN_1, lane2
-        return intID, extID
+            self.intID, self.extID = laneN_1, lane2
 
-    def _calibVDir(self) -> dict:
-        '''class function _calibVDir
+    def _distinguishLaneDirection(self):
+        '''class function _distinguishLaneDirection
 
         return
         ----------
         返回运动正方向, dict格式, {'x': 1, 'y': 1}。
         '''
-        dirDict = dict()
+        self.dirDict = dict()
         # 确定非应急车道速度正方向
         for id in self.laneIDs:
             if id in self.emgcIDs:
@@ -205,17 +203,16 @@ class Calibrator():
                 dir['x'] = -1
             if self.vxyCount[id]['y'] < 0:
                 dir['y'] = -1
-            dirDict[id] = dir
+            self.dirDict[id] = dir
         # 确定应急车道速度正方向
         for id in self.emgcIDs:
             if id == 1:
                 # copy 2号车道的方向
-                tmp = dirDict[id+1].copy()  # 为保存文件不出现乱码, 使用copy
-                dirDict[id] = tmp  # 1号车道与2号车道同向
+                tmp = self.dirDict[id+1].copy()  # 为保存文件不出现乱码, 使用copy
+                self.dirDict[id] = tmp  # 1号车道与2号车道同向
             else:
-                tmp = dirDict[id-1].copy()  # 为保存文件不出现乱码, 使用copy
-                dirDict[id] = tmp  # 最大车道与倒数第二车道同向
-        return dirDict
+                tmp = self.dirDict[id-1].copy()  # 为保存文件不出现乱码, 使用copy
+                self.dirDict[id] = tmp  # 最大车道与倒数第二车道同向
 
     def _calibXYMinMax(self):
         '''class function _calibXYMinMax
@@ -225,8 +222,8 @@ class Calibrator():
         并对所有lane得到的xyMinMax再次排序, 得到最大最小值, 存储到self.globalXYMinMax。
         self.globalXYMinMax值为[xmin, xmax, ymin, ymax]。
         '''
-        xyMinMax = dict()
-        globalXYMinMax = [0, 0, 0, 0]
+        self.xyMinMax = dict()
+        self.globalXYMinMax = [0, 0, 0, 0]
         # 对各lane的xyByLane分别以x或y排序, 得到最大最小值, 存储到self.xyMinMax
         for lane in self.xyByLane:
             # 以x排序
@@ -236,15 +233,14 @@ class Calibrator():
             self.xyByLane[lane].sort(key=lambda x: x[1])
             ymin, ymax = self.xyByLane[lane][0][1], self.xyByLane[lane][-1][1]
             # 存储
-            xyMinMax[lane] = [xmin, xmax, ymin, ymax]
-            globalXYMinMax[0] = min(globalXYMinMax[0], xmin)
-            globalXYMinMax[1] = max(globalXYMinMax[1], xmax)
-            globalXYMinMax[2] = min(globalXYMinMax[2], ymin)
-            globalXYMinMax[3] = max(globalXYMinMax[3], ymax)
-        return xyMinMax, globalXYMinMax
+            self.xyMinMax[lane] = [xmin, xmax, ymin, ymax]
+            self.globalXYMinMax[0] = min(self.globalXYMinMax[0], xmin)
+            self.globalXYMinMax[1] = max(self.globalXYMinMax[1], xmax)
+            self.globalXYMinMax[2] = min(self.globalXYMinMax[2], ymin)
+            self.globalXYMinMax[3] = max(self.globalXYMinMax[3], ymax)
 
-    def _calibPolyPts(self) -> dict:
-        '''class function _calibPolyPts
+    def _getLaneQuartilesPoints(self) -> dict:
+        '''class function _getLaneQuartilesPoints
 
         return
         ----------
@@ -252,16 +248,15 @@ class Calibrator():
             返回车道特征点, dict格式, {laneID: [list]}。
             元素为一个lane轨迹点的四分位特征点, shape=(5, 2)。
         '''
-        polyPts = dict()
+        self.polyPts = dict()
         for id in self.laneIDs:
             if id in self.emgcIDs:
                 continue
             featPoints = calQuartiles(self.xyByLane[id])
-            polyPts.update({id: featPoints})
-        return polyPts
+            self.polyPts.update({id: featPoints})
 
-    def _calibLanes(self):
-        '''class function _calibLanes
+    def _calculateLanesFunction(self):
+        '''class function _calculateLanesFunction
 
         return
         ----------
@@ -269,11 +264,11 @@ class Calibrator():
         利用存储的轨迹点信息, 计算车道特征点, 拟合出车道方程
         '''
         # 拟合laneExt车道线方程
-        lanesCoef = dict()
+        self.lanesCoef = dict()
         # 实验验证: 采用四分位特征点拟合效果优于直接用轨迹点拟合
         extCoef = poly2fit(np.array(self.polyPts[self.extID]))
         # extCoef = poly2fit(np.array(self.xyByLane[self.extID]))
-        lanesCoef[self.extID] = extCoef
+        self.lanesCoef[self.extID] = extCoef
 
         # 拟合其他非应急车道的车道线方程
         for id in self.laneIDs:
@@ -283,10 +278,10 @@ class Calibrator():
             # 实验验证: 采用四分位特征点拟合效果优于直接用轨迹点拟合
             a = poly2fitFrozen(np.array(self.polyPts[id]), extCoef[0])
             # a = poly2fitFrozen(np.array(self.xyByLane[id]), extCoef[0])
-            lanesCoef[id] = a
+            self.lanesCoef[id] = a
 
         # 拟合应急车道的车道线方程
-        intCoef = lanesCoef[self.intID]
+        intCoef = self.lanesCoef[self.intID]
         d = (self.laneWidth + self.emgcWidth) / 2   # 边界车道-应急车道距离
         # 计算ext车道线方程系数的导数
         diffCoef = np.polyder(np.poly1d(extCoef))
@@ -295,7 +290,7 @@ class Calibrator():
         # 计算边界车道-应急车道距离在y轴上的投影距离
         dY = d * np.sqrt(1 + k**2)
         # 计算应急车道的车道线方程系数
-        if lanesCoef[self.extID][2] > lanesCoef[self.intID][2]:
+        if self.lanesCoef[self.extID][2] > self.lanesCoef[self.intID][2]:
             aExtEmgc = [extCoef[0], extCoef[1], extCoef[2] + dY]
             aIntEmgc = [intCoef[0], intCoef[1], intCoef[2] - dY]
         else:
@@ -303,13 +298,11 @@ class Calibrator():
             aIntEmgc = [intCoef[0], intCoef[1], intCoef[2] + dY]
         # 存储应急车道的车道线方程系数
         if self.intID == self.emgcIDs[0] + 1:
-            lanesCoef[self.emgcIDs[0]] = np.array(aIntEmgc)
-            lanesCoef[self.emgcIDs[1]] = np.array(aExtEmgc)
+            self.lanesCoef[self.emgcIDs[0]] = np.array(aIntEmgc)
+            self.lanesCoef[self.emgcIDs[1]] = np.array(aExtEmgc)
         else:
-            lanesCoef[self.emgcIDs[0]] = np.array(aExtEmgc)
-            lanesCoef[self.emgcIDs[1]] = np.array(aIntEmgc)
-
-        return lanesCoef
+            self.lanesCoef[self.emgcIDs[0]] = np.array(aExtEmgc)
+            self.lanesCoef[self.emgcIDs[1]] = np.array(aIntEmgc)
 
     def _calibCells(self):
         '''class function _calibCells
@@ -336,7 +329,7 @@ class Calibrator():
                 count[order] += 1
             cellCount[id] = count
 
-        cells = dict()
+        self.cells = dict()
         for id in self.laneIDs:
             # 计算各元胞在一小时内的经过车辆数
             valid = []
@@ -346,8 +339,7 @@ class Calibrator():
             # 对于y运动方向为负的车道, 元胞列表反向(默认从ymin到ymax划分为正向)
             if self.vDir[id]['y'] < 0:
                 valid.reverse()
-            cells[id] = valid
-        return cells
+            self.cells[id] = valid
 
     def save(self):
         '''class function save
