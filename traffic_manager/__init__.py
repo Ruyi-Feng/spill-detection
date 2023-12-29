@@ -76,7 +76,7 @@ class TrafficMng():
             lanes[laneID] = lm
         return lanes
 
-    def update(self, cars):
+    def receive(self, cars):
         '''function update
 
         input
@@ -91,6 +91,7 @@ class TrafficMng():
         self._updateCache(cars)
         if self.count % self.itv == 0:
             self._updateTraffic()
+            print('road section Q = ', self.Q, 'veh/h')
 
     def _updateCache(self, cars: list):
         '''function _updateCache

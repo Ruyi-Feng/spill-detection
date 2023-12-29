@@ -29,6 +29,10 @@ def testManager():
             continue
         # TODO 检查点2
         # 交通管理器接受数据
-        tm.update(msg)
+        tm.receive(msg)
 
     assert 0 == 0
+
+
+if __name__ == '__main__':
+    testManager()

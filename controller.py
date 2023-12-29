@@ -159,7 +159,7 @@ class Controller:
         # 预处理
         cars = pre_processing.preProcess(cars, self.trm)
         # 交通流参数计算
-        traffic = self.tm.update(cars)
+        traffic = self.tm.receive(cars)
         # 事件检测
         cars = self.edt.run(cars, traffic)
         # 发送数据
