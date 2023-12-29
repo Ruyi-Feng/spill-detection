@@ -30,8 +30,11 @@ def testManager():
         # TODO 检查点2
         # 交通管理器接受数据
         tm.receive(msg)
-
-    assert 0 == 0
+        # 检验是否成功计算路段流量Q
+        if tm.count > tm.itv:
+            assert tm.Q > 0    
+        else:
+            assert tm.Q == 0
 
 
 if __name__ == '__main__':
