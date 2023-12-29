@@ -70,7 +70,7 @@ cellHandler实例属性:    # 在calib中定义
 {
     "order": 1,
     "valid": True,
-    "vCache":[100, 110, ...],
+    "cache":[100, 110, ...],
     "q": 100,
     "k": 100,
     "v": 100,

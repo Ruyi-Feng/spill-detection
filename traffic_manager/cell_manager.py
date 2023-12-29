@@ -30,7 +30,7 @@ class CellMng:
         rate2, 过大横向速度和换道导致的前向元胞置信度增加值
     danger : float
         元胞存在抛洒物的危险性
-    vCache : list
+    cache : list
         元胞速度缓存, 按接收顺序索引
     cacheRet: int
         cache retention, 缓存最长时间, 超出此时间的缓存被清除, 单位: 帧
@@ -84,7 +84,7 @@ class CellMng:
         self.r2 = r2
         self.danger = 0.0
         # 缓存
-        self.vCache = []    # list内按顺序索引, 用dict反而会有遍历的消耗
+        self.cache = []    # list内按顺序索引, 用dict反而会有遍历的消耗
         self.cacheRet = cacheRet
 
     def updateCache(self, cars: list, t: int):
@@ -97,17 +97,17 @@ class CellMng:
         t: int
             接收到该数据的帧号, 作为键值索引缓存数据
 
-        1. 更新元胞缓存, 将已确定归属于该元胞的车辆目标, 更新到vCache中。
+        1. 更新元胞缓存, 将已确定归属于该元胞的车辆目标, 更新到cache中。
         2. 要更新danger。
         若当前帧没有车辆处于该cell, 则以空占位,
         保证在没有时间戳索引的情况下, 能够用list自身的索引代替时间戳,
         空数据能够占位代表过去了1个时间戳。
         '''
         # 缓存
-        self.vCache.append(cars)
+        self.cache.append(cars)
         # 检查缓存长度, 清除过期缓存
-        if len(self.vCache) > self.cacheRet:
-            self.vCache.pop(0)
+        if len(self.cache) > self.cacheRet:
+            self.cache.pop(0)
         # 更新danger
         self._updateDanger()
 

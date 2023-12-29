@@ -1630,7 +1630,7 @@ def test_detect():
                     'order': 1,
                     'q': 0,
                     'v': 0,
-                    'vCache': [],
+                    'cache': [],
                     'valid': True
                 },
                 2:
@@ -1640,7 +1640,7 @@ def test_detect():
                     'order': 2,
                     'q': 0,
                     'v': 0,
-                    'vCache': [],
+                    'cache': [],
                     'valid': True
                 }
             }
