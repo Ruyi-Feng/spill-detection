@@ -125,7 +125,7 @@ class CellMng:
         self.k = aveCarNum / self.len * 1000
         # 计算v(单位: m/s)
         self.v = 0 if aveCarNum == 0 else \
-            abs(sum([car['VDecVy'] for car in cars])) / n
+            abs(sum([car['VDecVy'] for car in cars])) / len(cars)
         # 计算q(单位: veh/h)
         self.q = self.k * self.v * 3.6
         # TODO 每次更新交通参数, 更新rate1数值
