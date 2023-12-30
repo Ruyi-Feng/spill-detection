@@ -29,7 +29,7 @@ def testManager():
             continue
         # 检查点2
         # 交通管理器接受数据
-        tm.receive(msg)
+        tm.run(msg)
         # 检查点3 检验是否成功计算路段流量Q
         if tm.count >= tm.itv:
             assert tm.Q > 0
