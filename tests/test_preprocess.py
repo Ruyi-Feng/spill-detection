@@ -16,7 +16,8 @@ def test_preprocess():
     # 生成驱动器
     d = Driver()
     # 生成预处理器
-    tm = TargetManager()
+    tm = TargetManager(comMaxFrm=config['prepro']['max_complete_frames'],
+                       smthA=config['prepro']['smooth_alpha'])
     # 仿真器读取数据
     while True:
         msg = smltor.run()
