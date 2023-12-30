@@ -6,7 +6,7 @@ from event_detection.events.incident_single_car import incidentSingleCarDetect
 from event_detection.events.sudden_braking import SuddenBrakingDetect
 from event_detection.events.low_speed import lowSpeedDetect
 from event_detection.events.spill import spillDetect
-
+from traffic_manager import TrafficMng
 
 default_event_types = ['crowd', 'high_speed', 'illegal_occupation',
                        'incident_single_car', 'incident',
@@ -94,21 +94,15 @@ class EventDetector:
                        'ai': ai, 'di': di, 'dl': dl, 'dh': dh}
         self.types = event_types
 
-    def run(self, msg, traffic):
+    def run(self, msg: list, trf: TrafficMng) -> list:
         '''
         检测交通事件，输出并返回事件列表
         input
         ------
         msg: list
             传感器数据
-        traffic: dict
-            交通流数据
-        config: dict
-            标定参数
-        clb: dict
-            算法参数
-        event_types: list
-            需要检测的事件列表。
+        trf: TrafficMng
+            交通管理器, 存有交通流信息
 
         output
         ------
@@ -119,38 +113,38 @@ class EventDetector:
         events = []
         # 直接数值检测
         if 'crowd' in self.types:
-            events_c = crowdDetect(traffic,
+            events_c = crowdDetect(trf,
                                    self.config["dstc"], self.config["vc"])
             events += events_c
         # 群体性检测
         if 'incident' in self.types:
-            events_i = incidentDetect(msg, traffic,
+            events_i = incidentDetect(msg, trf,
                                       self.config, self.clb)
             events += events_i
         if 'spill' in self.types:
-            events_s = spillDetect(msg, traffic,
+            events_s = spillDetect(trf,
                                    self.config, self.clb)
             events += events_s
         # 单体性检测
         if 'high_speed' in self.types:
-            events_h = highSpeedDetect(msg, traffic,
+            events_h = highSpeedDetect(msg, trf,
                                        self.config, self.clb)
             events += events_h
         if 'illegal_occupation' in self.types:
-            events_o = illegalOccupationDetect(msg, traffic,
+            events_o = illegalOccupationDetect(msg, trf,
                                                self.config, self.clb)
             events += events_o
         if 'incident_single_car' in self.types:
-            events_is = incidentSingleCarDetect(msg, traffic,
+            events_is = incidentSingleCarDetect(msg, trf,
                                                 self.config, self.clb)
             events += events_is
 
         if 'intensive_speed_reduction' in self.types:
-            events_r = SuddenBrakingDetect(msg, traffic,
+            events_r = SuddenBrakingDetect(msg, trf,
                                            self.config, self.clb)
             events += events_r
         if 'low_speed' in self.types:
-            events_l = lowSpeedDetect(msg, traffic,
+            events_l = lowSpeedDetect(msg, trf,
                                       self.config, self.clb)
             events += events_l
 
