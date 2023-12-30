@@ -85,6 +85,7 @@ class Calibrator():
         '''
         self.count += 1
         for target in msg:
+            # MARK 输出指定id信息
             # if target['TargetId'] == 7390:
             #     # {'TargetId': 5087, 'XDecx': 2.57, 'YDecy': 7, 'ZDecz': 0,
             #     # 'VDecVx': 0.13, 'VDecVy': -19.3, 'Xsize': 0.47,
