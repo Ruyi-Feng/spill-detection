@@ -1,9 +1,37 @@
-from pre_processing.target_manager import TargetManager
+from rsu_simulator import Smltor
 from message_driver import Driver
+from pre_processing import TargetManager
+import yaml
 
 
 def test_preprocess():
-    data = [
+    # 1. 离线数据测试
+    # 读取配置文件
+    configPath = './config.yml'
+    with open(configPath, 'r') as f:
+        config = yaml.load(f, Loader=yaml.FullLoader)
+    # 生成仿真器
+    dataPath = './data/result.txt'
+    smltor = Smltor(dataPath)
+    # 生成驱动器
+    d = Driver()
+    # 生成预处理器
+    tm = TargetManager()
+    # 仿真器读取数据
+    while True:
+        msg = smltor.run()
+        if msg == '':
+            break
+        valid, cars = d.receive(msg)
+        if not valid:
+            continue
+        # 预处理接收数据
+        cars = tm.run(cars)
+        assert type(cars) == list
+
+    # 2. 备用数据测试
+    # 断续轨迹补全平滑测试数据, 备用
+    dataDiscontinuous = [
         {'TargetId': 5087, 'XDecx': -2.55, 'YDecy': 259.7,
          'VDecVx': 0, 'VDecVy': -26.56, 'LineNum': 2},
         {'TargetId': 5087, 'XDecx': -2.55, 'YDecy': 258.35,
@@ -495,13 +523,9 @@ def test_preprocess():
         {'TargetId': 5087, 'XDecx': 2.75, 'YDecy': 0.25,
          'VDecVx': 0.13, 'VDecVy': -19.3, 'LineNum': 101}
     ]
-    d = Driver()
-    t = TargetManager(comMaxFrm=20, smthA=0.1)
-    for car in data:
-        car = [car]  # 模拟传输来的1条信息
-        valid, car = d.receive(car)
-        if not valid:
-            continue
-        car = t.run(car)
-
-    assert type(car) == list
+    # for car in dataDiscontinuous:
+    #     cars = [car]   # 模拟传输来的1条信息
+    #     valid, cars = d.run(cars)
+    #     assert valid == True
+    #     cars = tm.run(cars)
+    #     assert type(cars) == list
