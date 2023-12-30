@@ -89,7 +89,7 @@ class LaneMng:
             end = start + self.cellLen * self.vdir
         return cells
 
-    def updateCache(self, cars: list, t: int):
+    def updateCache(self, cars: list):
         '''function updateCache
 
         input
@@ -105,7 +105,7 @@ class LaneMng:
         carsByCell = self._carsByCell(cars)
         # 按元胞更新缓存
         for order in self.cells:
-            self.cells[order].updateCache(carsByCell[order], t)
+            self.cells[order].updateCache(carsByCell[order])
 
     def updateTraffic(self):
         '''function updateTraffic

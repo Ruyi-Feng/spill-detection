@@ -89,15 +89,13 @@ class CellMng:
         self.cache = []    # list内按顺序索引, 用dict反而会有遍历的消耗
         self.cacheRet = cacheRet
 
-    def updateCache(self, cars: list, t: int):
+    def updateCache(self, cars: list):
         '''function update
 
         input
         -----
         cars: list
             车辆列表, 每个元素为一个dict, 代表一个车辆目标
-        t: int
-            接收到该数据的帧号, 作为键值索引缓存数据
 
         1. 更新元胞缓存, 将已确定归属于该元胞的车辆目标, 更新到cache中。
         2. 要更新danger。
