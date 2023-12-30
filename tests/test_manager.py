@@ -31,7 +31,7 @@ def testManager():
         # 交通管理器接受数据
         tm.receive(msg)
         # 检查点3 检验是否成功计算路段流量Q
-        if tm.count > tm.itv:
+        if tm.count >= tm.itv:
             assert tm.Q > 0
         else:
             assert tm.Q == 0
