@@ -76,7 +76,7 @@ class TrafficMng():
             lanes[laneID] = lm
         return lanes
 
-    def receive(self, cars):
+    def run(self, cars):
         '''function update
 
         input
