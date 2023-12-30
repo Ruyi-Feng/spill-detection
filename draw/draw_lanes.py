@@ -27,10 +27,12 @@ def drawLanes():
     #             7: array([ -0.9070356 ,  -4.52074536, 786.29154222]),
     #             8: array([ -0.9070356 ,  -4.52074536, 803.07538561])}
     # 不直接copy出lanePoly的值，从clb中读取
-    clb = yaml.load(open("./road_calibration/clb.yml", 'r'), Loader=yaml.FullLoader)
+    with open("./road_calibration/clb.yml", 'r') as f:
+        clb = yaml.load(f, Loader=yaml.FullLoader)
     lanePoly = dict()
     vDir = dict()
-    colormap = ['brown', 'olive', 'gold', 'lime', 'red', 'aqua', 'maroon', 'fuchsia', 'navy', 'silver']
+    colormap = ['brown', 'olive', 'gold', 'lime', 'red',
+                'aqua', 'maroon', 'fuchsia', 'navy', 'silver']
     for laneID in clb:
         lanePoly[laneID] = array(clb[laneID]['coef'])
         vDir[laneID] = clb[laneID]['vDir']['y']
@@ -69,10 +71,9 @@ def drawLanes():
             if (yArr[i] >= ymin) & (yArr[i] <= ymax):   # 仅画出边界内的，要不不好看
                 plt.annotate('', xy=(xArr[i+step], yArr[i+step]),
                              xytext=(xArr[i], yArr[i]),
-                            arrowprops=dict(
+                             arrowprops=dict(
                                 facecolor=colormap[laneID],
-                                shrink=0.05)
-                            )
+                                shrink=0.05))
 
     # 添加元素
     plt.xlabel("x/m")

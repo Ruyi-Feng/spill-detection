@@ -38,5 +38,5 @@ def test_driver():
         # print('------------------')
 
     # 检查点3
-    # 数据最后一行为str 
+    # 数据最后一行为str
     assert type(msg) == str

@@ -6,7 +6,7 @@ def incidentDetect(msg: list, traffic: TrafficMng, config: dict):
 
     input
     ------
-    msg: 
+    msg:
         list, 传感器数据
     traffic:
         TrafficMng, 交通管理器, 存有交通流信息

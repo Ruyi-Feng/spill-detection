@@ -1,5 +1,6 @@
 from traffic_manager import TrafficMng
 
+
 def lowSpeedDetect(msg: list, traffic: TrafficMng, config: dict):
     '''function lowSpeedDetect
 

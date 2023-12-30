@@ -526,6 +526,8 @@ def test_preprocess():
         {'TargetId': 5087, 'XDecx': 2.75, 'YDecy': 0.25,
          'VDecVx': 0.13, 'VDecVy': -19.3, 'LineNum': 101}
     ]
+    print('you passed test of preprocess.py! A number is generated to you:',
+          dataDiscontinuous[0]['XDecx'])
     # for car in dataDiscontinuous:
     #     cars = [car]   # 模拟传输来的1条信息
     #     valid, cars = d.run(cars)
