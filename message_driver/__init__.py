@@ -4,7 +4,7 @@ class Driver():
     数据格式转化驱动器，将传感器数据转化为代码内部流通的数据格式，
     将代码内部流通的数据格式转化为输出数据。
     '''
-    def receive(self, msg: list) -> list:
+    def receive(self, msg: list) -> (bool, list):
         '''function receive
 
         input
@@ -72,4 +72,4 @@ class Driver():
 
         判断数据是否有效, 若为str信息则返回False。
         '''
-        return type(msg) == str
+        return type(msg) == list
