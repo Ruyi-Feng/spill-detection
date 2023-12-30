@@ -1,4 +1,5 @@
 from event_detection import EventDetector
+from traffic_manager import TrafficMng
 import yaml
 from message_driver import Driver
 from rsu_simulator import Smltor
@@ -10,23 +11,44 @@ def test_detect():
     configPath = './config.yml'
     with open(configPath, 'r') as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
+    # 读取标定文件
+    calibPath = './road_calibration/clb.yml'
+    with open(calibPath, 'r') as f:
+        clb = yaml.load(f, Loader=yaml.FullLoader)
     # 生成仿真器
     dataPath = './data/result.txt'
     smltor = Smltor(dataPath)
     # 生成驱动器
     d = Driver()
     # 生成检测器
-    ed = EventDetector(fps=20)
+    ed = EventDetector(config['fps'],
+                       config['event']['event_types'],
+                       config['event']['v_low'],
+                       config['event']['v_high'],
+                       config['event']['t_tolerance'],
+                       config['event']['q_standard'],
+                       config['event']['rate2'],
+                       config['event']['d_touch'],
+                       config['event']['density_crowd'],
+                       config['event']['v_crowd'],
+                       config['event']['a_intense'],
+                       config['event']['duration_intense'],
+                       config['event']['duration_low'],
+                       config['event']['duration_high'])
+    # 生成交通管理器
+    tm = TrafficMng(clb, config)
     # 仿真器读取数据
     while True:
         msg = smltor.run()
         if msg == '':
             break
-        valid, msg = d.receive(msg)
+        valid, cars = d.receive(msg)
         if not valid:
             continue
+        # 交通流参数计算
+        tm.run(cars)
         # 事件检测
-        event = ed.run(msg)
+        event = ed.run(cars, TrafficMng)
         if event != []:
             print(event)
         assert type(event) == list
