@@ -51,6 +51,8 @@ def test_detect():
         event = ed.run(cars, TrafficMng)
         if event != []:
             print(event)
+        # 检查点1
+        # 数据事件类型为list
         assert type(event) == list
 
     # 2. 备用数据测试

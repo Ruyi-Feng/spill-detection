@@ -28,6 +28,8 @@ def test_preprocess():
             continue
         # 预处理接收数据
         cars = tm.run(cars)
+        # 检查点1
+        # 预处理后的数据为列表
         assert type(cars) == list
 
     # 2. 备用数据测试

@@ -121,6 +121,8 @@ def test_calibrator():
                       True, True, True, False, True, True, True, True]
         }
     }
+    # 检查点1
+    # 标定器标定结果与标准结果相同
     assert clb == standardClb
 
 

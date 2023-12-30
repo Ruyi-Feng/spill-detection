@@ -19,7 +19,6 @@ def test_driver():
 
         # 模拟接受数据
         # print('接收前', msg[0])
-        # 接受数据
         valid, cars = d.receive(msg)
         if not valid:
             continue
@@ -36,9 +35,8 @@ def test_driver():
         if len(cars) > 0:
             assert 'a' not in cars[0].keys()
         # print('发送', msg[0])
-        # 断点
         # print('------------------')
-    
+
     # 检查点3
     # 数据最后一行为str 
     assert type(msg) == str

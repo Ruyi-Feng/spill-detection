@@ -14,11 +14,9 @@ def testManager():
         config = yaml.load(f, Loader=yaml.FullLoader)
     with open(clbPath, 'r') as f:
         clb = yaml.load(f, Loader=yaml.FullLoader)
-
     # 生成仿真器
     sm = Smltor(dataPath)
-    # 检查点1
-    # 生成交通管理器
+    # 生成路口管理器
     tm = TrafficMng(clb, config)
     # 开始运行
     while True:
@@ -27,10 +25,9 @@ def testManager():
             break
         if type(msg) == str:
             continue
-        # 检查点2
-        # 交通管理器接受数据
         tm.run(msg)
-        # 检查点3 检验是否成功计算路段流量Q
+        # 检查点1
+        # 检验是否成功计算路段流量Q
         if tm.count >= tm.itv:
             assert tm.Q > 0
         else:
