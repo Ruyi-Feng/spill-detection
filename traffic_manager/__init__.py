@@ -44,8 +44,8 @@ class TrafficMng():
         self.cellLen = config['calib']['cell_len']   # 元胞长度
         # 状态属性
         self.Q = 0          # 存储整个路段的交通流量(单位: 辆/h)
-        self.count = 0      # 接收计数, 仅用于判定某一帧是否应当计算交通流参数
-        self.lanes = self._initLanes(clb, config)  # 车道管理器, 按照车道管理车道属性和交通流参数
+        self.count = 0      # 接收计数, 仅用于判定某一帧是否应当计算交通流参数, 达到itv后重置为0
+        self.lanes = self._initLanes(clb, config)  # 按照车道管理车道属性和交通流参数
 
     def _initLanes(self, clb: dict, config: dict) -> Dict[int, LaneMng]:
         '''function _initLanes
@@ -87,6 +87,8 @@ class TrafficMng():
         该方法不直接返回数据, 各层次的交通数据通过直接调用实例本身获取。
         '''
         self.count += 1
+        self.count %= self.itv  # 重置计数, count仅用于判断计算交通流的时机, 达到后即可置零
+
         # 更新缓存数据
         self._updateCache(cars)
         if self.count % self.itv == 0:
