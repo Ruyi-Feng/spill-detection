@@ -1,4 +1,4 @@
-from detection import EventDetector
+from event_detection import EventDetector
 
 
 def test_detect():
