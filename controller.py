@@ -112,7 +112,7 @@ class Controller:
         # 生成交通管理器
         self.tm = TrafficMng(self.clb, self.config)
         # 生成事件检测器
-        self.edt = EventDetector(self.config['fps'], self.clb,
+        self.edt = EventDetector(self.config['fps'],
                                  self.config['event']['event_types'],
                                  self.config['event']['v_low'],
                                  self.config['event']['v_high'],
@@ -138,7 +138,7 @@ class Controller:
         # 预处理
         cars = pre_processing.preProcess(cars, self.trm)
         # 交通流参数计算
-        traffic = self.tm.receive(cars)
+        traffic = self.tm.run(cars)
         # 事件检测
         event = self.edt.run(cars, traffic)
         # 发送数据
