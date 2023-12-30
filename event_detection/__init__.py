@@ -8,6 +8,7 @@ from event_detection.events.low_speed import lowSpeedDetect
 from event_detection.events.spill import spillDetect
 from traffic_manager import TrafficMng
 
+
 default_event_types = ['crowd', 'high_speed', 'illegal_occupation',
                        'incident_single_car', 'incident',
                        'intensive_speed_reduction', 'low_speed', 'spill']
@@ -20,8 +21,6 @@ class EventDetector:
     ----------
     fps: float
         frequency per second, 传感器采样频率
-    clb: dict
-        标定参数
     config: dict
         检测参数，包括: vl, vh, tt, r2, dt, dstc, vc, ai, di, dl, dh。
         vl: float, v_low, 低速阈值, 单位m/s
@@ -43,7 +42,7 @@ class EventDetector:
 
     事件检测类，用于检测交通事件。
     '''
-    def __init__(self, fps, clb, event_types=default_event_types,
+    def __init__(self, fps, event_types=default_event_types,
                  vl: float = 2.778, vh: float = 33.33,
                  tt: float = 300, qs: float = 10000,
                  r2: float = 0.1, dt: float = 5,
@@ -56,8 +55,7 @@ class EventDetector:
         ------
         fps: float
             frequency per second, 传感器采样频率
-        clb: dict
-            标定参数
+
         event_types: list
             需要检测的事件列表。
         vl: float
@@ -88,7 +86,6 @@ class EventDetector:
         生成事件检测器，用于检测交通事件。
         '''
         self.fps = fps
-        self.clb = clb
         self.config = {'vl': vl, 'vh': vh, 'tt': tt, 'qs': qs, 'r1': 1/tt,
                        'r2': r2, 'dt': dt, 'dstc': dstc, 'vc': vc,
                        'ai': ai, 'di': di, 'dl': dl, 'dh': dh}
@@ -118,34 +115,26 @@ class EventDetector:
             events += events_c
         # 群体性检测
         if 'incident' in self.types:
-            events_i = incidentDetect(msg, trf,
-                                      self.config, self.clb)
+            events_i = incidentDetect(msg, trf, self.config)
             events += events_i
         if 'spill' in self.types:
-            events_s = spillDetect(trf,
-                                   self.config, self.clb)
+            events_s = spillDetect(trf, self.config)
             events += events_s
         # 单体性检测
         if 'high_speed' in self.types:
-            events_h = highSpeedDetect(msg, trf,
-                                       self.config, self.clb)
+            events_h = highSpeedDetect(msg, trf, self.config)
             events += events_h
         if 'illegal_occupation' in self.types:
-            events_o = illegalOccupationDetect(msg, trf,
-                                               self.config, self.clb)
+            events_o = illegalOccupationDetect(msg, trf, self.config)
             events += events_o
         if 'incident_single_car' in self.types:
-            events_is = incidentSingleCarDetect(msg, trf,
-                                                self.config, self.clb)
+            events_is = incidentSingleCarDetect(msg, trf, self.config)
             events += events_is
-
         if 'intensive_speed_reduction' in self.types:
-            events_r = SuddenBrakingDetect(msg, trf,
-                                           self.config, self.clb)
+            events_r = SuddenBrakingDetect(msg, trf, self.config)
             events += events_r
         if 'low_speed' in self.types:
-            events_l = lowSpeedDetect(msg, trf,
-                                      self.config, self.clb)
+            events_l = lowSpeedDetect(msg, trf, self.config)
             events += events_l
 
         return events
