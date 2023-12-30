@@ -1,12 +1,15 @@
-def spillDetect(msg, traffic, config, clb):
+from traffic_manager import TrafficMng
+
+
+def spillDetect(traffic: TrafficMng, config: dict):
     '''function spillDetect
 
     input
     ------
-    msg: list, 传感器数据
-    traffic: dict, 交通流数据
-    config: dict, 标定参数
-    self.clb: dict, 算法参数
+    traffic:
+        dict, 交通流数据
+    config:
+        dict, 标定参数
 
     output
     ------

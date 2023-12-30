@@ -1,13 +1,17 @@
+from traffic_manager import TrafficMng
 
-def incidentDetect(msg, traffic, config, clb):
+
+def incidentDetect(msg: list, traffic: TrafficMng, config: dict):
     '''function incidentDetect
 
     input
     ------
-    msg: list, 传感器数据
-    traffic: dict, 交通流数据
-    config: dict, 标定参数
-    self.clb: dict, 算法参数
+    msg: 
+        list, 传感器数据
+    traffic:
+        TrafficMng, 交通管理器, 存有交通流信息
+    config:
+        dict, 标定参数
 
     output
     ------

@@ -1,13 +1,16 @@
+from traffic_manager import TrafficMng
 
-def lowSpeedDetect(msg, traffic, config, clb):
+def lowSpeedDetect(msg: list, traffic: TrafficMng, config: dict):
     '''function lowSpeedDetect
 
     input
     ------
-    msg: list, 传感器数据
-    traffic: dict, 交通流数据
-    config: dict, 标定参数
-    self.clb: dict, 算法参数
+    msg:
+        list, 传感器数据
+    traffic:
+        dict, 交通流数据
+    config:
+        dict, 标定参数
 
     output
     ------
