@@ -10,5 +10,6 @@ def test_simulator():
         msg = s.run()
         if msg == '':
             break
+        assert (type(msg) == str) | (type(msg) == list)
 
     assert type(msg) == str
