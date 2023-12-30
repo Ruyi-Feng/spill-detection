@@ -1,8 +1,39 @@
 from event_detection import EventDetector
+import yaml
+from message_driver import Driver
+from rsu_simulator import Smltor
 
 
 def test_detect():
-    data = [
+    # 1. 离线数据测试
+    # 读取配置文件
+    configPath = './config.yml'
+    with open(configPath, 'r') as f:
+        config = yaml.load(f, Loader=yaml.FullLoader)
+    # 生成仿真器
+    dataPath = './data/result.txt'
+    smltor = Smltor(dataPath)
+    # 生成驱动器
+    d = Driver()
+    # 生成检测器
+    ed = EventDetector(fps=20)
+    # 仿真器读取数据
+    while True:
+        msg = smltor.run()
+        if msg == '':
+            break
+        valid, msg = d.receive(msg)
+        if not valid:
+            continue
+        # 事件检测
+        event = ed.run(msg)
+        if event != []:
+            print(event)
+        assert type(event) == list
+
+    # 2. 备用数据测试
+    # 非法占用应急车道数据, 备用
+    dataIllegalOccupation = [
         {'TargetId': 7390, 'XDecx': 27.25, 'YDecy': 75.55,
          'VDecVx': -0.17, 'VDecVy': 16.16, 'LineNum': 7},
         {'TargetId': 7390, 'XDecx': 27.15, 'YDecy': 76.35,
@@ -1618,38 +1649,10 @@ def test_detect():
         {'TargetId': 7390, 'XDecx': 3.34, 'YDecy': 767.15,
          'VDecVx': -0.5, 'VDecVy': 17.77, 'LineNum': 8}
     ]
-    traffic = {
-        1:
-        {
-            'cells':
-            {
-                1:
-                {
-                    'danger': 0.0,
-                    'k': 0,
-                    'order': 1,
-                    'q': 0,
-                    'v': 0,
-                    'cache': [],
-                    'valid': True
-                },
-                2:
-                {
-                    'danger': 0.0,
-                    'k': 0,
-                    'order': 2,
-                    'q': 0,
-                    'v': 0,
-                    'cache': [],
-                    'valid': True
-                }
-            }
-        }
-    }
+    # for car in dataIllegalOccupation:
+    #     cars = [car]   # 模拟传输来的1条信息
+    #     valid, cars = d.run(cars)
+    #     assert valid == True
+    #     event = ed.run(cars)
+    #     assert type(event) == list
 
-    d = EventDetector(fps=20, clb=None)
-    for car in data:
-        car = [car]   # 模拟传输来的1条信息
-        car = d.run(car, traffic)
-
-    assert type(car) == list  # 返回占道报警值
