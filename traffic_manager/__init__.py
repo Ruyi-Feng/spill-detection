@@ -93,6 +93,7 @@ class TrafficMng():
         self._updateCache(cars)
         if self.count % self.itv == 0:
             self._updateTraffic()
+            print(self.Q, end=', ')
 
     def _updateCache(self, cars: list):
         '''function _updateCache

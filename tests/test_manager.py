@@ -19,16 +19,18 @@ def testManager():
     # 生成路口管理器
     tm = TrafficMng(clb, config)
     # 开始运行
+    OuterCount = 0      # tm内部count因重置为0的机制, 不能直接用来判定运行计数
     while True:
         msg = sm.run()
         if msg == '':
             break
         if type(msg) == str:
             continue
+        OuterCount += 1
         tm.run(msg)
         # 检查点1
         # 检验是否成功计算路段流量Q
-        if tm.count >= tm.itv:
+        if OuterCount >= tm.itv:
             assert tm.Q > 0
         else:
             assert tm.Q == 0
