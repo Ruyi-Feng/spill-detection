@@ -17,25 +17,24 @@ def drawLanes():
     # traj的colLane列， 10X车道直接改成X车道轨迹
     traj[colLane] = traj[colLane].apply(lambda x: x - 100 if x > 100 else x)
 
-    # 车道数据
-    # lanePoly = {1: array([ -0.9070356 , -45.79906234, 180.3907908 ]),
-    #             2: array([ -0.9070356 , -45.79906234, 197.17463419]),
-    #             3: array([ -0.9070356 , -35.44343418, 340.72063149]),
-    #             4: array([ -0.9070356 , -32.50765842, 469.61522482]),
-    #             5: array([ -0.9070356 , -17.1337203 , 715.16259501]),
-    #             6: array([ -0.9070356 , -12.01578466, 762.72382244]),
-    #             7: array([ -0.9070356 ,  -4.52074536, 786.29154222]),
-    #             8: array([ -0.9070356 ,  -4.52074536, 803.07538561])}
-    # 不直接copy出lanePoly的值，从clb中读取
+    # 读取配置文件
+    with open("./config.yml", 'r') as f:
+        config = yaml.load(f, Loader=yaml.FullLoader)
+    cellLen = config['calib']['cell_len']
+    # 读取标定文件
     with open("./road_calibration/clb.yml", 'r') as f:
         clb = yaml.load(f, Loader=yaml.FullLoader)
+    # 获取标定信息
+    start, end = clb[1]['start'], clb[1]['end']
+    if start > end:
+        start, end = end, start
     lanePoly = dict()
     vDir = dict()
-    colormap = ['brown', 'olive', 'gold', 'lime', 'red',
-                'aqua', 'maroon', 'fuchsia', 'navy', 'silver']
     for laneID in clb:
         lanePoly[laneID] = array(clb[laneID]['coef'])
         vDir[laneID] = clb[laneID]['vDir']['y']
+    colormap = ['brown', 'olive', 'gold', 'lime', 'red',
+            'aqua', 'maroon', 'fuchsia', 'navy', 'silver']
 
     # 画布生成
     plt.figure(figsize=(16, 16))
@@ -64,16 +63,20 @@ def drawLanes():
         plt.plot(xArr, yArr,
                  label='lane'+str(laneID), c=colormap[laneID], marker='o')
         # 绘制车道方向
-        start, end, step = len(yArr)-1, 0, vDir[laneID]  # step与vDir相反因为画图的顺序
+        s, e, step = len(yArr)-1, 0, vDir[laneID]  # step与vDir相反因为画图的顺序
         if step == 1:
-            start, end = end, start
-        for i in range(start, end, step):
+            s, e = e, s
+        for i in range(s, e, step):
             if (yArr[i] >= ymin) & (yArr[i] <= ymax):   # 仅画出边界内的，要不不好看
                 plt.annotate('', xy=(xArr[i+step], yArr[i+step]),
                              xytext=(xArr[i], yArr[i]),
                              arrowprops=dict(
                                 facecolor=colormap[laneID],
                                 shrink=0.05))
+    # 绘制元胞
+    end = (end // cellLen + 1) * cellLen
+    for i in range(int(start), int(end) + cellLen, cellLen):
+        plt.plot([xmin, xmax], [i, i], c='black', linewidth=0.5)
 
     # 添加元素
     plt.xlabel("x/m")
