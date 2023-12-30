@@ -18,7 +18,6 @@ def test_calibrator():
     5. 标定器标定
     6. 标定器保存
     '''
-
     # 读取配置文件
     configPath = './config.yml'
     with open(configPath, 'r') as f:
