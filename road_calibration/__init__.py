@@ -64,7 +64,7 @@ class Calibrator():
         # 车道ID与运动正方向
         self.laneIDs = []
         self.emgcIDs = []
-        self.vDir = dict()
+        self.vDirDict = dict()
         # 车道线方程
         self.xyMinMax = dict()                  # lane索引的xy的最大最小值
         self.globalXYMinMax = []    # 全局xy最大最小值[xmin,max, ymin,max]
@@ -143,9 +143,9 @@ class Calibrator():
 
         return
         ----------
-        ids: list
+        laneIDs: list
             返回车道ID号, list格式
-        emgc: list
+        emgcIDs: list
             返回应急车道号, list格式
 
         返回车道ID号, list格式。返回应急车道号, list格式。
@@ -156,12 +156,12 @@ class Calibrator():
         若最大车道号为奇数, 则补充车道号加1。
         应急车道为1号车道和最大号车道。
         '''
-        ids = list(self.xyByLane.keys())
-        m = max(ids)
+        laneIDs = list(self.xyByLane.keys())
+        m = max(laneIDs)
         if m % 2 == 1:    # 若最大车道号为奇数, 则补充车道号加1
             m += 1
-        self.ids = list(range(1, m+1))
-        self.emgc = [1, m]
+        self.laneIDs = list(range(1, m+1))
+        self.emgcIDs = [1, m]
 
     def _distinguishInnerAndOutboardLaneID(self):
         '''class function _distinguishInnerAndOutboardLaneID
@@ -193,7 +193,7 @@ class Calibrator():
         ----------
         返回运动正方向, dict格式, {'x': 1, 'y': 1}。
         '''
-        self.dirDict = dict()
+        self.vDirDict = dict()
         # 确定非应急车道速度正方向
         for id in self.laneIDs:
             if id in self.emgcIDs:
@@ -203,16 +203,16 @@ class Calibrator():
                 dir['x'] = -1
             if self.vxyCount[id]['y'] < 0:
                 dir['y'] = -1
-            self.dirDict[id] = dir
+            self.vDirDict[id] = dir
         # 确定应急车道速度正方向
         for id in self.emgcIDs:
             if id == 1:
                 # copy 2号车道的方向
-                tmp = self.dirDict[id+1].copy()  # 为保存文件不出现乱码, 使用copy
-                self.dirDict[id] = tmp  # 1号车道与2号车道同向
+                tmp = self.vDirDict[id+1].copy()  # 为保存文件不出现乱码, 使用copy
+                self.vDirDict[id] = tmp  # 1号车道与2号车道同向
             else:
-                tmp = self.dirDict[id-1].copy()  # 为保存文件不出现乱码, 使用copy
-                self.dirDict[id] = tmp  # 最大车道与倒数第二车道同向
+                tmp = self.vDirDict[id-1].copy()  # 为保存文件不出现乱码, 使用copy
+                self.vDirDict[id] = tmp  # 最大车道与倒数第二车道同向
 
     def _calibXYMinMax(self):
         '''class function _calibXYMinMax
@@ -264,11 +264,11 @@ class Calibrator():
         利用存储的轨迹点信息, 计算车道特征点, 拟合出车道方程
         '''
         # 拟合laneExt车道线方程
-        self.lanesCoef = dict()
+        self.coef = dict()
         # 实验验证: 采用四分位特征点拟合效果优于直接用轨迹点拟合
         extCoef = poly2fit(np.array(self.polyPts[self.extID]))
         # extCoef = poly2fit(np.array(self.xyByLane[self.extID]))
-        self.lanesCoef[self.extID] = extCoef
+        self.coef[self.extID] = extCoef
 
         # 拟合其他非应急车道的车道线方程
         for id in self.laneIDs:
@@ -278,10 +278,10 @@ class Calibrator():
             # 实验验证: 采用四分位特征点拟合效果优于直接用轨迹点拟合
             a = poly2fitFrozen(np.array(self.polyPts[id]), extCoef[0])
             # a = poly2fitFrozen(np.array(self.xyByLane[id]), extCoef[0])
-            self.lanesCoef[id] = a
+            self.coef[id] = a
 
         # 拟合应急车道的车道线方程
-        intCoef = self.lanesCoef[self.intID]
+        intCoef = self.coef[self.intID]
         d = (self.laneWidth + self.emgcWidth) / 2   # 边界车道-应急车道距离
         # 计算ext车道线方程系数的导数
         diffCoef = np.polyder(np.poly1d(extCoef))
@@ -290,7 +290,7 @@ class Calibrator():
         # 计算边界车道-应急车道距离在y轴上的投影距离
         dY = d * np.sqrt(1 + k**2)
         # 计算应急车道的车道线方程系数
-        if self.lanesCoef[self.extID][2] > self.lanesCoef[self.intID][2]:
+        if self.coef[self.extID][2] > self.coef[self.intID][2]:
             aExtEmgc = [extCoef[0], extCoef[1], extCoef[2] + dY]
             aIntEmgc = [intCoef[0], intCoef[1], intCoef[2] - dY]
         else:
@@ -298,11 +298,11 @@ class Calibrator():
             aIntEmgc = [intCoef[0], intCoef[1], intCoef[2] + dY]
         # 存储应急车道的车道线方程系数
         if self.intID == self.emgcIDs[0] + 1:
-            self.lanesCoef[self.emgcIDs[0]] = np.array(aIntEmgc)
-            self.lanesCoef[self.emgcIDs[1]] = np.array(aExtEmgc)
+            self.coef[self.emgcIDs[0]] = np.array(aIntEmgc)
+            self.coef[self.emgcIDs[1]] = np.array(aExtEmgc)
         else:
-            self.lanesCoef[self.emgcIDs[0]] = np.array(aExtEmgc)
-            self.lanesCoef[self.emgcIDs[1]] = np.array(aIntEmgc)
+            self.coef[self.emgcIDs[0]] = np.array(aExtEmgc)
+            self.coef[self.emgcIDs[1]] = np.array(aIntEmgc)
 
     def _calibCells(self):
         '''class function _calibCells
@@ -329,7 +329,6 @@ class Calibrator():
                 count[order] += 1
             cellCount[id] = count
 
-        self.cells = dict()
         for id in self.laneIDs:
             # 计算各元胞在一小时内的经过车辆数
             valid = []
@@ -337,7 +336,7 @@ class Calibrator():
                 q = cellCount[id][i] / (self.count / self.fps) * 3600
                 valid.append(True if q > self.qMerge else False)
             # 对于y运动方向为负的车道, 元胞列表反向(默认从ymin到ymax划分为正向)
-            if self.vDir[id]['y'] < 0:
+            if self.vDirDict[id]['y'] < 0:
                 valid.reverse()
             self.cells[id] = valid
 
@@ -346,29 +345,29 @@ class Calibrator():
 
         将标定结果保存到self.clbPath。
         '''
-        traffic = dict()
+        clb = dict()
         ymin, ymax = self.globalXYMinMax[2], self.globalXYMinMax[3]
-        traffic = dict()
+        clb = dict()
         for id in self.laneIDs:
             # 确定起点终点
             start, end = ymin, ymax
-            if self.vDir[id]['y'] < 0:
+            if self.vDirDict[id]['y'] < 0:
                 start, end = ymax, ymin
             # 生成实例
             laneClb = {'emgc': False if id not in self.emgcIDs else True,
-                       'vDir': self.vDir[id],
+                       'vDir': self.vDirDict[id],
                        'start': start,
                        'len': abs(start - end),
                        'end': end,
                        'coef': [round(x*1000)/1000 for x in self.coef[id]],
                        'cells': self.cells[id]
                        }
-            traffic.update({id: laneClb})
+            clb.update({id: laneClb})
 
         with open(self.clbPath, 'w') as f:
-            yaml.dump(traffic, f)
+            yaml.dump(clb, f)
 
-        return traffic
+        return clb
 
 
 if __name__ == '__main__':
