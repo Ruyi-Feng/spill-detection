@@ -499,7 +499,9 @@ def test_preprocess():
     t = TargetManager(comMaxFrm=20, smthA=0.1)
     for car in data:
         car = [car]  # 模拟传输来的1条信息
-        car = d.receive(car)
+        valid, car = d.receive(car)
+        if not valid:
+            continue
         car = t.run(car)
 
     assert type(car) == list
