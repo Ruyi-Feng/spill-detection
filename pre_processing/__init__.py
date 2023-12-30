@@ -33,11 +33,11 @@ class TargetManager():
         2. 进行补全, 平滑运算。
         3. 更新tgtInLastFrm, IDInLastFrm。
         '''
-        self.__update(curTgt)
-        curTgt, cmpltIDs = self.__run_complt(curTgt)
+        self._update(curTgt)
+        curTgt, cmpltIDs = self._run_complt(curTgt)
         curTgt, _ = self.crt.run(curTgt, cmpltIDs)
-        curTgt = self.__run_smooth(curTgt)
-        self.__update_last()
+        curTgt = self._run_smooth(curTgt)
+        self._update_last()
         return curTgt
 
     def _update(self, curTgt):
