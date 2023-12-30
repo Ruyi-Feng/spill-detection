@@ -1,12 +1,17 @@
+from traffic_manager import TrafficMng
 
-def crowdDetect(traffic: dict, dstc: float, vc: float):
+
+def crowdDetect(traffic: TrafficMng, dstc: float, vc: float):
     '''function crowdDetect
 
     input
     ------
-    traffic: dict, 交通流数据
-    dstc: float, density_crowd, 拥堵密度阈值, 单位辆/km
-    vc: float, v_crowd, 拥堵速度阈值, 单位m/s
+    traffic:
+        dict, 交通流数据
+    dstc:
+        float, density_crowd, 拥堵密度阈值, 单位辆/km
+    vc:
+        float, v_crowd, 拥堵速度阈值, 单位m/s
 
     output
     ------
