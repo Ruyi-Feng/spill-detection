@@ -20,7 +20,9 @@ def test_driver():
         # 模拟接受数据
         # print('接收前', msg[0])
         # 接受数据
-        msg = d.receive(msg)
+        valid, msg = d.receive(msg)
+        if not valid:
+            continue
         # print('代码内', msg[0])
         # 发送数据
         msg = d.send(msg)
