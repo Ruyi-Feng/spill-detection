@@ -48,7 +48,7 @@ def test_detect():
         # 交通流参数计算
         tm.run(cars)
         # 事件检测
-        event = ed.run(cars, TrafficMng)
+        event = ed.run(cars, tm)
         if event != []:
             print(event)
         # 检查点1
@@ -1675,7 +1675,7 @@ def test_detect():
     ]
     for car in dataIllegalOccupation:
         cars = [car]   # 模拟传输来的1条信息
-        valid, cars = d.run(cars)
+        valid, cars = d.receive(cars)
         assert valid
-        event = ed.run(cars)
+        event = ed.run(cars, tm)
         assert type(event) == list
