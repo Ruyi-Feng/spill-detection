@@ -1,23 +1,24 @@
 
 fps: 20
-laneWidth: 3.75
-emgcWidth: 3.5
 calib:
   if_recalib: false
   calib_seconds: 600
-  d_cell: 50
+  lane_width: 3.75
+  emgc_width: 3.5
+  cell_len: 50
   q_merge: 0
 prepro:
   max_complete_frames: 20
   smooth_alpha: 0.1
 traffic:
-  q_cal_duration: 300
+  q_duration: 300
   cal_interval: 30
 event:
   event_types: ["crowd", "high_speed", "illegal_occupation", "incident_single_car", "incident", "intensive_speed_reduction", "low_speed", "spill"]
   v_low: 2.778
   v_high: 33.33
   t_tolerance: 300
+  q_standard: 10000
   rate2: 0.1
   d_touch: 5
   density_crowd: 18

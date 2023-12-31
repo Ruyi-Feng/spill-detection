@@ -1,8 +1,63 @@
-from detection import EventDetector
+from event_detection import EventDetector
+from traffic_manager import TrafficMng
+import yaml
+from message_driver import Driver
+from rsu_simulator import Smltor
 
 
 def test_detect():
-    data = [
+    # 1. 离线数据测试
+    # 读取配置文件
+    configPath = './config.yml'
+    with open(configPath, 'r') as f:
+        config = yaml.load(f, Loader=yaml.FullLoader)
+    # 读取标定文件
+    calibPath = './road_calibration/clb.yml'
+    with open(calibPath, 'r') as f:
+        clb = yaml.load(f, Loader=yaml.FullLoader)
+    # 生成仿真器
+    dataPath = './data/result.txt'
+    smltor = Smltor(dataPath)
+    # 生成驱动器
+    d = Driver()
+    # 生成检测器
+    ed = EventDetector(config['fps'],
+                       config['event']['event_types'],
+                       config['event']['v_low'],
+                       config['event']['v_high'],
+                       config['event']['t_tolerance'],
+                       config['event']['q_standard'],
+                       config['event']['rate2'],
+                       config['event']['d_touch'],
+                       config['event']['density_crowd'],
+                       config['event']['v_crowd'],
+                       config['event']['a_intense'],
+                       config['event']['duration_intense'],
+                       config['event']['duration_low'],
+                       config['event']['duration_high'])
+    # 生成交通管理器
+    tm = TrafficMng(clb, config)
+    # 仿真器读取数据
+    while True:
+        msg = smltor.run()
+        if msg == '':
+            break
+        valid, cars = d.receive(msg)
+        if not valid:
+            continue
+        # 交通流参数计算
+        tm.run(cars)
+        # 事件检测
+        event = ed.run(cars, TrafficMng)
+        if event != []:
+            print(event)
+        # 检查点1
+        # 数据事件类型为list
+        assert type(event) == list
+
+    # 2. 备用数据测试
+    # 非法占用应急车道数据, 备用
+    dataIllegalOccupation = [
         {'TargetId': 7390, 'XDecx': 27.25, 'YDecy': 75.55,
          'VDecVx': -0.17, 'VDecVy': 16.16, 'LineNum': 7},
         {'TargetId': 7390, 'XDecx': 27.15, 'YDecy': 76.35,
@@ -1618,38 +1673,9 @@ def test_detect():
         {'TargetId': 7390, 'XDecx': 3.34, 'YDecy': 767.15,
          'VDecVx': -0.5, 'VDecVy': 17.77, 'LineNum': 8}
     ]
-    traffic = {
-        1:
-        {
-            'cells':
-            {
-                1:
-                {
-                    'danger': 0.0,
-                    'k': 0,
-                    'order': 1,
-                    'q': 0,
-                    'v': 0,
-                    'vCache': [],
-                    'valid': True
-                },
-                2:
-                {
-                    'danger': 0.0,
-                    'k': 0,
-                    'order': 2,
-                    'q': 0,
-                    'v': 0,
-                    'vCache': [],
-                    'valid': True
-                }
-            }
-        }
-    }
-
-    d = EventDetector(fps=20, clb=None)
-    for car in data:
-        car = [car]   # 模拟传输来的1条信息
-        car = d.run(car, traffic)
-
-    assert type(car) == list  # 返回占道报警值
+    for car in dataIllegalOccupation:
+        cars = [car]   # 模拟传输来的1条信息
+        valid, cars = d.run(cars)
+        assert valid
+        event = ed.run(cars)
+        assert type(event) == list

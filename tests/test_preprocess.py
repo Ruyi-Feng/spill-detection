@@ -1,9 +1,40 @@
-from pre_processing.target_manager import TargetManager
-from msg_driver import Driver
+from rsu_simulator import Smltor
+from message_driver import Driver
+from pre_processing import TargetManager
+import yaml
 
 
 def test_preprocess():
-    test_data = [
+    # 1. 离线数据测试
+    # 读取配置文件
+    configPath = './config.yml'
+    with open(configPath, 'r') as f:
+        config = yaml.load(f, Loader=yaml.FullLoader)
+    # 生成仿真器
+    dataPath = './data/result.txt'
+    smltor = Smltor(dataPath)
+    # 生成驱动器
+    d = Driver()
+    # 生成预处理器
+    tm = TargetManager(comMaxFrm=config['prepro']['max_complete_frames'],
+                       smthA=config['prepro']['smooth_alpha'])
+    # 仿真器读取数据
+    while True:
+        msg = smltor.run()
+        if msg == '':
+            break
+        valid, cars = d.receive(msg)
+        if not valid:
+            continue
+        # 预处理接收数据
+        cars = tm.run(cars)
+        # 检查点1
+        # 预处理后的数据为列表
+        assert type(cars) == list
+
+    # 2. 备用数据测试
+    # 断续轨迹补全平滑测试数据, 备用
+    dataDiscontinuous = [
         {'TargetId': 5087, 'XDecx': -2.55, 'YDecy': 259.7,
          'VDecVx': 0, 'VDecVy': -26.56, 'LineNum': 2},
         {'TargetId': 5087, 'XDecx': -2.55, 'YDecy': 258.35,
@@ -495,11 +526,11 @@ def test_preprocess():
         {'TargetId': 5087, 'XDecx': 2.75, 'YDecy': 0.25,
          'VDecVx': 0.13, 'VDecVy': -19.3, 'LineNum': 101}
     ]
-    d = Driver()
-    p = TargetManager(comMaxFrm=20, smthA=0.1)
-    for car in test_data:
-        car = [car]  # 模拟传输来的1条信息
-        car = d.receive(car)
-        car = p.run(car)
-
-    assert type(car) == list
+    print('you passed test of preprocess.py! A number is generated to you:',
+          dataDiscontinuous[0]['XDecx'])
+    # for car in dataDiscontinuous:
+    #     cars = [car]   # 模拟传输来的1条信息
+    #     valid, cars = d.run(cars)
+    #     assert valid == True
+    #     cars = tm.run(cars)
+    #     assert type(cars) == list
