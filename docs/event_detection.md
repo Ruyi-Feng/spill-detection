@@ -1,47 +1,31 @@
 # 说明
-检测道路事故。包括：抛洒物检测，事故检测，拥堵检测，异常急刹，异常停车/应急车道占用，超速行驶。
+检测道路事故。
 
 # 检测功能
 ## 1. 群体性检测
 抛洒物检测，事故检测
 ## 2. 单体性检测
-异常急刹
-单车撞护栏
-异常停车
-应急车道占用
-超速行驶
+异常急刹，应急车道占用，异常停车，超速行驶，低速行驶
 ## 3. 直接数值检测
 拥堵检测
 
 # 参数列表
-## 标定参数
-**内侧道路元胞分割距离cell_len(m)**：50m<br>
-**合流元胞判定交通量q_merge(v/h)**：0<br>
-## 全局共用参数
-**帧率FPS**：20
-**低速判定速度v_low(m/s)**：10/3.6 = 2.778m/s
-**高速判定速度v_high(m/s)**：120/3.6 = 33.33m/s
-## 功能参数
-### 1. 抛洒物检测
-**抛洒物处理容忍时间t_tolerance(s)**：5*60 = 300s<br>
-**抛洒物置信度时间增长率rate1(/frame)**：1/(t_tolerance * FPS)<br>
-**抛洒物置信度换道增长率rate2(1)**：1/10<br>
-### 2. 事故检测
-**接触距离d_touch(m)**：5m(两车追尾距离等于1个车长)<br>
-### 3. 拥堵检测
-**拥堵密度density_crowd(pcu/km/ln)**：18pcu/km/ln<br>
-**拥堵速度v_crowd(m/s)**：60/3.6 = 16.667m/s<br>
-### 4. 异常急刹
-**急刹加速度a_intense(m/s^2)**：3m/s^2<br>
-**急刹持续时间duration_intense(s)**：1s<br>
-### 5. 异常停车/应急车道占用
-**低速持续时间duration_low(s)**：5s<br>
-### 6. 超速行驶
-**超速持续时间duration_high(s)**：5s<br>
+参照文件：[spill-detection/docs/parameter.xlsx](./parameter.xlsx)
 
+# 检测逻辑
 <p>
 <img
-src="./docs/algorithms_logic.png"
+src="./algorithms_logic.png"
+alt="算法逻辑"
+title="算法逻辑"
+width="100%"
+>
+</p>
+
+# 伪代码逻辑
+<p>
+<img
+src="./event_detect_logic.png"
 alt="算法逻辑"
 title="算法逻辑"
 width="100%"
