@@ -1,4 +1,3 @@
-
 fps: 20
 calib:
   if_recalib: false
@@ -15,7 +14,8 @@ traffic:
   cal_interval: 30
 event:
   event_types: ["crowd", "high_speed", "illegal_occupation", "incident_single_car", "incident", "intensive_speed_reduction", "low_speed", "spill"]
-  v_low: 2.778
+  v_static: 2.778
+  v_low: 11.11
   v_high: 33.33
   t_tolerance: 300
   q_standard: 10000
@@ -25,5 +25,6 @@ event:
   v_crowd: 16.667
   a_intense: 3
   duration_intense: 1
+  duration_occupation: 5
   duration_low: 5
   duration_high: 5
