@@ -1,6 +1,8 @@
 # 说明
 根据实时接受的数据，实时计算宏观中观交通流。
 
+
+
 # 交通流计算方法
 ## 参数单位
 密度: v/km/ln或v/km，每车道每千米的车辆数
@@ -16,7 +18,7 @@
 ## 运算流程
 <p>
 <img
-src="./docs/traffic_parameter_calculation.png"
+src="./traffic_parameter_calculation.png"
 alt="交通流参数计算"
 title="交通流参数计算"
 width="100%"
@@ -37,6 +39,7 @@ width="100%"
 ## 交通密度的计算需要车道长度
 calibration过程得到
 
+# trafficManager架构
 <p>
 <img
 src="./trafficDataFormat.png"
@@ -45,7 +48,5 @@ title="交通数据格式"
 width="100%"
 >
 </p>
-
-
 
 
