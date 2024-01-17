@@ -79,7 +79,7 @@ class TrafficMng():
             lanes[laneID] = lm
         return lanes
 
-    def update(self, cars):
+    def update(self, cars: list):
         '''function update
 
         input
@@ -96,7 +96,7 @@ class TrafficMng():
         self._updateCache(cars)
         if self.count % self.itv == 0:
             self._updateTraffic()
-            print(self.Q, end=', ')
+            # print(self.Q, end=', ')
 
     def _updateCache(self, cars: list):
         '''function _updateCache
@@ -156,7 +156,7 @@ class TrafficMng():
         '''
         carsByLane = {id: [] for id in self.lanes}
         for car in cars:
-            laneID = car['LineNum'] - 100 if car['LineNum'] > 100 \
-                else car['LineNum']     # 大于100的减去100
+            laneID = car['laneID'] - 100 if car['laneID'] > 100 \
+                else car['laneID']     # 大于100的减去100
             carsByLane[laneID].append(car)
         return carsByLane
