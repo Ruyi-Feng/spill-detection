@@ -58,10 +58,10 @@ class Smoother():
 
         '''
 
-        tgt['XDecx'] = exp3Smooth(tgt['XDecx'], self.alpha,
-                                  lastTgt['smth']['x'])
-        tgt['YDecy'] = exp3Smooth(tgt['YDecy'], self.alpha,
-                                  lastTgt['smth']['y'])
+        # tgt['x'] = exp3Smooth(tgt['x'], self.alpha,
+        #                           lastTgt['smth']['x'])
+        # tgt['y'] = exp3Smooth(tgt['y'], self.alpha,
+        #                           lastTgt['smth']['y'])
         return tgt
 
 
