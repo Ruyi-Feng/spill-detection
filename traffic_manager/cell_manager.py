@@ -1,6 +1,8 @@
 class CellMng:
     '''class Cell
     实例化道路元胞
+    对外接口函数: updateCache, updateTraffic。
+    被laneMng调用, 用于每帧更新各个元胞的缓存, 每隔指定时间更新交通参数。
 
     Attributes
     ----------
@@ -108,8 +110,6 @@ class CellMng:
         # 检查缓存长度, 清除过期缓存
         if len(self.cache) > self.cacheRet:
             self.cache.pop(0)
-        # 更新danger
-        self._updateDanger()
 
     def updateTraffic(self):
         # 确定缓存数据量
@@ -131,7 +131,7 @@ class CellMng:
     def _updateDanger(self):
         '''function _updateDanger
 
-        更新元胞存在抛洒物的危险性
+        更新元胞存在抛洒物的危险性, 在event detect 时调用。
         '''
         # TODO 计算danger
         pass
