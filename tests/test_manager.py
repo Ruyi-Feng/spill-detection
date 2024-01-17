@@ -27,7 +27,7 @@ def testManager():
         if type(msg) == str:
             continue
         OuterCount += 1
-        tm.run(msg)
+        tm.update(msg)
         # 检查点1
         # 检验是否成功计算路段流量Q
         if OuterCount >= tm.itv:
