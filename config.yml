@@ -21,7 +21,7 @@ event:
   duration_static: 5
   v_low: 2.778
   duration_low: 5
-  v_high: 33.33
+  v_high: 22.22
   duration_high: 5
   a_intense: 3
   duration_intense: 1
