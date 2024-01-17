@@ -210,5 +210,5 @@ class LaneMng:
         根据车道的start, end, cellLen,与车辆的YDecy属性,
         确定车辆所在元胞序号。
         '''
-        order = self.vdir * (car['YDecy'] - self.start) // self.cellLen
+        order = self.vdir * (car['y'] - self.start) // self.cellLen
         return order
