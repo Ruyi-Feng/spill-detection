@@ -70,8 +70,6 @@ class EventDetector(TrafficMng):
 
         生成事件检测器，用于检测交通事件。
         '''
-        # TODO 在外层要将所有trafficmanager的方法都调整为由eventdetector调用
-
         # 令TrafficMng方法初始化给自身
         super().__init__(clb, cfg)
         # 初始化属性(其中秒为单位属性, 统一初次赋值后, 乘fps以帧为单位)
@@ -133,12 +131,12 @@ class EventDetector(TrafficMng):
         self.intenseDict = dict()
         self.occupationDict = dict()
 
-    def run(self, msg: list) -> list:
+    def run(self, cars: list) -> list:
         ''' function run
 
         input
         ------
-        msg: list
+        cars: list
             传感器数据
 
         output
@@ -149,26 +147,29 @@ class EventDetector(TrafficMng):
         更新交通流信息, 检测交通事件, 输出并返回事件列表。
         '''
         # 更新交通流信息
-        self.update(msg)
+        self.update(cars)
         # 检测交通事件
-        self.updatePotentialEventDict()
-        events = self.detect(msg)
+        self.updatePotentialEventDict(cars)
+        events = self.detect(cars)
         return events
 
-    def updatePotentialEventDict(self):
+    def updatePotentialEventDict(self, cars: list) -> None:
         '''function updatePotentialEventDict
-        更新潜在事件记录变量
+        
+        更新潜在事件记录变量, 将对应车辆的id和持续帧数记录在字典中。
+        潜在事件包括: 静止, 低速, 超速, 急刹车, 非法占道。
         '''
-        # TODO
-        pass
+        # 遍历车辆
+        for car in cars:
+            pass
 
-    def detect(self, msg: list) -> list:
+    def detect(self, cars: list) -> list:
         '''function detect
 
         检测交通事件，输出并返回事件列表
         input
         ------
-        msg: list
+        cars: list
             传感器数据
         trf: TrafficMng
             交通管理器, 存有交通流信息
@@ -187,20 +188,20 @@ class EventDetector(TrafficMng):
             events += events_s
         # 异常行驶检测
         if 'stop' in self.types:
-            events_s = self._stopDetect(msg)
+            events_s = self._stopDetect(cars)
             events += events_s
         if 'low_speed' in self.types:
-            events_l = self._lowSpeedDetect(msg)
+            events_l = self._lowSpeedDetect(cars)
             events += events_l
         if 'high_speed' in self.types:
-            events_h = self._highSpeedDetect(msg)
+            events_h = self._highSpeedDetect(cars)
             events += events_h
         if 'emergency_break' in self.types:
-            events_r = self._emergencyBrakeDetect(msg)
+            events_r = self._emergencyBrakeDetect(cars)
             events += events_r
         # 碰撞事故检测
         if 'incident' in self.types:
-            events_i = self._incidentDetect(msg)
+            events_i = self._incidentDetect(cars)
             events += events_i
         # 拥堵检测
         if 'crowd' in self.types:
@@ -208,7 +209,7 @@ class EventDetector(TrafficMng):
             events += events_c
         # 非法占道检测
         if 'illegal_occupation' in self.types:
-            events_o = self._illegalOccupationDetect(msg)
+            events_o = self._illegalOccupationDetect(cars)
             events += events_o
         return events
 
@@ -230,12 +231,12 @@ class EventDetector(TrafficMng):
 
         return events_s
 
-    def _stopDetect(self, msg: list) -> list:
+    def _stopDetect(self, cars: list) -> list:
         '''function stopDetect
 
         input
         ------
-        msg:
+        cars:
             list, 传感器数据
 
         output
@@ -248,12 +249,12 @@ class EventDetector(TrafficMng):
 
         return events_l
 
-    def _lowSpeedDetect(self, msg: list) -> list:
+    def _lowSpeedDetect(self, cars: list) -> list:
         '''function lowSpeedDetect
 
         input
         ------
-        msg:
+        cars:
             list, 传感器数据
 
         output
@@ -266,12 +267,12 @@ class EventDetector(TrafficMng):
 
         return events_l
 
-    def _highSpeedDetect(self, msg: list) -> list:
+    def _highSpeedDetect(self, cars: list) -> list:
         '''function highSpeedDetect
 
         input
         ------
-        msg:
+        cars:
             list, 传感器数据
 
         output
@@ -284,12 +285,12 @@ class EventDetector(TrafficMng):
 
         return events_h
   
-    def _emergencyBrakeDetect(self, msg: list) -> list:
+    def _emergencyBrakeDetect(self, cars: list) -> list:
         '''function intensiveSpeedReductionDetect
 
         input
         ------
-        msg:
+        cars:
             list, 传感器数据
 
         output
@@ -302,12 +303,12 @@ class EventDetector(TrafficMng):
 
         return events_r
 
-    def _incidentDetect(self, msg: list) -> list:
+    def _incidentDetect(self, cars: list) -> list:
         '''function incidentDetect
 
         input
         ------
-        msg:
+        cars:
             list, 传感器数据
 
         output
@@ -333,12 +334,12 @@ class EventDetector(TrafficMng):
 
         return events_c
 
-    def _illegalOccupationDetect(self, msg: list) -> list:
+    def _illegalOccupationDetect(self, cars: list) -> list:
         '''function illegalOccupationDetect
 
         input
         ------
-        msg:
+        cars:
             list, 传感器数据
 
         output
