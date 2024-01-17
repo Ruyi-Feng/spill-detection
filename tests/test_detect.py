@@ -20,23 +20,9 @@ def test_detect():
     smltor = Smltor(dataPath)
     # 生成驱动器
     d = Driver()
-    # 生成检测器
-    ed = EventDetector(config['fps'],
-                       config['event']['event_types'],
-                       config['event']['v_low'],
-                       config['event']['v_high'],
-                       config['event']['t_tolerance'],
-                       config['event']['q_standard'],
-                       config['event']['rate2'],
-                       config['event']['d_touch'],
-                       config['event']['density_crowd'],
-                       config['event']['v_crowd'],
-                       config['event']['a_intense'],
-                       config['event']['duration_intense'],
-                       config['event']['duration_low'],
-                       config['event']['duration_high'])
-    # 生成交通管理器
-    tm = TrafficMng(clb, config)
+    # 生成检测器(内含交通管理器)
+    ed = EventDetector(config['fps'], clb, config)
+
     # 仿真器读取数据
     while True:
         msg = smltor.run()
@@ -45,10 +31,8 @@ def test_detect():
         valid, cars = d.receive(msg)
         if not valid:
             continue
-        # 交通流参数计算
-        tm.run(cars)
         # 事件检测
-        event = ed.run(cars, tm)
+        event = ed.run(cars)
         if event != []:
             print(event)
         # 检查点1
@@ -1677,5 +1661,5 @@ def test_detect():
         cars = [car]   # 模拟传输来的1条信息
         valid, cars = d.receive(cars)
         assert valid
-        event = ed.run(cars, tm)
+        event = ed.run(cars)
         assert type(event) == list
