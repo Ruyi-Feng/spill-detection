@@ -1,3 +1,19 @@
+# 数据格式接口, 从接收数据转化为内部处理数据
+interface = {'TargetId': 'id',
+             'XDecx': 'x',
+             'YDecy': 'y',
+             'VDecVx': 'vx',
+             'VDecVy': 'vy',
+             'Xsize': 'width',
+             'Ysize': 'length',
+             'TargetType': 'class',
+             'LineNum': 'laneID'
+             }
+# 返还数据格式接口, 从内部处理数据转化为输出数据
+interface_back = dict()
+for key in interface.keys():
+    interface_back[interface[key]] = key
+
 class Driver():
     '''class Driver
 
@@ -16,22 +32,17 @@ class Driver():
         msg: list, 代码内流通的数据格式。
 
         接受传来的数据message, 将原始数据格式转化为代码内流通的数据格式。
-        返回值与接受的msg相比:
-        1. 增加加速度属性a
-        2. 增加速度属性speed, 单位m/s
-        3. 增加所在元胞属性cell
-        4. 增加三次指数平滑值属性smth
+        具体为: 修改原始数据属性名称为代码内部流通数据的属性名称。
         '''
+        # 检查传输信息是否为目标数据
         valid = self._ifValid(msg)
         if not valid:
             return False, msg
-        # 可用的目标数据信息
         for i in range(len(msg)):
-            msg[i]['a'] = 0
-            msg[i]['speed'] = 0
-            msg[i]['cell'] = {'lane': -1, 'order': -1}
-            msg[i]['smth'] = {'x': {1: 0, 2: 0, 3: 0},
-                              'y': {1: 0, 2: 0, 3: 0}}     # 存储三次指数平滑值
+            # 修改属性名称
+            for key in interface.keys():
+                msg[i][interface[key]] = msg[i][key]
+                del msg[i][key]
         return True, msg
 
     def send(self, msg: list) -> list:
@@ -46,16 +57,13 @@ class Driver():
         msg: list, 输出到外部的数据。
 
         将代码内部流通的数据, 转化为输出需要的格式。返回值与代码内流通相比相比:
-        1. 删除加速度属性a
-        2. 删除速度属性speed
-        3. 删除所在元胞属性cell
-        4. 删除三次指数平滑值属性smth
+        具体为: 还原代码内部流通数据为原始数据属性名称的属性名称
         '''
         for i in range(len(msg)):
-            del msg[i]['a']
-            del msg[i]['speed']
-            del msg[i]['cell']
-            del msg[i]['smth']
+            # 还原属性名称
+            for key in interface_back.keys():
+                msg[i][interface_back[key]] = msg[i][key]
+                del msg[i][key]
         return msg
 
     def _ifValid(self, msg) -> bool:
