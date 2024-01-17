@@ -43,6 +43,12 @@ class Driver():
             for key in interface.keys():
                 msg[i][interface[key]] = msg[i][key]
                 del msg[i][key]
+            # TODO 暂时在driver中加入，应当放在prepro中
+            msg[i]['a'] = 0
+            msg[i]['laneNeedAdd'] = False
+            if msg[i]['laneID'] > 100:
+                msg[i]['laneID'] -= 100
+                msg[i]['laneNeedAdd'] = True
         return True, msg
 
     def send(self, msg: list) -> list:
@@ -57,13 +63,20 @@ class Driver():
         msg: list, 输出到外部的数据。
 
         将代码内部流通的数据, 转化为输出需要的格式。返回值与代码内流通相比相比:
-        具体为: 还原代码内部流通数据为原始数据属性名称的属性名称
+        具体为: 还原代码内部流通数据为原始数据属性名称的属性名称,
+        并删除内部增加的属性。
         '''
         for i in range(len(msg)):
             # 还原属性名称
             for key in interface_back.keys():
                 msg[i][interface_back[key]] = msg[i][key]
                 del msg[i][key]
+            # TODO 除del外的操作, 暂时在driver中加入, 应当放在prepro中
+            del msg[i]['a']
+            if msg[i]['laneNeedAdd']:
+                msg[i][interface_back['laneID']] += 100
+                del msg[i]['laneNeedAdd']
+            
         return msg
 
     def _ifValid(self, msg) -> bool:
