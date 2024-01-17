@@ -13,18 +13,20 @@ traffic:
   q_duration: 300
   cal_interval: 30
 event:
-  event_types: ["crowd", "high_speed", "illegal_occupation", "incident_single_car", "incident", "intensive_speed_reduction", "low_speed", "spill"]
-  v_static: 2.778
-  v_low: 11.11
-  v_high: 33.33
+  event_types: ["spill","stop", "low_speed", "high_speed", "emergency_break", "incident", "crowd", "illegal_occupation"]
   t_tolerance: 300
   q_standard: 10000
   rate2: 0.1
-  d_touch: 5
-  density_crowd: 18
-  v_crowd: 16.667
+  v_static: 1
+  duration_static: 5
+  v_low: 2.778
+  duration_low: 5
+  v_high: 33.33
+  duration_high: 5
   a_intense: 3
   duration_intense: 1
+  d_touch: 5
+  t_supervise: 20
+  density_crowd: 18
+  v_crowd: 16.667
   duration_occupation: 5
-  duration_low: 5
-  duration_high: 5
