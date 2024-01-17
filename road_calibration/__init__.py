@@ -100,23 +100,23 @@ class Calibrator():
             #         del target[k]
             #     print(target, ',', sep='')
 
-            laneID = target['LineNum'] - 100 if target['LineNum'] > 100 \
-                else target['LineNum']
+            laneID = target['laneID'] - 100 if target['laneID'] > 100 \
+                else target['laneID']
 
             # 分配dict索引()
             if laneID not in self.xyByLane:
                 self.xyByLane[laneID] = []
                 self.vxyCount[laneID] = {'x': 0, 'y': 0}
             # 存储vxy
-            self.xyByLane[laneID].append([target['XDecx'], target['YDecy']])
+            self.xyByLane[laneID].append([target['x'], target['y']])
             # 更新vxyCount
-            if target['VDecVx'] > 0:
+            if target['vx'] > 0:
                 self.vxyCount[laneID]['x'] += 1
-            elif target['VDecVx'] < 0:
+            elif target['vx'] < 0:
                 self.vxyCount[laneID]['x'] -= 1
-            if target['VDecVy'] > 0:
+            if target['vy'] > 0:
                 self.vxyCount[laneID]['y'] += 1
-            elif target['VDecVy'] < 0:
+            elif target['vy'] < 0:
                 self.vxyCount[laneID]['y'] -= 1
 
     def calibrate(self):
