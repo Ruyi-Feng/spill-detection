@@ -74,6 +74,7 @@ class EventDetector(TrafficMng):
         super().__init__(clb, cfg)
         # 初始化属性(其中秒为单位属性, 统一初次赋值后, 乘fps以帧为单位)
         self.fps = fps
+        self.clb = clb
         self.types = cfg['event_types'] if 'event_types' in cfg.keys() else \
             default_event_config['types']
         # 抛洒物检测参数
@@ -161,7 +162,37 @@ class EventDetector(TrafficMng):
         '''
         # 遍历车辆
         for car in cars:
-            pass
+            # 潜在静止
+            if abs(car['vy']) <= self.vs:
+                if car['id'] not in self.staticDict.keys():
+                    self.staticDict[car['id']] = 1
+                else:
+                    self.staticDict[car['id']] += 1
+            # 潜在低速
+            if self.vs < abs(car['vy']) <= self.vl:
+                if car['id'] not in self.lowSpeedDict.keys():
+                    self.lowSpeedDict[car['id']] = 1
+                else:
+                    self.lowSpeedDict[car['id']] += 1
+            # 潜在超速
+            if abs(car['vy']) > self.vh:
+                if car['id'] not in self.highSpeedDict.keys():
+                    self.highSpeedDict[car['id']] = 1
+                else:
+                    self.highSpeedDict[car['id']] += 1
+            # 潜在急刹车
+            # TODO a可能要考虑改为ay
+            if (abs(car['a']) > self.ai) & (car['a'] * car['vy'] <= 0):
+                if car['id'] not in self.intenseDict.keys():
+                    self.intenseDict[car['id']] = 1
+                else:
+                    self.intenseDict[car['id']] += 1
+            # 潜在应急车道占用
+            if self.clb[car['laneID']]['emgc']:
+                if car['id'] not in self.occupationDict.keys():
+                    self.occupationDict[car['id']] = 1
+                else:
+                    self.occupationDict[car['id']] += 1
 
     def detect(self, cars: list) -> list:
         '''function detect
