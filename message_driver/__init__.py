@@ -45,6 +45,7 @@ class Driver():
                 del msg[i][key]
             # TODO 暂时在driver中加入，应当放在prepro中
             msg[i]['a'] = 0
+            msg[i]['speed'] = (msg[i]['vx']**2 + msg[i]['vy']**2)**0.5
             msg[i]['laneNeedAdd'] = False
             if msg[i]['laneID'] > 100:
                 msg[i]['laneID'] -= 100
@@ -73,10 +74,11 @@ class Driver():
                 del msg[i][key]
             # TODO 除del外的操作, 暂时在driver中加入, 应当放在prepro中
             del msg[i]['a']
+            del msg[i]['speed']
             if msg[i]['laneNeedAdd']:
                 msg[i][interface_back['laneID']] += 100
                 del msg[i]['laneNeedAdd']
-            
+
         return msg
 
     def _ifValid(self, msg) -> bool:
