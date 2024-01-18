@@ -5,7 +5,7 @@ from typing import Dict
 class LaneMng:
     '''class Lane
     按照车道管理车道属性和交通流参数
-    唯二对外接口函数: `updateCache(cars)`, `updateTraffic()`, 返回值为None。
+    对外接口函数: `updateCache(cars)`, `updateTraffic(), updateDanger()`, 返回值为None。
     用于被上层trafficMng调用, 每帧将调用更新缓存, 每个指定时间更新traffic。
     该2个函数的调用顺序不可颠倒, 内部实际为调用cell的2个更新函数。
 
@@ -134,6 +134,7 @@ class LaneMng:
                                cfg['fps'],
                                cfg['event']['q_standard'],
                                cfg['event']['rate2'],
+                               cfg['event']['v_lat'],
                                self.cacheRet)
             # print([self.ID, i, self.cellsValid[i],
             #                    self.cellLen, start, end])
@@ -188,6 +189,21 @@ class LaneMng:
         '''
         for order in self.cells:
             self.cells[order].updateR1(q)
+
+    def updateDanger(self):
+        '''function updateDanger
+
+        更新cell的危险系数
+        '''
+        for order in self.cells:
+            # 按时间增加r1, 并检查是否需要让前方cell增加r2
+            PossibleFrontSpill, _ = self.cells[order].updateDanger()
+            # 如果当前遍历的cell发现可能有抛洒物, 前方cell更新危险度+r2
+            if PossibleFrontSpill:
+                for frontOrder in self.cells:
+                    if frontOrder <= order:
+                        continue
+                    self.cells[frontOrder].updateDangerPassive()
 
     def _carsByCell(self, cars: list) -> dict:
         '''function _carsByCell
