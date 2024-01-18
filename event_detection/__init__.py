@@ -19,7 +19,7 @@ class EventDetector(TrafficMng):
     唯一对外调用函数: `run(cars)`, 用于更新交通流信息, 检测交通事件, 输出并返回事件列表。
     此种定义下, 在外围调用时, 无需生成TrafficMng类,
     只需生成EventDetector类即可, EventDetector可直接调用TrafficMng的方法。
-    TODO 当前报警信息每帧输出一次, 没必要, 应该一定时间报警一次即可。
+    TODO 当前报警信息每帧输出一次, 没必要, 除spill外报警一次即可。
 
     Properties
     ----------
@@ -163,6 +163,7 @@ class EventDetector(TrafficMng):
 
         更新潜在事件记录变量, 将对应车辆的id和持续帧数记录在字典中。
         潜在事件包括: 静止, 低速, 超速, 急刹车, 非法占道。
+        关于为啥这个函数套了5个小函数, 因为直接写在这个里面flake8会提示复杂了。
         '''
         # 遍历车辆
         for car in cars:
@@ -170,35 +171,95 @@ class EventDetector(TrafficMng):
             self.currentIDs.append(car['id'])
             # 潜在静止
             if abs(car['vy']) <= self.vs:
-                if car['id'] not in self.staticDict.keys():
-                    self.staticDict[car['id']] = 1
-                else:
-                    self.staticDict[car['id']] += 1
+                self._updateStaticDict(car['id'])
             # 潜在低速
             if self.vs < abs(car['vy']) <= self.vl:
-                if car['id'] not in self.lowSpeedDict.keys():
-                    self.lowSpeedDict[car['id']] = 1
-                else:
-                    self.lowSpeedDict[car['id']] += 1
+                self._updateLowSpeedDict(car['id'])
             # 潜在超速
             if abs(car['vy']) > self.vh:
-                if car['id'] not in self.highSpeedDict.keys():
-                    self.highSpeedDict[car['id']] = 1
-                else:
-                    self.highSpeedDict[car['id']] += 1
+                self._updateHighSpeedDict(car['id'])
             # 潜在急刹车
             # TODO a可能要考虑改为ax,ay,a
             if (abs(car['a']) > self.ai) & (car['a'] * car['vy'] <= 0):
-                if car['id'] not in self.intenseDict.keys():
-                    self.intenseDict[car['id']] = 1
-                else:
-                    self.intenseDict[car['id']] += 1
+                self._updateIntenseDict(car['id'])
             # 潜在应急车道占用
             if self.clb[car['laneID']]['emgc']:
-                if car['id'] not in self.occupationDict.keys():
-                    self.occupationDict[car['id']] = 1
-                else:
-                    self.occupationDict[car['id']] += 1
+                self._updateOccupationDict(car['id'])
+
+    def _updateStaticDict(self, id: int) -> None:
+        '''function _updateStaticDict
+
+        input
+        ------
+        id: int
+            车辆id
+
+        更新静止记录字典
+        '''
+        if id in self.staticDict.keys():
+            self.staticDict[id] += 1
+        else:
+            self.staticDict[id] = 1
+
+    def _updateLowSpeedDict(self, id: int) -> None:
+        '''function _updateLowSpeedDict
+
+        input
+        ------
+        id: int
+            车辆id
+
+        更新低速记录字典
+        '''
+        if id in self.lowSpeedDict.keys():
+            self.lowSpeedDict[id] += 1
+        else:
+            self.lowSpeedDict[id] = 1
+
+    def _updateHighSpeedDict(self, id: int) -> None:
+        '''function _updateHighSpeedDict
+
+        input
+        ------
+        id: int
+            车辆id
+
+        更新高速记录字典
+        '''
+        if id in self.highSpeedDict.keys():
+            self.highSpeedDict[id] += 1
+        else:
+            self.highSpeedDict[id] = 1
+
+    def _updateIntenseDict(self, id: int) -> None:
+        '''function _updateIntenseDict
+
+        input
+        ------
+        id: int
+            车辆id
+
+        更新急刹车记录字典
+        '''
+        if id in self.intenseDict.keys():
+            self.intenseDict[id] += 1
+        else:
+            self.intenseDict[id] = 1
+
+    def _updateOccupationDict(self, id: int) -> None:
+        '''function _updateOccupationDict
+
+        input
+        ------
+        id: int
+            车辆id
+
+        更新应急车道占用记录字典
+        '''
+        if id in self.occupationDict.keys():
+            self.occupationDict[id] += 1
+        else:
+            self.occupationDict[id] = 1
 
     def detect(self, cars: list) -> list:
         '''function detect
@@ -209,8 +270,6 @@ class EventDetector(TrafficMng):
         ------
         cars: list
             传感器数据
-        trf: TrafficMng
-            交通管理器, 存有交通流信息
 
         output
         ------
@@ -254,11 +313,6 @@ class EventDetector(TrafficMng):
     def _spillDetect(self) -> list:
         '''function spillDetect
 
-        input
-        ------
-        traffic:
-            dict, 交通流数据
-
         output
         ------
         events: list, 事件列表, 元素为event的衍生类
@@ -266,7 +320,21 @@ class EventDetector(TrafficMng):
         检测抛洒物事件, 输出并返回事件列表
         '''
         events_s = []
-
+        self.updateDanger()     # 更新危险度
+        # 检查是否存在抛洒物可能
+        for id in self.lanes:
+            for order in self.lanes[id].cells:
+                # 检查危险度达到1否, 若则报警
+                if self.lanes[id].cells[order].danger >= 1:
+                    # TODO 设置每隔一段时间报警, 报警信息包括车道, cell的起始与重点
+                    cellStart = self.lanes[id].cells[order].start
+                    cellEnd = self.lanes[id].cells[order].end
+                    if cellStart >= cellEnd:
+                        cellStart, cellEnd = cellEnd, cellStart
+                    event = f"事件: id={str(id)}车道可能有抛洒物, " + \
+                        f"元胞起点: {str(cellStart)}, 元胞终点: {str(cellEnd)}, " + \
+                        f"危险度: {str(self.lanes[id].cells[order].danger)}。"
+                    events_s.append(event)
         return events_s
 
     def _stopDetect(self, cars: list) -> list:
