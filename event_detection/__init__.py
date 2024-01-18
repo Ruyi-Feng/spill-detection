@@ -359,10 +359,10 @@ class EventDetector(TrafficMng):
                 id2delete.append(id)
                 continue
             # 检查事件
-            if self.staticDict[id] >= self.ds:
+            if self.staticDict[id] == self.ds:
                 event = f"事件: id={str(id)}车辆准静止, " + \
                     self._getCarBaseInfo(self._getCarFromCars(cars, id)) + \
-                    f", 持续时间{str(self.staticDict[id]/self.fps)}s。"
+                    f", 已持续时间{str(self.staticDict[id]/self.fps)}s。"
                 events_l.append(event)
         # 删除已消失目标
         for id in id2delete:
@@ -391,10 +391,10 @@ class EventDetector(TrafficMng):
                 id2delete.append(id)
                 continue
             # 检查事件
-            if self.lowSpeedDict[id] >= self.dl:
+            if self.lowSpeedDict[id] == self.dl:
                 event = f"事件: id={str(id)}车辆低速行驶, " + \
                     self._getCarBaseInfo(self._getCarFromCars(cars, id)) + \
-                    f", 持续时间{str(self.lowSpeedDict[id]/self.fps)}s。"
+                    f", 已持续时间{str(self.lowSpeedDict[id]/self.fps)}s。"
                 events_l.append(event)
         # 删除已消失目标
         for id in id2delete:
@@ -423,10 +423,10 @@ class EventDetector(TrafficMng):
                 id2delete.append(id)
                 continue
             # 检查事件
-            if self.highSpeedDict[id] >= self.dh:
+            if self.highSpeedDict[id] == self.dh:
                 event = f"事件: id={str(id)}车辆超速行驶, " + \
                     self._getCarBaseInfo(self._getCarFromCars(cars, id)) + \
-                    f", 持续时间{str(self.highSpeedDict[id]/self.fps)}s。"
+                    f", 已持续时间{str(self.highSpeedDict[id]/self.fps)}s。"
                 events_h.append(event)
         # 删除已消失目标
         for id in id2delete:
@@ -455,11 +455,11 @@ class EventDetector(TrafficMng):
                 id2delete.append(id)
                 continue
             # 检查事件
-            if self.intenseDict[id] >= self.di:
+            if self.intenseDict[id] == self.di:
                 event = f"事件: id={str(id)}车辆急刹车, " + \
                     self._getCarBaseInfo(self._getCarFromCars(cars, id)) + \
                     f"加速度: {cars[id]['a']}" + \
-                    f", 持续时间{str(self.intenseDict[id]/self.fps)}s。"
+                    f", 已持续时间{str(self.intenseDict[id]/self.fps)}s。"
                 events_r.append(event)
         # 删除已消失目标
         for id in id2delete:
@@ -579,10 +579,10 @@ class EventDetector(TrafficMng):
                 id2delete.append(id)
                 continue
             # 检查事件
-            if self.occupationDict[id] >= self.do:
+            if self.occupationDict[id] == self.do:
                 event = f"事件: id={str(id)}车辆非法占用应急车道, " + \
                     self._getCarBaseInfo(self._getCarFromCars(cars, id)) + \
-                    f", 持续时间{str(self.occupationDict[id]/self.fps)}s。"
+                    f", 已持续时间{str(self.occupationDict[id]/self.fps)}s。"
                 events_o.append(event)
         # 删除已消失目标
         for id in id2delete:
