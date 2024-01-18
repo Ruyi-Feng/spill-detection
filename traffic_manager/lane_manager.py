@@ -134,7 +134,7 @@ class LaneMng:
                                cfg['fps'],
                                cfg['event']['q_standard'],
                                cfg['event']['rate2'],
-                               cfg['event']['v_lat'],
+                               cfg['event']['v_lateral'],
                                self.cacheRet)
             # print([self.ID, i, self.cellsValid[i],
             #                    self.cellLen, start, end])
