@@ -90,6 +90,8 @@ class CellMng:
         # 缓存
         self.cache = []    # list内按顺序索引, 用dict反而会有遍历的消耗
         self.cacheRet = cacheRet
+        # 每帧更新r2是否被加，加上了就不再加了, 每帧更新r2时重置为False
+        self.r2added = False
 
     def updateCache(self, cars: list):
         '''function update
@@ -126,7 +128,20 @@ class CellMng:
             abs(sum([car['vy'] for car in cars])) / len(cars)
         # 计算q(单位: veh/h)
         self.q = self.k * self.v * 3.6
-        # TODO 每次更新交通参数, 更新rate1数值
+
+    def _updateR1(self, q: float):
+        '''function _updateR1
+
+        input
+        -----
+        q: float
+            整个路段交通流量, 单位: 辆/小时
+
+        将路段q数据传递给各个cell, 用于更新cell抛洒物置信度随时间增长的rate1。
+        每次更新计算traffic后, 由trafficManager调用, 更新r1的新数据。
+        计算方法: r1 = r1s * q / qs
+        '''
+        self.r1 = self.r1s * q / self.qs
 
     def _updateDanger(self):
         '''function _updateDanger
