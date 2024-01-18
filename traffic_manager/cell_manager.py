@@ -136,8 +136,8 @@ class CellMng:
         # 计算q(单位: veh/h)
         self.q = self.k * self.v * 3.6
 
-    def _updateR1(self, q: float):
-        '''function _updateR1
+    def updateR1(self, q: float):
+        '''function updateR1
 
         input
         -----
