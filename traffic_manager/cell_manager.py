@@ -1,7 +1,7 @@
 class CellMng:
     '''class Cell
     实例化道路元胞
-    对外接口函数: updateCache, updateTraffic。
+    对外接口函数: `updateCache(cars), updateTraffic(), updateDanger()`。
     被laneMng调用, 用于每帧更新各个元胞的缓存, 每隔指定时间更新交通参数。
 
     Attributes
@@ -30,6 +30,8 @@ class CellMng:
         rate1, 元胞默认随时间增长的置信度, 按r1s * q / qs更新
     r2 : float
         rate2, 过大横向速度和换道导致的前向元胞置信度增加值
+    vLat : float
+        lateral velocity, 横向速度阈值(认定前方可能有抛洒物), 单位: m/s
     danger : float
         元胞存在抛洒物的危险性
     cache : list
@@ -37,10 +39,12 @@ class CellMng:
         TODO: 直接缓存车辆整个信息会不会炸内存? 还是只缓存必要信息?
     cacheRet: int
         cache retention, 缓存最长时间, 超出此时间的缓存被清除, 单位: 帧
+    r2added: bool
+        每帧更新r2是否被加, 加上了就不再加了, 每帧更新r2时重置为False
     '''
     def __init__(self, laneID: int, order: int, valid: bool,
                  len: float, start: float, end: float,
-                 tt: float, fps: float, qs: float, r2: float,
+                 tt: float, fps: float, qs: float, r2: float, vLat: float,
                  cacheRet: float):
         '''function __init__
 
@@ -66,6 +70,8 @@ class CellMng:
             q standard, 用于影响元胞置信度时间增长率r1的标准流量, 单位: veh/h
         r2 : float
             rate2, 过大横向速度和换道导致的前向元胞置信度增加值
+        vLat : float
+            lateral velocity, 横向速度阈值(认定前方可能有抛洒物), 单位: m/s
         cacheRet: int
             cache retention, 缓存最长时间, 超出此时间的缓存被清除, 单位: 帧
         '''
@@ -86,6 +92,7 @@ class CellMng:
         self.qs = qs
         self.r1 = 0
         self.r2 = r2
+        self.vLat = vLat
         self.danger = 0.0
         # 缓存
         self.cache = []    # list内按顺序索引, 用dict反而会有遍历的消耗
@@ -143,10 +150,42 @@ class CellMng:
         '''
         self.r1 = self.r1s * q / self.qs
 
-    def _updateDanger(self):
+    def updateDanger(self) -> (bool, int):
         '''function _updateDanger
 
+        return
+        ------
+        PossibleFrontSpill: bool
+            是否有可能前方有抛洒物
+        order: int
+            当前元胞序号
+
         更新元胞存在抛洒物的危险性, 在event detect 时调用。
+        返回bool和int, bool代表该cell前方是否有可能有抛洒物,
+        int代表该cell的序号。
         '''
-        # TODO 计算danger
-        pass
+        PossibleFrontSpill = False
+        # 若最后一帧有车, 更新danger为0
+        if len(self.cache[-1]) != 0:
+            self.danger = 0.0
+            # 判断是否有车辆速度超限
+            for car in self.cache[-1]:
+                if abs(car['vx']) > self.vLat:
+                    PossibleFrontSpill = True
+                    return PossibleFrontSpill, self.order
+        else:
+            # 增加默认时间增长率
+            self.danger += self.r1
+        return PossibleFrontSpill, self.order
+
+    def updateDangerPassive(self):
+        '''function updateDangerPassive
+
+        更新元胞存在抛洒物的危险性, 区别于updateDanger,
+        updateDanger为每帧都会调用更新,
+        而updateDangerPassive为该元胞可能存在抛洒物时才会调用更新。
+        在event detect 时发现该元胞前一些元胞有车辆横向速度过大时调用。
+        '''
+        if not self.r2added:    # 已经被加过就不加了
+            self.danger += self.r2
+            self.r2added = True
