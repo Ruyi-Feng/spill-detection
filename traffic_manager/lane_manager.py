@@ -176,6 +176,19 @@ class LaneMng:
         self.v = vSum / aveCarNum if aveCarNum != 0 else 0  # 加权求速度
         self.q = self.k * self.v * 3.6
 
+    def updateR1(self, q: float):
+        '''function updateR1
+
+        input
+        -----
+        q: float
+            整个路段交通流量, 单位: 辆/小时
+
+        将路段q数据传递给各个cell, 用于更新cell抛洒物置信度随时间增长的rate1
+        '''
+        for order in self.cells:
+            self.cells[order].updateR1(q)
+
     def _carsByCell(self, cars: list) -> dict:
         '''function _carsByCell
 
