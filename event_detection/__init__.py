@@ -548,12 +548,12 @@ class EventDetector(TrafficMng):
         '''
         events_c = []
         # 遍历车道实例
-        for lm in self.lanes:
+        for id in self.lanes:
+            k = self.lanes[id].k
+            v = self.lanes[id].v
             # 检查事件
-            if (lm.k >= self.dstc) & (lm.v <= self.vc):
-                event = f"事件: id={str(lm.ID)}车道拥堵, " + \
-                    f"车道密度: {str(lm.k)}辆/km, " + \
-                    f"车道速度: {str(lm.v)}km/h。"
+            if (k >= self.dstc) & (v <= self.vc):
+                event = f"事件: id={id}车道拥堵, 车道密度: {k}辆/km, 车道速度: {v}km/h。"
                 events_c.append(event)
         return events_c
 
