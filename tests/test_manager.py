@@ -9,7 +9,9 @@ def testManager():
     configPath = './config.yml'
     clbPath = './road_calibration/clb.yml'
     dataPath = './data/result.txt'
-    # standardQ = [923, 937, 1121, 1153, 1147, 1137, 1101, 1058, 1103, 1094, 1101, 1155, 1158, 1192, 1227, 1193, 1250, 1297, 1241, 1241, 1266]
+    # standardQ = [923, 937, 1121, 1153, 1147, 1137, 1101, 1058, 1103, 1094,
+    #              1101, 1155, 1158, 1192, 1227, 1193, 1250, 1297, 1241, 1241,
+    #              1266]
 
     # 读取配置文件和标定文件
     with open(configPath, 'r') as f:

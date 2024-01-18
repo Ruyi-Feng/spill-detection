@@ -35,6 +35,12 @@ class LaneMng:
         cache retention, 缓存保存时长, 单位: 帧
     cells: dict
         键为元胞序号order, 值为CellMng实例
+    q: float
+        车道交通流量, 单位: 辆/小时
+    k: float
+        车道密度, 单位: 辆/公里
+    v: float
+        车道平均速度, 单位: 公里/小时
 
     Methods
     -------

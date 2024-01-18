@@ -17,7 +17,7 @@ class EventDetector(TrafficMng):
 
     事件检测类, 用于检测交通事件。继承TrafficMng类, 用于获取交通流信息。
     唯一对外调用函数: `run(cars)`, 用于更新交通流信息, 检测交通事件, 输出并返回事件列表。
-    此种定义下, 在外围调用时, 无需生成TrafficMng类, 
+    此种定义下, 在外围调用时, 无需生成TrafficMng类,
     只需生成EventDetector类即可, EventDetector可直接调用TrafficMng的方法。
     TODO 当前报警信息每帧输出一次, 没必要, 应该一定时间报警一次即可。
 
@@ -29,7 +29,7 @@ class EventDetector(TrafficMng):
         event_types需要检测的事件列表, 包括: 抛撒物检测,
         停车检测, 低速行驶检测, 超速行驶检测, 急停车检测,
         事故检测, 拥堵检测, 非法占用应急车道检测。
-    
+
     检测参数，包括: tt, qs, r2, vs, ds, vl, dl, vh, dh, ai, di,
                    dt, ts, dstc, vc, do
     抛洒物检测类
@@ -53,7 +53,6 @@ class EventDetector(TrafficMng):
     vc: float, v_crowd, 拥堵速度阈值, 单位m/s
     非法占道类
     do: float, duration_occupation, 非法占道持续时间阈值, 单位s
-
     '''
     def __init__(self, fps, clb, cfg):
         ''' function __init__
@@ -115,7 +114,7 @@ class EventDetector(TrafficMng):
         # 非法占道检测参数
         self.do = cfg['do'] if 'duration_occupation' in cfg.keys() else \
             default_event_config['do']
-        
+
         # 更新参数单位从秒到帧
         self.tt *= self.fps     # 抛洒物存在持续时间容忍度
         self.ds *= self.fps     # 准静止持续时间阈值
@@ -154,14 +153,14 @@ class EventDetector(TrafficMng):
         # 更新交通流信息
         self.update(cars)
         # 检测交通事件
-        self.updatePotentialEventDict(cars)
+        self.updatePotentialDict(cars)
         events = self.detect(cars)
         self.currentIDs = []    # 清空当前帧车辆id列表
         return events
 
-    def updatePotentialEventDict(self, cars: list) -> None:
-        '''function updatePotentialEventDict
-        
+    def updatePotentialDict(self, cars: list) -> None:
+        '''function updatePotentialDict
+
         更新潜在事件记录变量, 将对应车辆的id和持续帧数记录在字典中。
         潜在事件包括: 静止, 低速, 超速, 急刹车, 非法占道。
         '''
@@ -365,7 +364,7 @@ class EventDetector(TrafficMng):
         for id in id2delete:
             del self.highSpeedDict[id]
         return events_h
-  
+
     def _emergencyBrakeDetect(self, cars: list) -> list:
         '''function intensiveSpeedReductionDetect
 
@@ -415,7 +414,7 @@ class EventDetector(TrafficMng):
         '''
         events_i = []
         # 异常运动车辆少于2，不可能有事故
-        if (len(self.staticDict) + len(self.lowSpeedDict) + \
+        if (len(self.staticDict) + len(self.lowSpeedDict) +
                 len(self.highSpeedDict) + len(self.intenseDict)) < 2:
             return events_i
         # 组合异常车辆id列表, 求并集
@@ -440,13 +439,15 @@ class EventDetector(TrafficMng):
                 if (kAve < self.dstc) & (vAve > self.vc):
                     continue
                 # 判定距离小于接触距离
-                d = ((car1['x'] - car2['x'])**2 + (car1['y'] - car2['y'])**2)**0.5
+                d = ((car1['x'] - car2['x'])**2 +
+                     (car1['y'] - car2['y'])**2)**0.5
                 if d < self.dt:  # 加入监测对象
                     self.incidentDict[[car1['id'], car2['id']]] = 1
         # 遍历incidentDict, 检查事件
         for ids in self.incidentDict:
             # 若某一车不在currentIDs中, 则移除监测, 跳过
-            if (ids[0] not in self.currentIDs) | (ids[1] not in self.currentIDs):
+            if not ((ids[0] in self.currentIDs) &
+                    (ids[1] in self.currentIDs)):
                 del self.incidentDict[ids]
                 continue
             # 检查两辆车是否在某时刻速度趋于0
@@ -465,7 +466,7 @@ class EventDetector(TrafficMng):
                 if self.incidentDict[ids] >= self.ts:
                     # 删除记录
                     del self.incidentDict[ids]
-        
+
         return events_i
 
     def _crowdDetect(self) -> list:
@@ -549,7 +550,7 @@ class EventDetector(TrafficMng):
         ------
         car: dict
             单车数据
-        
+
         return
         ------
         info: str

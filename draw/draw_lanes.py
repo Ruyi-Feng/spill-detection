@@ -34,7 +34,7 @@ def drawLanes():
         lanePoly[laneID] = array(clb[laneID]['coef'])
         vDir[laneID] = clb[laneID]['vDir']['y']
     colormap = ['brown', 'olive', 'gold', 'lime', 'red',
-            'aqua', 'maroon', 'fuchsia', 'navy', 'silver']
+                'aqua', 'maroon', 'fuchsia', 'navy', 'silver']
 
     # 画布生成
     plt.figure(figsize=(16, 16))
