@@ -6,7 +6,7 @@ class TrafficMng():
     '''class TrafficManager
 
     交通流计算类，根据传感器信息计算交通流。
-    唯一对外接口函数: `update(cars)`, 返回值为None。
+    对外接口函数: `update(cars), updateDanger()`, 返回值为None。
     实现tm对车辆进行按帧缓存, 并每隔一定时间计算交通流参数。
 
     Attributes
@@ -98,6 +98,14 @@ class TrafficMng():
             self._updateTraffic()
             self._updateR1()    # 更新路段q后, 重新计算cell的抛洒物置信度时间增长率R1
             # print(self.Q, end=', ')
+
+    def updateDanger(self):
+        '''function updateDanger
+
+        更新cell的危险系数
+        '''
+        for id in self.lanes:
+            self.lanes[id].updateDanger()
 
     def _updateCache(self, cars: list):
         '''function _updateCache
