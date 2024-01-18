@@ -133,6 +133,8 @@ class EventDetector(TrafficMng):
         self.highSpeedDict = dict()
         self.intenseDict = dict()
         self.occupationDict = dict()
+        # 高级记录器, 记录事故监测
+        self.incidentDict = dict()  # 以两辆车id为索引, 记录监测时间
 
     def run(self, cars: list) -> list:
         ''' function run
@@ -412,7 +414,58 @@ class EventDetector(TrafficMng):
         检测多车事故事件, 输出并返回事件列表
         '''
         events_i = []
-
+        # 异常运动车辆少于2，不可能有事故
+        if (len(self.staticDict) + len(self.lowSpeedDict) + \
+                len(self.highSpeedDict) + len(self.intenseDict)) < 2:
+            return events_i
+        # 组合异常车辆id列表, 求并集
+        abIDs = set(self.staticDict.keys()) | set(self.lowSpeedDict.keys()) |\
+            set(self.highSpeedDict.keys()) | set(self.intenseDict.keys())
+        # 利用集合运算，删除不在currentIDs中的id
+        abIDs = abIDs & set(self.currentIDs)
+        abIDs = list(abIDs)
+        # 两两组合记录潜在事件
+        for i in range(len(abIDs)):
+            for j in range(i+1, len(abIDs)):
+                # 获取车辆
+                car1 = self._getCarFromCars(cars, abIDs[i])
+                car2 = self._getCarFromCars(cars, abIDs[j])
+                # 判定非拥堵情况(拥堵情况跳过判断)
+                kLane1 = self.lanes[car1['laneID']].k
+                kLane2 = self.lanes[car2['laneID']].k
+                kAve = (kLane1 + kLane2) / 2
+                vLane1 = self.lanes[car1['laneID']].v
+                vLane2 = self.lanes[car2['laneID']].v
+                vAve = (vLane1 + vLane2) / 2
+                if (kAve < self.dstc) & (vAve > self.vc):
+                    continue
+                # 判定距离小于接触距离
+                d = ((car1['x'] - car2['x'])**2 + (car1['y'] - car2['y'])**2)**0.5
+                if d < self.dt:  # 加入监测对象
+                    self.incidentDict[[car1['id'], car2['id']]] = 1
+        # 遍历incidentDict, 检查事件
+        for ids in self.incidentDict:
+            # 若某一车不在currentIDs中, 则移除监测, 跳过
+            if (ids[0] not in self.currentIDs) | (ids[1] not in self.currentIDs):
+                del self.incidentDict[ids]
+                continue
+            # 检查两辆车是否在某时刻速度趋于0
+            car1 = self._getCarFromCars(cars, ids[0])
+            car2 = self._getCarFromCars(cars, ids[1])
+            # 速度趋于0, 则报警
+            if (abs(car1['vy']) <= self.vs) & (abs(car2['vy']) <= self.vs):
+                event = f"事件: id={str(ids[0])},{str(ids[1])}车辆碰撞, " + \
+                    self._getCarBaseInfo(car1) + self._getCarBaseInfo(car2)
+                events_i.append(event)
+                # 删除记录
+                del self.incidentDict[ids]
+            else:   # 碰撞后的过程, 速度下降但未趋于0时, 计数
+                self.incidentDict[ids] += 1
+                # 检查是否超过监测时间
+                if self.incidentDict[ids] >= self.ts:
+                    # 删除记录
+                    del self.incidentDict[ids]
+        
         return events_i
 
     def _crowdDetect(self) -> list:
@@ -425,8 +478,14 @@ class EventDetector(TrafficMng):
         检测拥堵事件，输出并返回事件列表
         '''
         events_c = []
-
-
+        # 遍历车道实例
+        for lm in self.lanes:
+            # 检查事件
+            if (lm.k >= self.dstc) & (lm.v <= self.vc):
+                event = f"事件: id={str(lm.ID)}车道拥堵, " + \
+                    f"车道密度: {str(lm.k)}辆/km, " + \
+                    f"车道速度: {str(lm.v)}km/h。"
+                events_c.append(event)
         return events_c
 
     def _illegalOccupationDetect(self, cars: list) -> list:
