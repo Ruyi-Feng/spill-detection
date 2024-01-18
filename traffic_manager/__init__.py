@@ -96,6 +96,7 @@ class TrafficMng():
         self._updateCache(cars)
         if self.count % self.itv == 0:
             self._updateTraffic()
+            self._updateR1()    # 更新路段q后, 重新计算cell的抛洒物置信度时间增长率R1
             # print(self.Q, end=', ')
 
     def _updateCache(self, cars: list):
@@ -138,6 +139,15 @@ class TrafficMng():
         self.Q = 0
         for id in self.lanes:
             self.Q += self.lanes[id].q
+
+    def _updateR1(self):
+        ''' function _updateR1
+
+        将路段q数据传递给各个cell, 用于更新cell抛洒物置信度随时间增长的rate1
+        '''
+        # 调用各lane的updateR1
+        for id in self.lanes:
+            self.lanes[id].updateR1(self.Q)
 
     def _carsByLane(self, cars: list) -> dict:
         '''function carsByLane
