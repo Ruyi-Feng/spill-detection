@@ -12,6 +12,12 @@
 # 参数列表
 参照文件：[spill-detection/docs/parameter.xlsx](./parameter.xlsx)
 
+# 报警频率
+## 抛洒物
+每2min报警1次
+## 其他事件
+只报警1次
+
 # 检测逻辑
 <p>
 <img
