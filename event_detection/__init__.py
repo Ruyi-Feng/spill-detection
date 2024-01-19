@@ -34,8 +34,8 @@ class EventDetector(TrafficMng):
     rate2:      float, 抛洒物横向运动置信度增长率
     spillWarnFreq: int, 抛洒物报警频率, 单位帧
     异常行驶类
-    vStatic:        float, 准静止判定速度阈值, 单位m/s
-    durationStatic: float, 准静止持续时间阈值, 单位s
+    vStop:        float, 准静止判定速度阈值, 单位m/s
+    durationStop: float, 准静止持续时间阈值, 单位s
     vLow:           float, 低速阈值, 单位m/s
     durationLow:    float, 低速持续时间阈值, 单位s
     vHigh:          float, 高速阈值, 单位m/s
@@ -75,7 +75,7 @@ class EventDetector(TrafficMng):
         # 更新参数单位从秒到帧
         self.tTolerance *= self.fps             # 抛洒物存在持续时间容忍度
         self.spillWarnFreq *= self.fps          # 抛洒物报警频率
-        self.durationStatic *= self.fps         # 准静止持续时间阈值
+        self.durationStop *= self.fps         # 准静止持续时间阈值
         self.durationLow *= self.fps            # 低速持续时间阈值
         self.durationHigh *= self.fps           # 高速持续时间阈值
         self.durationIntense *= self.fps        # 急刹车持续时间阈值
@@ -85,7 +85,7 @@ class EventDetector(TrafficMng):
         # 初始化潜在事件记录变量
         self.currentIDs = []    # 当前帧车辆id列表
         # 记录数据格式为: {车辆id: 持续帧数count}
-        self.staticDict = dict()
+        self.stopDict = dict()
         self.lowSpeedDict = dict()
         self.highSpeedDict = dict()
         self.intenseDict = dict()
@@ -130,10 +130,10 @@ class EventDetector(TrafficMng):
             # 加入当前帧id列表
             self.currentIDs.append(car['id'])
             # 潜在静止
-            if abs(car['vy']) <= self.vStatic:
-                updateDictCount(self.staticDict, car['id'])
+            if abs(car['vy']) <= self.vStop:
+                updateDictCount(self.stopDict, car['id'])
             # 潜在低速
-            if self.vStatic < abs(car['vy']) <= self.vLow:
+            if self.vStop < abs(car['vy']) <= self.vLow:
                 updateDictCount(self.lowSpeedDict, car['id'])
             # 潜在超速
             if abs(car['vy']) > self.vHigh:
@@ -220,22 +220,22 @@ class EventDetector(TrafficMng):
         检测低速事件, 输出并返回事件列表
         '''
         id2delete = []  # 用于缓存已消失的目标id
-        for id in self.staticDict.keys():
+        for id in self.stopDict.keys():
             # 检查目标是否已消失
             if id not in self.currentIDs:
                 id2delete.append(id)
                 continue
             # 检查事件
-            if self.staticDict[id] == self.ds:
+            if self.stopDict[id] == self.ds:
                 car = getCarFromCars(cars, id)
                 event = f"事件: id={str(id)}车辆准静止, " + getCarBaseInfo(car) + \
-                    f", 已持续时间{str(self.staticDict[id]/self.fps)}s。"
+                    f", 已持续时间{str(self.stopDict[id]/self.fps)}s。"
                 print(event)
                 # 真正用生成事件
                 # TODO 有时间戳数据后更新self.count为时间戳
                 self.eventMng.run('stop', self.count, car)
         # 删除已消失目标
-        delDictKeys(self.staticDict, id2delete)
+        delDictKeys(self.stopDict, id2delete)
 
     def _lowSpeedDetect(self, cars: list):
         '''function lowSpeedDetect
@@ -345,11 +345,11 @@ class EventDetector(TrafficMng):
         检测多车事故事件, 输出并返回事件列表
         '''
         # 异常运动车辆少于2，不可能有事故
-        if (len(self.staticDict) + len(self.lowSpeedDict) +
+        if (len(self.stopDict) + len(self.lowSpeedDict) +
                 len(self.highSpeedDict) + len(self.intenseDict)) < 2:
             return
         # 组合异常车辆id列表, 求并集
-        abIDs = set(self.staticDict.keys()) | set(self.lowSpeedDict.keys()) |\
+        abIDs = set(self.stopDict.keys()) | set(self.lowSpeedDict.keys()) |\
             set(self.highSpeedDict.keys()) | set(self.intenseDict.keys())
         # 利用集合运算，删除不在currentIDs中的id
         abIDs = abIDs & set(self.currentIDs)
@@ -387,8 +387,8 @@ class EventDetector(TrafficMng):
             car1 = getCarFromCars(cars, ids[0])
             car2 = getCarFromCars(cars, ids[1])
             # 速度趋于0, 则报警
-            if ((abs(car1['vy']) <= self.vStatic) &
-               (abs(car2['vy']) <= self.vStatic)):
+            if ((abs(car1['vy']) <= self.vStop) &
+               (abs(car2['vy']) <= self.vStop)):
                 event = f"事件: id={str(ids[0])},{str(ids[1])}车辆碰撞, " + \
                     getCarBaseInfo(car1) + getCarBaseInfo(car2)
                 print(event)

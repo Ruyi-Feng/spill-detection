@@ -58,7 +58,7 @@ class EventMng():
         time: str, 事件发生时间
         originalInfo: any, 事件信息, 为可变数量的参数。
         - 当type为'spill'时, originalInfo为[cellMng]
-        - 当type为'static', 'lowSpeed', 'highSpeed', 'EmergencyBrake',
+        - 当type为'stop', 'lowSpeed', 'highSpeed', 'EmergencyBrake',
           'illegalOccupation'时, originalInfo为[car]
         - 当type为'incident'时, originalInfo为[car1, car2]
         - 当type为'crowd'时, originalInfo为[laneMng]
