@@ -31,12 +31,10 @@ def test_detect():
         if not valid:
             continue
         # 事件检测
-        event = ed.run(cars)
-        if event != []:
-            print(event)
+        events = ed.run(cars)
         # 检查点1
         # 数据事件类型为list
-        assert type(event) == list
+        assert type(events) == list
 
     # 2. 备用数据测试
     # 非法占用应急车道数据, 备用
