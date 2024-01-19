@@ -190,10 +190,10 @@ class EventDetector(TrafficMng):
                         cellEnd = self.lanes[id].cells[order].end
                         if cellStart >= cellEnd:
                             cellStart, cellEnd = cellEnd, cellStart
-                        event = f"事件: id={str(id)}车道可能有抛洒物, " + \
-                            f"元胞起点: {str(cellStart)}, 元胞终点: {str(cellEnd)}, " + \
-                            f"危险度: {str(self.lanes[id].cells[order].danger)}, " + \
-                            f"持续时间: {str(self.dangerDict[(id, order)]/self.fps)}s。"
+                        event = f"事件: id={id}车道可能有抛洒物, " + \
+                            f"元胞起点: {cellStart}, 元胞终点: {cellEnd}, " + \
+                            f"危险度: {self.lanes[id].cells[order].danger}, " + \
+                            f"持续时间: {self.dangerDict[(id, order)]/self.fps}s。"
                         events_s.append(event)
                 else:   # 未达到1, 检查是否在记录表内, 若在则删除
                     if (id, order) in self.dangerDict.keys():
@@ -365,7 +365,8 @@ class EventDetector(TrafficMng):
                 d = ((car1['x'] - car2['x'])**2 +
                      (car1['y'] - car2['y'])**2)**0.5
                 if d < self.dTouch:  # 加入监测对象
-                    updateDictCount(self.incidentDict, (car1['id'], car2['id']))
+                    updateDictCount(self.incidentDict,
+                                    (car1['id'], car2['id']))
         # 遍历incidentDict, 检查事件
         key2delete = []  # 用于缓存应当删除的键
         for ids in self.incidentDict:
@@ -378,7 +379,8 @@ class EventDetector(TrafficMng):
             car1 = getCarFromCars(cars, ids[0])
             car2 = getCarFromCars(cars, ids[1])
             # 速度趋于0, 则报警
-            if (abs(car1['vy']) <= self.vStatic) & (abs(car2['vy']) <= self.vStatic):
+            if ((abs(car1['vy']) <= self.vStatic) &
+               (abs(car2['vy']) <= self.vStatic)):
                 event = f"事件: id={str(ids[0])},{str(ids[1])}车辆碰撞, " + \
                     getCarBaseInfo(car1) + getCarBaseInfo(car2)
                 events_i.append(event)

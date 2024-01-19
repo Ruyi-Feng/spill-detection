@@ -20,6 +20,7 @@ def getCarFromCars(cars: list, id: int) -> dict:
             return car  # 找到指定id的车辆
     return None     # 未找到指定id的车辆
 
+
 def getCarBaseInfo(car: dict) -> str:
     '''function _getCarBaseInfo
 
