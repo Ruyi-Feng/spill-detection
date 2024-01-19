@@ -1,4 +1,5 @@
 from traffic_manager import TrafficMng
+from event_detection.event import EventMng
 from utils import updateDictCount, delDictKeys
 from utils.car_utils import getCarFromCars, getCarBaseInfo
 
@@ -63,6 +64,8 @@ class EventDetector(TrafficMng):
         '''
         # 令TrafficMng方法初始化给自身
         super().__init__(clb, cfg)
+        # 生成事件管理器
+        self.eventMng = EventMng(cfg['eventTypes'])
         # 初始化属性(其中秒为单位属性, 统一初次赋值后, 乘fps以帧为单位)
         self.clb = clb
         self.fps = cfg['fps']
@@ -105,13 +108,15 @@ class EventDetector(TrafficMng):
 
         更新交通流信息, 检测交通事件, 输出并返回事件列表。
         '''
+        # 清空上一帧事件信息
+        self.currentIDs = []
+        self.eventMng.clear()   # 清空事件管理器
         # 更新交通流信息
         self.update(cars)
         # 检测交通事件
         self.updatePotentialDict(cars)
-        events = self.detect(cars)
-        self.currentIDs = []    # 清空当前帧车辆id列表
-        return events
+        self.detect(cars)
+        return self.eventMng.events
 
     def updatePotentialDict(self, cars: list) -> None:
         '''function updatePotentialDict
@@ -141,7 +146,7 @@ class EventDetector(TrafficMng):
             if self.clb[car['laneID']]['emgc']:
                 updateDictCount(self.occupationDict, car['id'])
 
-    def detect(self, cars: list) -> list:
+    def detect(self, cars: list):
         '''function detect
 
         检测交通事件，输出并返回事件列表。
@@ -154,12 +159,10 @@ class EventDetector(TrafficMng):
         ------
         events: list, 事件列表, 元素为event的衍生类
         '''
-        events = []
         for event_type in self.eventTypes:
-            events += getattr(self, f'_{event_type}Detect')(cars)
-        return events
+            getattr(self, f'_{event_type}Detect')(cars)
 
-    def _spillDetect(self, cars: list) -> list:
+    def _spillDetect(self, cars: list):
         '''function spillDetect
 
         input
@@ -172,7 +175,6 @@ class EventDetector(TrafficMng):
 
         检测抛洒物事件, 输出并返回事件列表
         '''
-        events_s = []
         self.updateDanger()     # 更新危险度
         # 检查是否存在抛洒物可能
         for id in self.lanes:
@@ -190,18 +192,21 @@ class EventDetector(TrafficMng):
                         cellEnd = self.lanes[id].cells[order].end
                         if cellStart >= cellEnd:
                             cellStart, cellEnd = cellEnd, cellStart
+                        # 调试用输出
                         event = f"事件: id={id}车道可能有抛洒物, " + \
                             f"元胞起点: {cellStart}, 元胞终点: {cellEnd}, " + \
                             f"危险度: {self.lanes[id].cells[order].danger}, " + \
                             f"持续时间: {self.dangerDict[(id, order)]/self.fps}s。"
-                        events_s.append(event)
+                        print(event)
+                        # 真正用生成事件
+                        # TODO 有时间戳数据后更新self.count为时间戳
+                        self.eventMng.run('spill', self.count,
+                                          self.lanes[id].cells[order])
                 else:   # 未达到1, 检查是否在记录表内, 若在则删除
                     if (id, order) in self.dangerDict.keys():
                         del self.dangerDict[(id, order)]
 
-        return events_s
-
-    def _stopDetect(self, cars: list) -> list:
+    def _stopDetect(self, cars: list):
         '''function stopDetect
 
         input
@@ -214,7 +219,6 @@ class EventDetector(TrafficMng):
 
         检测低速事件, 输出并返回事件列表
         '''
-        events_l = []
         id2delete = []  # 用于缓存已消失的目标id
         for id in self.staticDict.keys():
             # 检查目标是否已消失
@@ -223,15 +227,17 @@ class EventDetector(TrafficMng):
                 continue
             # 检查事件
             if self.staticDict[id] == self.ds:
-                event = f"事件: id={str(id)}车辆准静止, " + \
-                    getCarBaseInfo(getCarFromCars(cars, id)) + \
+                car = getCarFromCars(cars, id)
+                event = f"事件: id={str(id)}车辆准静止, " + getCarBaseInfo(car) + \
                     f", 已持续时间{str(self.staticDict[id]/self.fps)}s。"
-                events_l.append(event)
+                print(event)
+                # 真正用生成事件
+                # TODO 有时间戳数据后更新self.count为时间戳
+                self.eventMng.run('stop', self.count, car)
         # 删除已消失目标
         delDictKeys(self.staticDict, id2delete)
-        return events_l
 
-    def _lowSpeedDetect(self, cars: list) -> list:
+    def _lowSpeedDetect(self, cars: list):
         '''function lowSpeedDetect
 
         input
@@ -244,7 +250,6 @@ class EventDetector(TrafficMng):
 
         检测低速事件, 输出并返回事件列表
         '''
-        events_l = []
         id2delete = []  # 用于缓存已消失的目标id
         for id in self.lowSpeedDict.keys():
             # 检查目标是否已消失
@@ -253,15 +258,17 @@ class EventDetector(TrafficMng):
                 continue
             # 检查事件
             if self.lowSpeedDict[id] == self.durationLow:
-                event = f"事件: id={str(id)}车辆低速行驶, " + \
-                    getCarBaseInfo(getCarFromCars(cars, id)) + \
+                car = getCarFromCars(cars, id)
+                event = f"事件: id={str(id)}车辆低速行驶, " + getCarBaseInfo(car) + \
                     f", 已持续时间{str(self.lowSpeedDict[id]/self.fps)}s。"
-                events_l.append(event)
+                print(event)
+                # 真正用生成事件
+                # TODO 有时间戳数据后更新self.count为时间戳
+                self.eventMng.run('lowSpeed', self.count, car)
         # 删除已消失目标
         delDictKeys(self.lowSpeedDict, id2delete)
-        return events_l
 
-    def _highSpeedDetect(self, cars: list) -> list:
+    def _highSpeedDetect(self, cars: list):
         '''function highSpeedDetect
 
         input
@@ -274,7 +281,6 @@ class EventDetector(TrafficMng):
 
         检测超速事件, 输出并返回事件列表
         '''
-        events_h = []
         id2delete = []  # 用于缓存已消失的目标id
         for id in self.highSpeedDict.keys():
             # 检查目标是否已消失
@@ -283,15 +289,17 @@ class EventDetector(TrafficMng):
                 continue
             # 检查事件
             if self.highSpeedDict[id] == self.durationHigh:
-                event = f"事件: id={str(id)}车辆超速行驶, " + \
-                    getCarBaseInfo(getCarFromCars(cars, id)) + \
+                car = getCarFromCars(cars, id)
+                event = f"事件: id={str(id)}车辆超速行驶, " + getCarBaseInfo(car) + \
                     f", 已持续时间{str(self.highSpeedDict[id]/self.fps)}s。"
-                events_h.append(event)
+                print(event)
+                # 真正用生成事件
+                # TODO 有时间戳数据后更新self.count为时间戳
+                self.eventMng.run('highSpeed', self.count, car)
         # 删除已消失目标
         delDictKeys(self.highSpeedDict, id2delete)
-        return events_h
 
-    def _emergencyBrakeDetect(self, cars: list) -> list:
+    def _emergencyBrakeDetect(self, cars: list):
         '''function intensiveSpeedReductionDetect
 
         input
@@ -304,7 +312,6 @@ class EventDetector(TrafficMng):
 
         检测急刹车事件, 输出并返回事件列表。减速判断也需要考虑加速度a方向需要跟v方向相反。
         '''
-        events_r = []
         id2delete = []  # 用于缓存已消失的目标id
         for id in self.intenseDict.keys():
             # 检查目标是否已消失
@@ -313,16 +320,18 @@ class EventDetector(TrafficMng):
                 continue
             # 检查事件
             if self.intenseDict[id] == self.durationIntense:
-                event = f"事件: id={str(id)}车辆急刹车, " + \
-                    getCarBaseInfo(getCarFromCars(cars, id)) + \
+                car = getCarFromCars(cars, id)
+                event = f"事件: id={str(id)}车辆急刹车, " + getCarBaseInfo(car) + \
                     f"加速度: {cars[id]['a']}" + \
                     f", 已持续时间{str(self.intenseDict[id]/self.fps)}s。"
-                events_r.append(event)
+                print(event)
+                # 真正用生成事件
+                # TODO 有时间戳数据后更新self.count为时间戳
+                self.eventMng.run('emergencyBrake', self.count, car)
         # 删除已消失目标
         delDictKeys(self.intenseDict, id2delete)
-        return events_r
 
-    def _incidentDetect(self, cars: list) -> list:
+    def _incidentDetect(self, cars: list):
         '''function incidentDetect
 
         input
@@ -335,11 +344,10 @@ class EventDetector(TrafficMng):
 
         检测多车事故事件, 输出并返回事件列表
         '''
-        events_i = []
         # 异常运动车辆少于2，不可能有事故
         if (len(self.staticDict) + len(self.lowSpeedDict) +
                 len(self.highSpeedDict) + len(self.intenseDict)) < 2:
-            return events_i
+            return
         # 组合异常车辆id列表, 求并集
         abIDs = set(self.staticDict.keys()) | set(self.lowSpeedDict.keys()) |\
             set(self.highSpeedDict.keys()) | set(self.intenseDict.keys())
@@ -383,7 +391,10 @@ class EventDetector(TrafficMng):
                (abs(car2['vy']) <= self.vStatic)):
                 event = f"事件: id={str(ids[0])},{str(ids[1])}车辆碰撞, " + \
                     getCarBaseInfo(car1) + getCarBaseInfo(car2)
-                events_i.append(event)
+                print(event)
+                # 真正用生成事件
+                # TODO 有时间戳数据后更新self.count为时间戳
+                self.eventMng.run('incident', self.count, car1, car2)
                 # 删除记录
                 key2delete.append(ids)
             else:   # 碰撞后的过程, 速度下降但未趋于0时, 计数
@@ -394,8 +405,6 @@ class EventDetector(TrafficMng):
                     key2delete.append(ids)
         # 删除不需监测的键
         delDictKeys(self.incidentDict, key2delete)
-
-        return events_i
 
     def _crowdDetect(self, cars: list) -> list:
         '''function crowdDetect
@@ -410,7 +419,6 @@ class EventDetector(TrafficMng):
 
         检测拥堵事件，输出并返回事件列表
         '''
-        events_c = []
         # 遍历车道实例
         for id in self.lanes:
             k = self.lanes[id].k
@@ -418,10 +426,12 @@ class EventDetector(TrafficMng):
             # 检查事件
             if (k >= self.densityCrowd) & (v <= self.vCrowd):
                 event = f"事件: id={id}车道拥堵, 车道密度: {k}辆/km, 车道速度: {v}km/h。"
-                events_c.append(event)
-        return events_c
+                print(event)
+                # 真正用生成事件
+                # TODO 有时间戳数据后更新self.count为时间戳
+                self.eventMng.run('crowd', self.count, self.lanes[id])
 
-    def _illegalOccupationDetect(self, cars: list) -> list:
+    def _illegalOccupationDetect(self, cars: list):
         '''function illegalOccupationDetect
 
         input
@@ -434,7 +444,6 @@ class EventDetector(TrafficMng):
 
         检测非法占用应急车道事件, 输出并返回事件列表
         '''
-        events_o = []
         id2delete = []  # 用于缓存已消失的目标id
         for id in self.occupationDict.keys():
             # 检查目标是否已消失
@@ -443,10 +452,12 @@ class EventDetector(TrafficMng):
                 continue
             # 检查事件
             if self.occupationDict[id] == self.durationOccupation:
-                event = f"事件: id={str(id)}车辆非法占用应急车道, " + \
-                    getCarBaseInfo(getCarFromCars(cars, id)) + \
+                car = getCarFromCars(cars, id)
+                event = f"事件: id={str(id)}车辆占用应急车道, " + getCarBaseInfo(car) +\
                     f", 已持续时间{str(self.occupationDict[id]/self.fps)}s。"
-                events_o.append(event)
+                print(event)
+                # 真正用生成事件
+                # TODO 有时间戳数据后更新self.count为时间戳
+                self.eventMng.run('illegalOccupation', self.count, car)
         # 删除已消失目标
         delDictKeys(self.occupationDict, id2delete)
-        return events_o
