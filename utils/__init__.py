@@ -64,8 +64,8 @@ def loadYaml(path: str) -> dict:
     return dic
 
 
-def updateDict(dic: dict, key: any):
-    '''function updateDict
+def updateDictCount(dic: dict, key: any):
+    '''function updateDictCount
 
     input
     ------
@@ -76,3 +76,17 @@ def updateDict(dic: dict, key: any):
     '''
     dic.setdefault(key, 0)
     dic[key] += 1
+
+def delDictKeys(dic: dict, keys: list):
+    '''function delDictKeys
+
+    input
+    ------
+    dic: dict, 潜在事件记录字典
+    keys: list, 键列表
+
+    删除字典中的指定键。
+    '''
+    for key in keys:
+        if key in dic:
+            del dic[key]
