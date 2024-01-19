@@ -1,9 +1,12 @@
 import os
-import yaml
 from road_calibration import Calibrator
 from message_driver import Driver
 import pre_processing
 from event_detection import EventDetector
+from utils import loadConfig, loadYaml
+
+
+'''Controller is to control the whole process of the project.'''
 
 
 class Controller:
@@ -20,16 +23,9 @@ class Controller:
 
     methods
     -------
-    receive(msg)
-        接受传感器数据，返回发送数据、交通流参数、事件检测结果。
-    calibrate(msg)
-        接受标定数据，更新标定器。
-    run(msg)
-        接受传感器数据，返回发送数据、交通流参数、事件检测结果。
-    _loadfile(path)
-        读取json文件, 返回dict。
-    _saveCalib()
-        保存标定结果到clbPath。
+    startManager(msg): 在完成标定或读取标定后启动管理器。
+    calibration(msg):  接受标定数据，更新标定器。
+    run(msg):          接受传感器数据，返回发送数据、交通流参数、事件检测结果。
 
     生成控制器，用于控制整个算法流程。
     '''
@@ -48,7 +44,7 @@ class Controller:
         self.cfgPath = cfgPath
         self.clbPath = clbPath
         # 配置参数
-        cfg = self._loadyaml(cfgPath)
+        cfg = loadConfig(cfgPath)
         self.cfg = cfg
         # 是否标定
         self.needClb = False
@@ -67,7 +63,7 @@ class Controller:
             self.clbtor = clbtor
         else:   # 有cfg则读取, 不需要标定
             print('开始接收数据')
-            self.clb = self._loadyaml(clbPath)
+            self.clb = loadYaml(clbPath)
             self.startManager()
 
     def calibration(self, msg):
@@ -83,8 +79,7 @@ class Controller:
         msg: str | list
             发送数据, str | list格式。str为传输信息(不处理), list为传感器数据。
 
-        接受传感器数据，返回发送数据、交通流参数、事件检测结果。
-        根据条件判断是否需要标定，若需要则标定。
+        接受传感器数据，根据条件判断是否需要标定或结束标定。
         '''
         if self.clbtor.count < self.calibFrames:
             self.clbtor.run(msg)
@@ -92,7 +87,7 @@ class Controller:
             self.clbtor.calibrate()
             self.clbtor.save()
             print('开始接收数据')
-            self.clb = self._loadyaml(self.clbPath)
+            self.clb = loadYaml(self.clbPath)
             # 启动管理器
             self.startManager()
             self.needClb = False
@@ -108,6 +103,19 @@ class Controller:
         self.edt = EventDetector(self.cfg['fps'], self.clb, self.cfg)
 
     def run(self, msg: list) -> (list, list):
+        '''function run
+
+        input
+        -----
+        msg: str | list, 传感器车辆数据。str为传输信息(不处理), list为传感器数据。
+
+        return
+        ------
+        msg: str | list, 传感器车辆数据。str为传输信息(不处理), list为传感器数据。
+        event: list, 事件检测结果。
+
+        接受传感器数据，返回发送数据、事件检测结果。
+        '''
         # 接受数据
         valid, cars = self.drv.receive(msg)
         if not valid:
@@ -123,20 +131,3 @@ class Controller:
         msg = self.drv.send(cars)
         # print(msg)
         return msg, event
-
-    def _loadyaml(self, path: str) -> dict:
-        '''function _loadParam
-
-        input
-        -----
-        path: str
-            文件路径
-
-        return
-        ------
-        cfg: dict
-            配置参数
-        '''
-        with open(path, 'r') as f:
-            cfg = yaml.load(f, Loader=yaml.FullLoader)
-        return cfg
