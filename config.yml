@@ -18,6 +18,7 @@ event:
   q_standard: 10000
   v_lateral: 0.56
   rate2: 0.1
+  spill_warn_frequecy: 300
   v_static: 1
   duration_static: 5
   v_low: 2.778
