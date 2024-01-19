@@ -126,8 +126,8 @@ class Controller:
         # 预处理
         cars = pre_processing.preProcess(cars, self.trm)
         # 事件检测(内含交通流参数计算+事件检测)
-        event = self.edt.run(cars)
+        events = self.edt.run(cars)
         # 发送数据
         msg = self.drv.send(cars)
         # print(msg)
-        return msg, event
+        return msg, events
