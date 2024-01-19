@@ -13,7 +13,7 @@ traffic:
   q_duration: 300
   cal_interval: 30
 event:
-  event_types: ["spill","stop", "low_speed", "high_speed", "emergency_break", "incident", "crowd", "illegal_occupation"]
+  event_types: ["spill", "stop", "lowSpeed", "highSpeed", "emergencyBrake", "incident", "crowd", "illegalOccupation"]
   t_tolerance: 300
   q_standard: 10000
   v_lateral: 0.56
