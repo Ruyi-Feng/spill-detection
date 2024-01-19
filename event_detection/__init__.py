@@ -1,5 +1,5 @@
 from traffic_manager import TrafficMng
-from utils import updateDict
+from utils import updateDictCount, delDictKeys
 from utils.car_utils import getCarFromCars, getCarBaseInfo
 
 
@@ -126,20 +126,20 @@ class EventDetector(TrafficMng):
             self.currentIDs.append(car['id'])
             # 潜在静止
             if abs(car['vy']) <= self.vStatic:
-                updateDict(self.staticDict, car['id'])
+                updateDictCount(self.staticDict, car['id'])
             # 潜在低速
             if self.vStatic < abs(car['vy']) <= self.vLow:
-                updateDict(self.lowSpeedDict, car['id'])
+                updateDictCount(self.lowSpeedDict, car['id'])
             # 潜在超速
             if abs(car['vy']) > self.vHigh:
-                updateDict(self.highSpeedDict, car['id'])
+                updateDictCount(self.highSpeedDict, car['id'])
             # 潜在急刹车
             # TODO a可能要考虑改为ax,ay,a
             if (abs(car['a']) > self.aIntense) & (car['a'] * car['vy'] <= 0):
-                updateDict(self.intenseDict, car['id'])
+                updateDictCount(self.intenseDict, car['id'])
             # 潜在应急车道占用
             if self.clb[car['laneID']]['emgc']:
-                updateDict(self.occupationDict, car['id'])
+                updateDictCount(self.occupationDict, car['id'])
 
     def detect(self, cars: list) -> list:
         '''function detect
@@ -228,8 +228,7 @@ class EventDetector(TrafficMng):
                     f", 已持续时间{str(self.staticDict[id]/self.fps)}s。"
                 events_l.append(event)
         # 删除已消失目标
-        for id in id2delete:
-            del self.staticDict[id]
+        delDictKeys(self.staticDict, id2delete)
         return events_l
 
     def _lowSpeedDetect(self, cars: list) -> list:
@@ -259,8 +258,7 @@ class EventDetector(TrafficMng):
                     f", 已持续时间{str(self.lowSpeedDict[id]/self.fps)}s。"
                 events_l.append(event)
         # 删除已消失目标
-        for id in id2delete:
-            del self.lowSpeedDict[id]
+        delDictKeys(self.lowSpeedDict, id2delete)
         return events_l
 
     def _highSpeedDetect(self, cars: list) -> list:
@@ -290,8 +288,7 @@ class EventDetector(TrafficMng):
                     f", 已持续时间{str(self.highSpeedDict[id]/self.fps)}s。"
                 events_h.append(event)
         # 删除已消失目标
-        for id in id2delete:
-            del self.highSpeedDict[id]
+        delDictKeys(self.highSpeedDict, id2delete)
         return events_h
 
     def _emergencyBrakeDetect(self, cars: list) -> list:
@@ -322,8 +319,7 @@ class EventDetector(TrafficMng):
                     f", 已持续时间{str(self.intenseDict[id]/self.fps)}s。"
                 events_r.append(event)
         # 删除已消失目标
-        for id in id2delete:
-            del self.intenseDict[id]
+        delDictKeys(self.intenseDict, id2delete)
         return events_r
 
     def _incidentDetect(self, cars: list) -> list:
@@ -369,7 +365,7 @@ class EventDetector(TrafficMng):
                 d = ((car1['x'] - car2['x'])**2 +
                      (car1['y'] - car2['y'])**2)**0.5
                 if d < self.dTouch:  # 加入监测对象
-                    updateDict(self.incidentDict, (car1['id'], car2['id']))
+                    updateDictCount(self.incidentDict, (car1['id'], car2['id']))
         # 遍历incidentDict, 检查事件
         key2delete = []  # 用于缓存应当删除的键
         for ids in self.incidentDict:
@@ -395,8 +391,7 @@ class EventDetector(TrafficMng):
                     # 删除记录
                     key2delete.append(ids)
         # 删除不需监测的键
-        for ids in key2delete:
-            del self.incidentDict[ids]
+        delDictKeys(self.incidentDict, key2delete)
 
         return events_i
 
@@ -451,6 +446,5 @@ class EventDetector(TrafficMng):
                     f", 已持续时间{str(self.occupationDict[id]/self.fps)}s。"
                 events_o.append(event)
         # 删除已消失目标
-        for id in id2delete:
-            del self.occupationDict[id]
+        delDictKeys(self.occupationDict, id2delete)
         return events_o
