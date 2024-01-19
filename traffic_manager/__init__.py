@@ -41,10 +41,10 @@ class TrafficMng():
         '''
         # 参数
         self.fps = cfg['fps']
-        self.qd = cfg['traffic']['q_duration'] * self.fps        # 单位帧
-        self.itv = cfg['traffic']['cal_interval'] * self.fps     # 单位帧
+        self.qd = cfg['qDuration'] * self.fps        # 单位帧
+        self.itv = cfg['calInterval'] * self.fps     # 单位帧
         self.cacheRet = max(self.qd, self.itv)  # 缓存保存时长(/frame)
-        self.cellLen = cfg['calib']['cell_len']   # 元胞长度
+        self.cellLen = cfg['cellLen']   # 元胞长度
         # 状态属性
         self.Q = 0          # 存储整个路段的交通流量(单位: 辆/h)
         self.count = 0      # 接收计数, 仅用于判定某一帧是否应当计算交通流参数, 达到itv后重置为0
