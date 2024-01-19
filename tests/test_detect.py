@@ -34,7 +34,7 @@ def test_detect():
         events = ed.run(cars)
         # 检查点1
         # 数据事件类型为list
-        assert type(events) == list
+        assert type(events) == dict
 
     # 2. 备用数据测试
     # 非法占用应急车道数据, 备用
