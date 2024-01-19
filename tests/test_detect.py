@@ -20,7 +20,7 @@ def test_detect():
     # 生成驱动器
     d = Driver()
     # 生成检测器(内含交通管理器)
-    ed = EventDetector(config['fps'], clb, config)
+    ed = EventDetector(clb, config)
 
     # 仿真器读取数据
     while True:
