@@ -91,3 +91,20 @@ def delDictKeys(dic: dict, keys: list):
     for key in keys:
         if key in dic:
             del dic[key]
+
+
+def int2strID(num: int, length: int) -> str:
+    '''function int2strID
+
+    input
+    -----
+    num: int, 数字
+    length: int, 字符串长度
+
+    return
+    ------
+    str: str, 字符串
+
+    将数字转换为指定长度的字符串, 不足的前面补零。
+    '''
+    return str(num).zfill(length)
