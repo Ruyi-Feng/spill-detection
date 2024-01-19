@@ -1,34 +1,34 @@
 fps: 20
-calib:
-  if_recalib: false
-  calib_seconds: 600
-  lane_width: 3.75
-  emgc_width: 3.5
-  cell_len: 50
-  q_merge: 0
-prepro:
-  max_complete_frames: 20
-  smooth_alpha: 0.1
-traffic:
-  q_duration: 300
-  cal_interval: 30
-event:
-  event_types: ["spill", "stop", "lowSpeed", "highSpeed", "emergencyBrake", "incident", "crowd", "illegalOccupation"]
-  t_tolerance: 300
-  q_standard: 10000
-  v_lateral: 0.56
-  rate2: 0.1
-  spill_warn_frequecy: 300
-  v_static: 1
-  duration_static: 5
-  v_low: 2.778
-  duration_low: 5
-  v_high: 22.22
-  duration_high: 5
-  a_intense: 3
-  duration_intense: 1
-  d_touch: 5
-  t_supervise: 20
-  density_crowd: 18
-  v_crowd: 16.667
-  duration_occupation: 5
+
+ifRecalib: false
+calibSeconds: 600
+laneWidth: 3.75
+emgcWidth: 3.5
+cellLen: 50
+q_Merge: 0
+
+maxCompleteFrames: 20
+smoothAlpha: 0.1
+
+qDuration: 300
+calInterval: 30
+
+eventTypes: ["spill", "stop", "lowSpeed", "highSpeed", "emergencyBrake", "incident", "crowd", "illegalOccupation"]
+tTolerance: 300
+qStandard: 10000
+vLateral: 0.56
+rate2: 0.1
+spillWarnFreq: 300
+vStatic: 1
+durationStatic: 5
+vLow: 2.778
+durationLow: 5
+vHigh: 22.22
+durationHigh: 5
+aIntense: 3
+durationIntense: 1
+dTouch: 5
+tSupervise: 20
+densityCrowd: 18
+vCrowd: 16.667
+durationOccupation: 5
