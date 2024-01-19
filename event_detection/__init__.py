@@ -6,7 +6,8 @@ default_event_types = ['spill',
                        'incident', 'crowd', 'illegal_occupation']
 # 默认配置适用于高速公路
 default_event_config = {'types': default_event_types,
-                        'tt': 300, 'qs': 10000, 'r2': 0.1,
+                        'tt': 300, 'qs': 10000, 'r2': 0.1, 'vLat': 0.56,
+                        'spillWarnFreq':300,
                         'vs': 2.778, 'ds': 5, 'vl': 11.11, 'dl': 5,
                         'vh': 33.33, 'dh': 5, 'ai': 3, 'di': 1,
                         'dt': 5, 'ts': 20, 'dstc': 18, 'vc': 16.67, 'do': 5}
@@ -84,6 +85,11 @@ class EventDetector(TrafficMng):
             default_event_config['qs']
         self.r2 = cfg['r2'] if 'rate2' in cfg.keys() else \
             default_event_config['r2']
+        self.vLat = cfg['vLat'] if 'v_lateral' in cfg.keys() else \
+            default_event_config['vLat']
+        self.spillWarnFreq = cfg['spill_warn_frequecy'] \
+            if 'spill_warn_frequecy' in cfg.keys() else \
+            default_event_config['spillWarnFreq']
         # 异常行驶检测参数
         self.vs = cfg['vs'] if 'v_static' in cfg.keys() else \
             default_event_config['vs']
@@ -134,6 +140,8 @@ class EventDetector(TrafficMng):
         self.occupationDict = dict()
         # 高级记录器, 记录事故监测
         self.incidentDict = dict()  # 以两辆车id为索引, 记录监测时间
+        # 高级记录器，记录抛洒物监测
+        self.dangerDict = dict()    # 以车道id+cell order为索引, 记录持续帧数
 
     def run(self, cars: list) -> list:
         ''' function run
@@ -326,15 +334,26 @@ class EventDetector(TrafficMng):
             for order in self.lanes[id].cells:
                 # 检查危险度达到1否, 若则报警
                 if self.lanes[id].cells[order].danger >= 1:
-                    # TODO 设置每隔一段时间报警, 报警信息包括车道, cell的起始与重点
-                    cellStart = self.lanes[id].cells[order].start
-                    cellEnd = self.lanes[id].cells[order].end
-                    if cellStart >= cellEnd:
-                        cellStart, cellEnd = cellEnd, cellStart
-                    event = f"事件: id={str(id)}车道可能有抛洒物, " + \
-                        f"元胞起点: {str(cellStart)}, 元胞终点: {str(cellEnd)}, " + \
-                        f"危险度: {str(self.lanes[id].cells[order].danger)}。"
-                    events_s.append(event)
+                    # 记录
+                    if (id, order) in self.dangerDict.keys():
+                        self.dangerDict[(id, order)] += 1
+                    else:
+                        self.dangerDict[(id, order)] = 1
+                    # 报警
+                    if self.dangerDict[(id, order)] % self.spillWarnFreq == 0:
+                        cellStart = self.lanes[id].cells[order].start
+                        cellEnd = self.lanes[id].cells[order].end
+                        if cellStart >= cellEnd:
+                            cellStart, cellEnd = cellEnd, cellStart
+                        event = f"事件: id={str(id)}车道可能有抛洒物, " + \
+                            f"元胞起点: {str(cellStart)}, 元胞终点: {str(cellEnd)}, " + \
+                            f"危险度: {str(self.lanes[id].cells[order].danger)}, " + \
+                            f"持续时间: {str(self.dangerDict[(id, order)]/self.fps)}s。"
+                        events_s.append(event)
+                else:   # 未达到1, 检查是否在记录表内, 若在则删除
+                    if (id, order) in self.dangerDict.keys():
+                        del self.dangerDict[(id, order)]
+
         return events_s
 
     def _stopDetect(self, cars: list) -> list:
