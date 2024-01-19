@@ -130,11 +130,11 @@ class LaneMng:
         for i in range(len(self.cellsValid)):
             cells[i] = CellMng(self.ID, i, self.cellsValid[i],
                                self.cellLen, start, end,
-                               cfg['event']['t_tolerance'],
+                               cfg['tTolerance'],
                                cfg['fps'],
-                               cfg['event']['q_standard'],
-                               cfg['event']['rate2'],
-                               cfg['event']['v_lateral'],
+                               cfg['qStandard'],
+                               cfg['rate2'],
+                               cfg['vLateral'],
                                self.cacheRet)
             # print([self.ID, i, self.cellsValid[i],
             #                    self.cellLen, start, end])
