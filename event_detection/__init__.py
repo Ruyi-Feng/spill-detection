@@ -173,101 +173,39 @@ class EventDetector(TrafficMng):
         潜在事件包括: 静止, 低速, 超速, 急刹车, 非法占道。
         关于为啥这个函数套了5个小函数, 因为直接写在这个里面flake8会提示复杂了。
         '''
+        def _updateDict(dic: dict, id: int):
+            '''function _updateDict
+
+            input
+            ------
+            dic: dict, 潜在事件记录字典
+            id: int, 车辆id
+
+            更新潜在事件记录字典
+            '''
+            dic.setdefault(id, 0)
+            dic[id] += 1
+        
         # 遍历车辆
         for car in cars:
             # 加入当前帧id列表
             self.currentIDs.append(car['id'])
             # 潜在静止
             if abs(car['vy']) <= self.vs:
-                self._updateStaticDict(car['id'])
+                _updateDict(self.staticDict, car['id'])
             # 潜在低速
             if self.vs < abs(car['vy']) <= self.vl:
-                self._updateLowSpeedDict(car['id'])
+                _updateDict(self.lowSpeedDict, car['id'])
             # 潜在超速
             if abs(car['vy']) > self.vh:
-                self._updateHighSpeedDict(car['id'])
+                _updateDict(self.highSpeedDict, car['id'])
             # 潜在急刹车
             # TODO a可能要考虑改为ax,ay,a
             if (abs(car['a']) > self.ai) & (car['a'] * car['vy'] <= 0):
-                self._updateIntenseDict(car['id'])
+                _updateDict(self.intenseDict, car['id'])
             # 潜在应急车道占用
             if self.clb[car['laneID']]['emgc']:
-                self._updateOccupationDict(car['id'])
-
-    def _updateStaticDict(self, id: int) -> None:
-        '''function _updateStaticDict
-
-        input
-        ------
-        id: int
-            车辆id
-
-        更新静止记录字典
-        '''
-        if id in self.staticDict.keys():
-            self.staticDict[id] += 1
-        else:
-            self.staticDict[id] = 1
-
-    def _updateLowSpeedDict(self, id: int) -> None:
-        '''function _updateLowSpeedDict
-
-        input
-        ------
-        id: int
-            车辆id
-
-        更新低速记录字典
-        '''
-        if id in self.lowSpeedDict.keys():
-            self.lowSpeedDict[id] += 1
-        else:
-            self.lowSpeedDict[id] = 1
-
-    def _updateHighSpeedDict(self, id: int) -> None:
-        '''function _updateHighSpeedDict
-
-        input
-        ------
-        id: int
-            车辆id
-
-        更新高速记录字典
-        '''
-        if id in self.highSpeedDict.keys():
-            self.highSpeedDict[id] += 1
-        else:
-            self.highSpeedDict[id] = 1
-
-    def _updateIntenseDict(self, id: int) -> None:
-        '''function _updateIntenseDict
-
-        input
-        ------
-        id: int
-            车辆id
-
-        更新急刹车记录字典
-        '''
-        if id in self.intenseDict.keys():
-            self.intenseDict[id] += 1
-        else:
-            self.intenseDict[id] = 1
-
-    def _updateOccupationDict(self, id: int) -> None:
-        '''function _updateOccupationDict
-
-        input
-        ------
-        id: int
-            车辆id
-
-        更新应急车道占用记录字典
-        '''
-        if id in self.occupationDict.keys():
-            self.occupationDict[id] += 1
-        else:
-            self.occupationDict[id] = 1
+                _updateDict(self.occupationDict, car['id'])
 
     def detect(self, cars: list) -> list:
         '''function detect
