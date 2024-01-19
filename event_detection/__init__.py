@@ -2,8 +2,8 @@ from traffic_manager import TrafficMng
 
 
 default_event_types = ['spill',
-                       'stop', 'low_speed', 'high_speed', 'emergency_break',
-                       'incident', 'crowd', 'illegal_occupation']
+                       'stop', 'lowSpeed', 'highSpeed', 'emergencyBrake',
+                       'incident', 'crowd', 'illegalOccupation']
 # 默认配置适用于高速公路
 default_event_config = {'types': default_event_types,
                         'tt': 300, 'qs': 10000, 'r2': 0.1, 'vLat': 0.56,
@@ -207,6 +207,7 @@ class EventDetector(TrafficMng):
             if self.clb[car['laneID']]['emgc']:
                 _updateDict(self.occupationDict, car['id'])
 
+
     def detect(self, cars: list) -> list:
         '''function detect
 
@@ -222,42 +223,19 @@ class EventDetector(TrafficMng):
         events: list
             事件列表, 元素为event的衍生类
         '''
-
         # 事件检测
         events = []
-        # 抛洒物检测
-        if 'spill' in self.types:
-            events_s = self._spillDetect()
-            events += events_s
-        # 异常行驶检测
-        if 'stop' in self.types:
-            events_s = self._stopDetect(cars)
-            events += events_s
-        if 'low_speed' in self.types:
-            events_l = self._lowSpeedDetect(cars)
-            events += events_l
-        if 'high_speed' in self.types:
-            events_h = self._highSpeedDetect(cars)
-            events += events_h
-        if 'emergency_break' in self.types:
-            events_r = self._emergencyBrakeDetect(cars)
-            events += events_r
-        # 碰撞事故检测
-        if 'incident' in self.types:
-            events_i = self._incidentDetect(cars)
-            events += events_i
-        # 拥堵检测
-        if 'crowd' in self.types:
-            events_c = self._crowdDetect()
-            events += events_c
-        # 非法占道检测
-        if 'illegal_occupation' in self.types:
-            events_o = self._illegalOccupationDetect(cars)
-            events += events_o
+        for event_type in default_event_types:
+            if event_type in self.types:
+                events += getattr(self, f'_{event_type}Detect')(cars)
         return events
 
-    def _spillDetect(self) -> list:
+    def _spillDetect(self, cars: list) -> list:
         '''function spillDetect
+
+        input
+        ------
+        cars: list, 传感器数据, 仅用作统一与其他detect的输入格式
 
         output
         ------
@@ -494,8 +472,12 @@ class EventDetector(TrafficMng):
 
         return events_i
 
-    def _crowdDetect(self) -> list:
+    def _crowdDetect(self, cars: list) -> list:
         '''function crowdDetect
+
+        input
+        ------
+        cars: list, 传感器数据, 仅用作统一与其他detect的输入格式
 
         output
         ------
