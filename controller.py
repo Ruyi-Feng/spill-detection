@@ -100,7 +100,7 @@ class Controller:
         # 生成数据驱动器
         self.drv = Driver()
         # 生成事件检测器(内含交通参数管理器)
-        self.edt = EventDetector(self.cfg['fps'], self.clb, self.cfg)
+        self.edt = EventDetector(self.clb, self.cfg)
 
     def run(self, msg: list) -> (list, list):
         '''function run
