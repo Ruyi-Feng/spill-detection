@@ -47,6 +47,7 @@ def loadConfig(path: str) -> dict:
         cfg.setdefault(param, defaultConfig[param])
     return cfg
 
+
 def loadYaml(path: str) -> dict:
     '''function loadYaml
 
@@ -61,3 +62,17 @@ def loadYaml(path: str) -> dict:
     with open(path, 'r') as f:
         dic = yaml.load(f, Loader=yaml.FullLoader)
     return dic
+
+
+def updateDict(dic: dict, key: any):
+    '''function updateDict
+
+    input
+    ------
+    dic: dict, 潜在事件记录字典
+    key: any, 键, 如id, id组合的列表/元胞等
+
+    更新字典, 为id对应的车辆计数加一。
+    '''
+    dic.setdefault(key, 0)
+    dic[key] += 1
