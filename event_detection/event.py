@@ -38,8 +38,8 @@ class EventMng():
         # encode event types
         num = len(eventTypes)
         self.eventTypes = eventTypes
-        self.typeIdDict = {self.eventTypes[i]: i for i in range(num)}   # 数字编码
-        self.typeCharDict = ({chr(i+65): i for i in range(num)})    # A起始字母编码
+        self.typeIdDict = {eventTypes[i]: i for i in range(num)}
+        self.typeCharDict = ({eventTypes[i]: chr(i+65) for i in range(num)})
         # formulate event format
         self.eventsFormat = dict()
         for type in self.eventTypes:
@@ -47,30 +47,32 @@ class EventMng():
                                        'items': dict()}
         self.events = self.eventsFormat.copy()
         # initialize event ID
-        self.eventIdCount = {char: 0 for char in self.typeCharDict}  # 每类最多百万
+        self.eventIdCount = {type: 0 for type in eventTypes}  # 每类最多百万
 
-    def run(self, type: str, time: str, *originalInfo: any):
+    def run(self, type: str, time: str, *info: any):
         '''function run
 
         input
         -----
         type: str, 事件类型
         time: str, 事件发生时间
-        originalInfo: any, 事件信息, 为可变数量的参数。
-        - 当type为'spill'时, originalInfo为[cellMng]
+        info: any, 事件信息, 为可变数量的参数。
+        - 当type为'spill'时, info为[cellMng]
         - 当type为'stop', 'lowSpeed', 'highSpeed', 'EmergencyBrake',
-          'illegalOccupation'时, originalInfo为[car]
-        - 当type为'incident'时, originalInfo为[car1, car2]
-        - 当type为'crowd'时, originalInfo为[laneMng]
+          'illegalOccupation'时, info为[car]
+        - 当type为'incident'时, info为[car1, car2]
+        - 当type为'crowd'时, info为[laneMng]
 
         执行事件管理, 将事件信息添加到events中。在检测到event时调用。
         '''
         # distribute event ID
-        eventID = self.typeCharDict[type] + int2strID(self.eventIdCount[type])
+        idLen = 7
+        eventID = self.typeCharDict[type] + \
+            int2strID(self.eventIdCount[type], idLen)
         self.eventIdCount[type] += 1
-        self.eventIdCount[type] %= 10000000
+        self.eventIdCount[type] %= 10^(idLen-1)
         # formulate event info
-        event = self._generateEvent(type, eventID, time, originalInfo)
+        event = self._generateEvent(type, eventID, time, info)
         # add event to events
         self.events[type]['occured'] = True
         self.events[type]['items'][eventID] = event
@@ -82,20 +84,20 @@ class EventMng():
         '''
         self.events = self.eventsFormat.copy()
 
-    def _generateEvent(self, type: str, eventID: str, time: str, *originalInfo: any):
+    def _generateEvent(self, type: str, eventID: str, time: str, info: any):
         '''function _generateEvent
 
         生成事件实例, 用于添加到events中
         '''
         if type == 'spill':
-            event = SpillEvent(time, eventID, originalInfo[0])
+            event = SpillEvent(type, eventID, time, info[0])
         elif type in ['stop', 'lowSpeed', 'highSpeed',
                       'emergencyBrake', 'illegalOccupation']:
-            event = SingleCarEvent(time, originalInfo[0])
+            event = SingleCarEvent(type, eventID, time, info[0])
         elif type == 'incident':
-            event = IncidentEvent(time, originalInfo[0], originalInfo[1])
+            event = IncidentEvent(type, eventID, time, info[0], info[1])
         elif type == 'crowd':
-            event = CrowdEvent(time, originalInfo[0])
+            event = CrowdEvent(type, eventID, time, info[0])
         else:
             raise ValueError(f"Invalid event type '{type}' is defined.")
         return event
