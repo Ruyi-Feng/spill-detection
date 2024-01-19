@@ -24,7 +24,7 @@ class EventMng():
                         'items': {eventID1: event1,
                                     eventID2: event2,
                                     ...}}
-              'static': {'name': 'static', 'occured': False,
+              'stop': {'name': 'stop', 'occured': False,
                          'items': {eventID1: event1,
                                    eventID2: event2,
                                    ...}}
@@ -89,7 +89,7 @@ class EventMng():
         '''
         if type == 'spill':
             event = SpillEvent(time, eventID, originalInfo[0])
-        elif type in ['static', 'lowSpeed', 'highSpeed',
+        elif type in ['stop', 'lowSpeed', 'highSpeed',
                       'emergencyBrake', 'illegalOccupation']:
             event = SingleCarEvent(time, originalInfo[0])
         elif type == 'incident':
