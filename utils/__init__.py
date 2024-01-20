@@ -4,9 +4,6 @@ import yaml
 
 
 # 默认配置适用于高速公路
-defaultEventTypes = ['spill', 'stop', 'lowSpeed', 'highSpeed',
-                     'emergencyBrake', 'incident', 'crowd',
-                     'illegalOccupation']
 defaultConfig = {"fps": 20,
                  "ifRecalib": False, "calibSeconds": 600,
                  "laneWidth": 3.75, "emgcWidth": 3.5,
@@ -14,14 +11,14 @@ defaultConfig = {"fps": 20,
                  "maxCompleteFrames": 20, "smoothAlpha": 0.1,
                  "qDuration": 300, "calInterval": 30,
                  "eventTypes": ["spill", "stop", "lowSpeed", "highSpeed",
-                                "emergencyBrake", "incident", "crowd",
+                                "emgcBrake", "incident", "crowd",
                                 "illegalOccupation"],
                  "tTolerance": 300, "qStandard": 10000,
                  "vLateral": 0.56, "rate2": 0.1, "spillWarnFreq": 300,
                  "vStop": 2.778, "durationStop": 5,
                  "vLow": 11.11, "durationLow": 5,
                  "vHigh": 33.33, "durationHigh": 5,
-                 "aIntense": 3, "durationIntense": 1,
+                 "aEmgcBrake": 3, "durationEmgcBrake": 1,
                  "dTouch": 5, "tSupervise": 20,
                  "densityCrowd": 18, "vCrowd": 16.667,
                  "durationOccupation": 5}

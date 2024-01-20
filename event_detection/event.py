@@ -58,7 +58,7 @@ class EventMng():
         time: str, 事件发生时间
         info: any, 事件信息, 为可变数量的参数。
         - 当type为'spill'时, info为[cellMng]
-        - 当type为'stop', 'lowSpeed', 'highSpeed', 'EmergencyBrake',
+        - 当type为'stop', 'lowSpeed', 'highSpeed', 'EmgcBrake',
           'illegalOccupation'时, info为[car]
         - 当type为'incident'时, info为[car1, car2]
         - 当type为'crowd'时, info为[laneMng]
@@ -92,7 +92,7 @@ class EventMng():
         if type == 'spill':
             event = SpillEvent(type, eventID, time, info[0])
         elif type in ['stop', 'lowSpeed', 'highSpeed',
-                      'emergencyBrake', 'illegalOccupation']:
+                      'emgcBrake', 'illegalOccupation']:
             event = SingleCarEvent(type, eventID, time, info[0])
         elif type == 'incident':
             event = IncidentEvent(type, eventID, time, info[0], info[1])
