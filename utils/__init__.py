@@ -105,3 +105,19 @@ def int2strID(num: int, length: int) -> str:
     将数字转换为指定长度的字符串, 不足的前面补零。
     '''
     return str(num).zfill(length)
+
+
+def strCapitalize(str: str) -> str:
+    '''function strCapitalize
+
+    input
+    -----
+    str: str, 字符串
+
+    return
+    ------
+    str: str, 字符串
+
+    字符串首字母大写。
+    '''
+    return str[0].upper() + str[1:]
