@@ -70,7 +70,7 @@ class EventMng():
         eventID = self.typeCharDict[type] + \
             int2strID(self.eventIdCount[type], idLen)
         self.eventIdCount[type] += 1
-        self.eventIdCount[type] %= 10^(idLen-1)
+        self.eventIdCount[type] %= 10 ^ (idLen - 1)
         # formulate event info
         event = self._generateEvent(type, eventID, time, info)
         # add event to events
@@ -79,7 +79,7 @@ class EventMng():
 
     def clear(self):
         '''function clear
-        
+
         清空events, 在每帧事件检测结束后调用, 即ed.run()末尾。
         '''
         self.events = self.eventsFormat.copy()
@@ -167,7 +167,7 @@ class SpillEvent(BaseEvent):
 
 class SingleCarEvent(BaseEvent):
     '''class SingleCarEvent
-    
+
     单车事件类, 包括静止, 低速, 高速, 紧急制动, 违章占道, 以class形式存储事件信息
 
     properties

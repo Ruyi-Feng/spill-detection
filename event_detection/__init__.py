@@ -15,7 +15,7 @@ class EventDetector(TrafficMng):
     此种定义下, 在外围调用时, 无需生成TrafficMng类,
     只需生成EventDetector类即可, EventDetector可直接调用TrafficMng的方法。
 
-    TODO 
+    TODO
     1. 单车事件报警, 后续可能需要调整为判定一次+结束一次
     (判定报警已完成, 结束报警应在deleteNoUsePotentialDictKeys中添加)
     2. 肇事事件报警, 只需判定一次即可。因此其dict的记录与操作与其他不同
@@ -243,7 +243,6 @@ class EventDetector(TrafficMng):
 
         检测低速事件, 输出并返回事件列表
         '''
-        id2delete = []  # 用于缓存已消失的目标id
         for id in self.lowSpeedDict.keys():
             # 检查事件
             if self.lowSpeedDict[id] == self.durationLow:
