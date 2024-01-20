@@ -1,6 +1,6 @@
 from traffic_manager import TrafficMng
 from event_detection.event import EventMng
-from utils import updateDictCount, delDictKeys
+from utils import updateDictCount, delDictKeys, strCapitalize
 from utils.car_utils import getCarFromCars, getCarBaseInfo
 
 
@@ -14,7 +14,12 @@ class EventDetector(TrafficMng):
     唯一对外调用函数: `run(cars)`, 用于更新交通流信息, 检测交通事件, 输出并返回事件列表。
     此种定义下, 在外围调用时, 无需生成TrafficMng类,
     只需生成EventDetector类即可, EventDetector可直接调用TrafficMng的方法。
-    TODO 当前报警信息每帧输出一次, 没必要, 除spill外报警一次即可。
+
+    TODO 
+    1. 单车事件报警, 后续可能需要调整为判定一次+结束一次
+    (判定报警已完成, 结束报警应在deleteNoUsePotentialDictKeys中添加)
+    2. 肇事事件报警, 只需判定一次即可。因此其dict的记录与操作与其他不同
+    3. 抛洒物、拥堵事件报警, 需要判定一次+定期n次, 后续每隔一定时间都要报警一次
 
     Properties
     ----------
@@ -84,12 +89,14 @@ class EventDetector(TrafficMng):
 
         # 初始化潜在事件记录变量
         self.currentIDs = []    # 当前帧车辆id列表
+        self.potentialEventTypes = ['stop', 'lowSpeed', 'highSpeed',
+                                    'emgcBrake', 'illegalOccupation']
         # 记录数据格式为: {车辆id: 持续帧数count}
         self.stopDict = dict()
         self.lowSpeedDict = dict()
         self.highSpeedDict = dict()
         self.emgcBrakeDict = dict()
-        self.occupationDict = dict()
+        self.illegalOccupationDict = dict()
         # 高级记录器, 记录事故监测
         self.incidentDict = dict()  # 以两辆车id为索引, 记录监测时间
         # 高级记录器，记录抛洒物监测
@@ -125,81 +132,20 @@ class EventDetector(TrafficMng):
         潜在事件包括: 静止, 低速, 超速, 急刹车, 非法占道。
         关于为啥这个函数套了5个小函数, 因为直接写在这个里面flake8会提示复杂了。
         '''
-        # 遍历车辆
+        # 1.遍历车辆
+        # 更新当前帧车辆id列表, 检测潜在事件
         for car in cars:
             # 加入当前帧id列表
             self.currentIDs.append(car['id'])
-            # 潜在静止
-            if self._isCarStop(car):
-                updateDictCount(self.stopDict, car['id'])
-            # 潜在低速
-            if self._isCarLowSpeed(car):
-                updateDictCount(self.lowSpeedDict, car['id'])
-            # 潜在超速
-            if self._isCarHighSpeed(car):
-                updateDictCount(self.highSpeedDict, car['id'])
-            # 潜在急刹车
-            # TODO a可能要考虑改为ax,ay,a
-            if self._isCarEmgcBrake(car):
-                updateDictCount(self.emgcBrakeDict, car['id'])
-            # 潜在应急车道占用
-            if self._isCarIllegalOccupation(car):
-                updateDictCount(self.occupationDict, car['id'])
+            # 检车车辆可能产生的潜在事件
+            for type in self.potentialEventTypes:
+                if getattr(self, f'_isCar{strCapitalize(type)}')(car):
+                    updateDictCount(getattr(self, f'{type}Dict'), car['id'])
+        # 2. 遍历潜在事件记录字典
+        # 删除无效dict键, 包括当前帧丢失目标, 或未消失但已脱离事件检测条件的目标
+        for type in self.potentialEventTypes:
+            self._deleteNoUsePotentialDictKeys(type, cars)
 
-        # TODO 删除无效dict键, 包括当前帧丢失目标, 或未消失但已脱离事件检测条件的目标
-        # 当前代码，如果有车超速后又正常, 导致车辆id无法在事件dict被删除
-        # 将统一把各代码中的dict删除放在这里
-        key2delete = []  # 用于缓存应当删除的键
-        for id in self.stopDict.keys():
-            if id not in self.currentIDs:
-                key2delete.append(id)
-                continue
-            car = getCarFromCars(cars, id)
-            if not self._isCarStop(car):
-                key2delete.append(id)
-        delDictKeys(self.stopDict, key2delete)
-
-        key2delete = []  # 用于缓存应当删除的键
-        for id in self.lowSpeedDict.keys():
-            if id not in self.currentIDs:
-                key2delete.append(id)
-                continue
-            car = getCarFromCars(cars, id)
-            if not self._isCarLowSpeed(car):
-                key2delete.append(id)
-        delDictKeys(self.lowSpeedDict, key2delete)
-
-        key2delete = []  # 用于缓存应当删除的键
-        for id in self.highSpeedDict.keys():
-            if id not in self.currentIDs:
-                key2delete.append(id)
-                continue
-            car = getCarFromCars(cars, id)
-            if not self._isCarHighSpeed(car):
-                key2delete.append(id)
-        delDictKeys(self.highSpeedDict, key2delete)
-
-        key2delete = []  # 用于缓存应当删除的键
-        for id in self.emgcBrakeDict.keys():
-            if id not in self.currentIDs:
-                key2delete.append(id)
-                continue
-            car = getCarFromCars(cars, id)
-            if not self._isCarEmgcBrake(car):
-                key2delete.append(id)
-        delDictKeys(self.emgcBrakeDict, key2delete)
-
-        key2delete = []  # 用于缓存应当删除的键
-        for id in self.occupationDict.keys():
-            if id not in self.currentIDs:
-                key2delete.append(id)
-                continue
-            car = getCarFromCars(cars, id)
-            if not self._isCarIllegalOccupation(car):
-                key2delete.append(id)
-        delDictKeys(self.occupationDict, key2delete)
-
-        
     def detect(self, cars: list):
         '''function detect
 
@@ -471,12 +417,12 @@ class EventDetector(TrafficMng):
 
         检测非法占用应急车道事件, 输出并返回事件列表
         '''
-        for id in self.occupationDict.keys():
+        for id in self.illegalOccupationDict.keys():
             # 检查事件
-            if self.occupationDict[id] == self.durationOccupation:
+            if self.illegalOccupationDict[id] == self.durationOccupation:
                 car = getCarFromCars(cars, id)
                 event = f"事件: id={str(id)}车辆占用应急车道, " + getCarBaseInfo(car) +\
-                    f", 已持续时间{str(self.occupationDict[id]/self.fps)}s。"
+                    f", 已持续时间{str(self.illegalOccupationDict[id]/self.fps)}s。"
                 print(event)
                 # 真正用生成事件
                 # TODO 有时间戳数据后更新self.count为时间戳
@@ -540,6 +486,7 @@ class EventDetector(TrafficMng):
 
         判断车辆是否急刹车
         '''
+        # TODO a可能要考虑改为ax,ay,a
         return (abs(car['a']) > self.aEmgcBrake) & (car['a'] * car['vy'] <= 0)
 
     def _isCarIllegalOccupation(self, car: dict) -> bool:
@@ -556,3 +503,24 @@ class EventDetector(TrafficMng):
         判断车辆是否非法占用应急车道
         '''
         return self.clb[car['laneID']]['emgc']
+
+    def _deleteNoUsePotentialDictKeys(self, type: str, cars: list):
+        '''function _deleteNoUsePotentialDictKeys
+
+        input
+        ------
+        type: str, 潜在事件类型
+        cars: list, 传感器数据
+
+        删除无效dict键, 包括当前帧丢失目标, 或未消失但已脱离事件检测条件的目标。
+        TODO 这种情况代表事件已结束, 若需要报警总持续时长, 可在此处添加。
+        '''
+        key2delete = []
+        for id in getattr(self, f'{type}Dict').keys():
+            if id not in self.currentIDs:
+                key2delete.append(id)
+                continue
+            car = getCarFromCars(cars, id)
+            if not getattr(self, f'_isCar{strCapitalize(type)}')(car):
+                key2delete.append(id)
+        delDictKeys(getattr(self, f'{type}Dict'), key2delete)
