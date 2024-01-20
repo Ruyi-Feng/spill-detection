@@ -40,8 +40,8 @@ class EventDetector(TrafficMng):
     durationLow:    float, 低速持续时间阈值, 单位s
     vHigh:          float, 高速阈值, 单位m/s
     durationHigh:   float, 高速持续时间阈值, 单位s
-    aIntense:       float, 急刹车加速度阈值(绝对值), 单位m/s^2
-    durationIntense: float, 急刹车持续时间阈值, 单位s
+    aEmgcBrake:       float, 急刹车加速度阈值(绝对值), 单位m/s^2
+    durationEmgcBrake: float, 急刹车持续时间阈值, 单位s
     车辆碰撞检测类
     dTouch:     float, 车辆碰撞判定距离, 单位m
     tSupervise: float, 车辆碰撞监控时间, 单位s
@@ -78,7 +78,7 @@ class EventDetector(TrafficMng):
         self.durationStop *= self.fps         # 准静止持续时间阈值
         self.durationLow *= self.fps            # 低速持续时间阈值
         self.durationHigh *= self.fps           # 高速持续时间阈值
-        self.durationIntense *= self.fps        # 急刹车持续时间阈值
+        self.durationEmgcBrake *= self.fps        # 急刹车持续时间阈值
         self.tSupervise *= self.fps             # 车辆碰撞监控时间
         self.durationOccupation *= self.fps     # 非法占道持续时间阈值
 
@@ -88,7 +88,7 @@ class EventDetector(TrafficMng):
         self.stopDict = dict()
         self.lowSpeedDict = dict()
         self.highSpeedDict = dict()
-        self.intenseDict = dict()
+        self.emgcBrakeDict = dict()
         self.occupationDict = dict()
         # 高级记录器, 记录事故监测
         self.incidentDict = dict()  # 以两辆车id为索引, 记录监测时间
@@ -130,22 +130,76 @@ class EventDetector(TrafficMng):
             # 加入当前帧id列表
             self.currentIDs.append(car['id'])
             # 潜在静止
-            if abs(car['vy']) <= self.vStop:
+            if self._isCarStop(car):
                 updateDictCount(self.stopDict, car['id'])
             # 潜在低速
-            if self.vStop < abs(car['vy']) <= self.vLow:
+            if self._isCarLowSpeed(car):
                 updateDictCount(self.lowSpeedDict, car['id'])
             # 潜在超速
-            if abs(car['vy']) > self.vHigh:
+            if self._isCarHighSpeed(car):
                 updateDictCount(self.highSpeedDict, car['id'])
             # 潜在急刹车
             # TODO a可能要考虑改为ax,ay,a
-            if (abs(car['a']) > self.aIntense) & (car['a'] * car['vy'] <= 0):
-                updateDictCount(self.intenseDict, car['id'])
+            if self._isCarEmgcBrake(car):
+                updateDictCount(self.emgcBrakeDict, car['id'])
             # 潜在应急车道占用
-            if self.clb[car['laneID']]['emgc']:
+            if self._isCarIllegalOccupation(car):
                 updateDictCount(self.occupationDict, car['id'])
 
+        # TODO 删除无效dict键, 包括当前帧丢失目标, 或未消失但已脱离事件检测条件的目标
+        # 当前代码，如果有车超速后又正常, 导致车辆id无法在事件dict被删除
+        # 将统一把各代码中的dict删除放在这里
+        key2delete = []  # 用于缓存应当删除的键
+        for id in self.stopDict.keys():
+            if id not in self.currentIDs:
+                key2delete.append(id)
+                continue
+            car = getCarFromCars(cars, id)
+            if not self._isCarStop(car):
+                key2delete.append(id)
+        delDictKeys(self.stopDict, key2delete)
+
+        key2delete = []  # 用于缓存应当删除的键
+        for id in self.lowSpeedDict.keys():
+            if id not in self.currentIDs:
+                key2delete.append(id)
+                continue
+            car = getCarFromCars(cars, id)
+            if not self._isCarLowSpeed(car):
+                key2delete.append(id)
+        delDictKeys(self.lowSpeedDict, key2delete)
+
+        key2delete = []  # 用于缓存应当删除的键
+        for id in self.highSpeedDict.keys():
+            if id not in self.currentIDs:
+                key2delete.append(id)
+                continue
+            car = getCarFromCars(cars, id)
+            if not self._isCarHighSpeed(car):
+                key2delete.append(id)
+        delDictKeys(self.highSpeedDict, key2delete)
+
+        key2delete = []  # 用于缓存应当删除的键
+        for id in self.emgcBrakeDict.keys():
+            if id not in self.currentIDs:
+                key2delete.append(id)
+                continue
+            car = getCarFromCars(cars, id)
+            if not self._isCarEmgcBrake(car):
+                key2delete.append(id)
+        delDictKeys(self.emgcBrakeDict, key2delete)
+
+        key2delete = []  # 用于缓存应当删除的键
+        for id in self.occupationDict.keys():
+            if id not in self.currentIDs:
+                key2delete.append(id)
+                continue
+            car = getCarFromCars(cars, id)
+            if not self._isCarIllegalOccupation(car):
+                key2delete.append(id)
+        delDictKeys(self.occupationDict, key2delete)
+
+        
     def detect(self, cars: list):
         '''function detect
 
@@ -219,12 +273,7 @@ class EventDetector(TrafficMng):
 
         检测低速事件, 输出并返回事件列表
         '''
-        id2delete = []  # 用于缓存已消失的目标id
         for id in self.stopDict.keys():
-            # 检查目标是否已消失
-            if id not in self.currentIDs:
-                id2delete.append(id)
-                continue
             # 检查事件
             if self.stopDict[id] == self.ds:
                 car = getCarFromCars(cars, id)
@@ -234,8 +283,6 @@ class EventDetector(TrafficMng):
                 # 真正用生成事件
                 # TODO 有时间戳数据后更新self.count为时间戳
                 self.eventMng.run('stop', self.count, car)
-        # 删除已消失目标
-        delDictKeys(self.stopDict, id2delete)
 
     def _lowSpeedDetect(self, cars: list):
         '''function lowSpeedDetect
@@ -252,10 +299,6 @@ class EventDetector(TrafficMng):
         '''
         id2delete = []  # 用于缓存已消失的目标id
         for id in self.lowSpeedDict.keys():
-            # 检查目标是否已消失
-            if id not in self.currentIDs:
-                id2delete.append(id)
-                continue
             # 检查事件
             if self.lowSpeedDict[id] == self.durationLow:
                 car = getCarFromCars(cars, id)
@@ -265,8 +308,6 @@ class EventDetector(TrafficMng):
                 # 真正用生成事件
                 # TODO 有时间戳数据后更新self.count为时间戳
                 self.eventMng.run('lowSpeed', self.count, car)
-        # 删除已消失目标
-        delDictKeys(self.lowSpeedDict, id2delete)
 
     def _highSpeedDetect(self, cars: list):
         '''function highSpeedDetect
@@ -281,12 +322,7 @@ class EventDetector(TrafficMng):
 
         检测超速事件, 输出并返回事件列表
         '''
-        id2delete = []  # 用于缓存已消失的目标id
         for id in self.highSpeedDict.keys():
-            # 检查目标是否已消失
-            if id not in self.currentIDs:
-                id2delete.append(id)
-                continue
             # 检查事件
             if self.highSpeedDict[id] == self.durationHigh:
                 car = getCarFromCars(cars, id)
@@ -296,10 +332,8 @@ class EventDetector(TrafficMng):
                 # 真正用生成事件
                 # TODO 有时间戳数据后更新self.count为时间戳
                 self.eventMng.run('highSpeed', self.count, car)
-        # 删除已消失目标
-        delDictKeys(self.highSpeedDict, id2delete)
 
-    def _emergencyBrakeDetect(self, cars: list):
+    def _emgcBrakeDetect(self, cars: list):
         '''function intensiveSpeedReductionDetect
 
         input
@@ -312,24 +346,17 @@ class EventDetector(TrafficMng):
 
         检测急刹车事件, 输出并返回事件列表。减速判断也需要考虑加速度a方向需要跟v方向相反。
         '''
-        id2delete = []  # 用于缓存已消失的目标id
-        for id in self.intenseDict.keys():
-            # 检查目标是否已消失
-            if id not in self.currentIDs:
-                id2delete.append(id)
-                continue
+        for id in self.emgcBrakeDict.keys():
             # 检查事件
-            if self.intenseDict[id] == self.durationIntense:
+            if self.emgcBrakeDict[id] == self.durationEmgcBrake:
                 car = getCarFromCars(cars, id)
                 event = f"事件: id={str(id)}车辆急刹车, " + getCarBaseInfo(car) + \
                     f"加速度: {cars[id]['a']}" + \
-                    f", 已持续时间{str(self.intenseDict[id]/self.fps)}s。"
+                    f", 已持续时间{str(self.emgcBrakeDict[id]/self.fps)}s。"
                 print(event)
                 # 真正用生成事件
                 # TODO 有时间戳数据后更新self.count为时间戳
-                self.eventMng.run('emergencyBrake', self.count, car)
-        # 删除已消失目标
-        delDictKeys(self.intenseDict, id2delete)
+                self.eventMng.run('emgcBrake', self.count, car)
 
     def _incidentDetect(self, cars: list):
         '''function incidentDetect
@@ -346,11 +373,11 @@ class EventDetector(TrafficMng):
         '''
         # 异常运动车辆少于2，不可能有事故
         if (len(self.stopDict) + len(self.lowSpeedDict) +
-                len(self.highSpeedDict) + len(self.intenseDict)) < 2:
+                len(self.highSpeedDict) + len(self.emgcBrakeDict)) < 2:
             return
         # 组合异常车辆id列表, 求并集
         abIDs = set(self.stopDict.keys()) | set(self.lowSpeedDict.keys()) |\
-            set(self.highSpeedDict.keys()) | set(self.intenseDict.keys())
+            set(self.highSpeedDict.keys()) | set(self.emgcBrakeDict.keys())
         # 利用集合运算，删除不在currentIDs中的id
         abIDs = abIDs & set(self.currentIDs)
         abIDs = list(abIDs)
@@ -444,12 +471,7 @@ class EventDetector(TrafficMng):
 
         检测非法占用应急车道事件, 输出并返回事件列表
         '''
-        id2delete = []  # 用于缓存已消失的目标id
         for id in self.occupationDict.keys():
-            # 检查目标是否已消失
-            if id not in self.currentIDs:
-                id2delete.append(id)
-                continue
             # 检查事件
             if self.occupationDict[id] == self.durationOccupation:
                 car = getCarFromCars(cars, id)
@@ -459,5 +481,78 @@ class EventDetector(TrafficMng):
                 # 真正用生成事件
                 # TODO 有时间戳数据后更新self.count为时间戳
                 self.eventMng.run('illegalOccupation', self.count, car)
-        # 删除已消失目标
-        delDictKeys(self.occupationDict, id2delete)
+
+    def _isCarStop(self, car: dict) -> bool:
+        '''function _isCarStop
+
+        input
+        ------
+        car: dict, 车辆数据
+
+        output
+        ------
+        isStop: bool, 是否静止
+
+        判断车辆是否静止
+        '''
+        return abs(car['vy']) <= self.vStop
+
+    def _isCarLowSpeed(self, car: dict) -> bool:
+        '''function _isCarLowSpeed
+
+        input
+        ------
+        car: dict, 车辆数据
+
+        output
+        ------
+        isLowSpeed: bool, 是否低速
+
+        判断车辆是否低速
+        '''
+        return self.vStop < abs(car['vy']) <= self.vLow
+
+    def _isCarHighSpeed(self, car: dict) -> bool:
+        '''function _isCarHighSpeed
+
+        input
+        ------
+        car: dict, 车辆数据
+
+        output
+        ------
+        isHighSpeed: bool, 是否高速
+
+        判断车辆是否高速
+        '''
+        return abs(car['vy']) > self.vHigh
+
+    def _isCarEmgcBrake(self, car: dict) -> bool:
+        '''function _isCarEmgcBrake
+
+        input
+        ------
+        car: dict, 车辆数据
+
+        output
+        ------
+        isEmgcBrake: bool, 是否急刹车
+
+        判断车辆是否急刹车
+        '''
+        return (abs(car['a']) > self.aEmgcBrake) & (car['a'] * car['vy'] <= 0)
+
+    def _isCarIllegalOccupation(self, car: dict) -> bool:
+        '''function _isCarIllegalOccupation
+
+        input
+        ------
+        car: dict, 车辆数据
+
+        output
+        ------
+        isIllegalOccupation: bool, 是否非法占用应急车道
+
+        判断车辆是否非法占用应急车道
+        '''
+        return self.clb[car['laneID']]['emgc']
