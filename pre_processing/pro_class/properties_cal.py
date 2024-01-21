@@ -7,8 +7,6 @@ class PropCalculator:
     用于计算车辆目标的新增属性，包括：
     1. 车辆目标的加速度
     2. 车辆目标的速度值
-    3. 车辆目标所处的元胞
-    note: 车辆目标的轨迹平滑值由smoother计算
     '''
     def __init__(self):
         pass
