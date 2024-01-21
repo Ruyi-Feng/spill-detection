@@ -36,7 +36,6 @@ class Smoother():
         '''
         resultTgt = []
         for tgt in curTgt:
-            tgt = self.__smooth(tgt, lastTgt[0])
             resultTgt.append(tgt)
 
         return resultTgt
