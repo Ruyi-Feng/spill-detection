@@ -1,6 +1,6 @@
 from pre_processing.pro_class.smooth import Smoother
 from pre_processing.pro_class.complete import Completer
-from utils.car_utils import carsList2Dict, carsDict2List
+from utils.car_utils import carsList2Dict  # carsDict2List
 
 
 class TargetManager():
