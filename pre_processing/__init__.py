@@ -1,6 +1,6 @@
 from pre_processing.pro_class.smooth import Smoother
 from pre_processing.pro_class.complete import Completer
-from pre_processing.pro_class.id_correct import IDCorrector
+from utils.car_utils import carsList2Dict, carsDict2List
 
 
 class TargetManager():
@@ -11,21 +11,20 @@ class TargetManager():
         self.IDInCurFrm = []            # 存储当前帧车辆目标的ID
         self.lostIDs = []               # 存储当前帧丢失的ID
         self.newIDs = []                # 存储当前帧新出现的ID
-        self.crt = IDCorrector()        # ID跳变修正器, 可能要设置到completer之下的一个属性TODO
         self.cmp = Completer(comMaxFrm)          # 补全器
         self.smth = Smoother(smthA)          # 平滑器
 
-    def run(self, curTgt: list) -> list:
+    def run(self, curFrame: list) -> list:
         '''function run
 
         input
         -----
-        curTgt: list
+        curFrame: list
             当前帧车辆目标信息
 
         return
         ------
-        curTgt: list
+        curFrame: list
             预处理后的当前帧车辆目标信息
 
         接收当前帧的传感器数据:
@@ -33,46 +32,34 @@ class TargetManager():
         2. 进行补全, 平滑运算。
         3. 更新tgtInLastFrm, IDInLastFrm。
         '''
-        self._update(curTgt)
-        curTgt, cmpltIDs = self._run_complt(curTgt)
-        curTgt, _ = self.crt.run(curTgt, cmpltIDs)
-        curTgt = self._run_smooth(curTgt)
+        curFrame = carsList2Dict(curFrame)
+        # TODO 计算新增属性
+        # TODO 形成历史数据存储
+        self._update(curFrame)
+        # TODO 接入cerebum的补全平滑
+        curFrame, cmpltIDs = self._run_complt(curFrame)
+        curFrame = self._run_smooth(curFrame)
         self._update_last()
-        return curTgt
+        curFrame = carsDict2List(curFrame)
+        return curFrame
 
-    def _update(self, curTgt):
+    def _update(self, curFrame):
         '''
         接受每帧传输来的目标信息, 更新targetList
         '''
         # 更新target
 
-    def _run_IDCorrect(self, curTgt):
-        '''function __run_IDCorrect
-
-        input
-        -----
-        curTgt: list
-            当前帧车辆目标信息
-
-        return
-        ------
-        curTgt: list
-            当前帧车辆目标信息
-
-        '''
-        self.crt.run()
-
-    def _run_complt(self, curTgt):
+    def _run_complt(self, curFrame):
         '''
         '''
-        curTgt = self.cmp.run(curTgt)
-        return curTgt
+        curFrame = self.cmp.run(curFrame)
+        return curFrame
 
-    def _run_smooth(self, curTgt):
+    def _run_smooth(self, curFrame):
         '''
         '''
-        curTgt = self.smth.run(curTgt, curTgt)
-        return curTgt
+        curFrame = self.smth.run(curFrame, curFrame)
+        return curFrame
 
     def _update_last(self):
         '''
