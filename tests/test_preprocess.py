@@ -7,17 +7,17 @@ import yaml
 def test_preprocess():
     # 1. 离线数据测试
     # 读取配置文件
-    configPath = './config.yml'
-    with open(configPath, 'r') as f:
-        config = yaml.load(f, Loader=yaml.FullLoader)
+    cfgPath = './config.yml'
+    with open(cfgPath, 'r') as f:
+        cfg = yaml.load(f, Loader=yaml.FullLoader)
     # 生成仿真器
     dataPath = './data/result.txt'
     smltor = Smltor(dataPath)
     # 生成驱动器
     d = Driver()
     # 生成预处理器
-    tm = TargetManager(comMaxFrm=config['prepro']['max_complete_frames'],
-                       smthA=config['prepro']['smooth_alpha'])
+    tm = TargetManager(comMaxFrm=cfg['maxCompleteFrames'],
+                       smthA=cfg['smoothAlpha'])
     # 仿真器读取数据
     while True:
         msg = smltor.run()
