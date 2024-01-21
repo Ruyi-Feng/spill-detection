@@ -5,7 +5,7 @@ calibSeconds: 600
 laneWidth: 3.75
 emgcWidth: 3.5
 cellLen: 50
-q_Merge: 0
+qMerge: 0
 
 maxCompleteFrames: 20
 smoothAlpha: 0.1
