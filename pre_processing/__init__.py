@@ -40,7 +40,7 @@ class TargetManager():
         curFrame, cmpltIDs = self._run_complt(curFrame)
         curFrame = self._run_smooth(curFrame)
         self._update_last()
-        curFrame = carsDict2List(curFrame)
+        # curFrame = carsDict2List(curFrame)
         return curFrame
 
     def _update(self, curFrame):
