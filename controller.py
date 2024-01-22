@@ -1,7 +1,7 @@
 import os
 from road_calibration import Calibrator
 from message_driver import Driver
-import pre_processing
+from pre_processing import PreProcessor
 from event_detection import EventDetector
 from utils import loadConfig, loadYaml
 
@@ -34,71 +34,66 @@ class Controller:
 
         input
         -----
-        cfgPath: str
-            算法参数文件路径
-        clbPath: str
-            标定参数文件路径
-
+        cfgPath: str, 算法参数文件路径
+        clbPath: str, 标定参数文件路径
         '''
-        # 控制器启动
+        # 读取配置
         self.cfgPath = cfgPath
-        self.clbPath = clbPath
-        # 配置参数
         cfg = loadConfig(cfgPath)
         self.cfg = cfg
+        # 生成数据驱动器
+        self.drv = Driver()
         # 是否标定
+        self.clbPath = clbPath
         self.needClb = False
         self.clbtor = None
-        self.calibFrames = cfg['calib']['calib_seconds'] * cfg['fps']
+        self.calibFrames = cfg['calibSeconds'] * cfg['fps']
         self.calibCount = 0
-        if not (os.path.exists(clbPath)) | self.cfg['calib']['if_recalib']:
+        if not (os.path.exists(clbPath)) | self.cfg['ifRecalib']:
             print('开始标定过程')
             # 没有cfg或者配置需要则标定
             self.needClb = True
             clbtor = Calibrator(clbPath=clbPath, fps=cfg['fps'],
-                                laneWidth=cfg['calib']['laneWidth'],
-                                emgcWidth=cfg['calib']['emgcWidth'],
-                                cellLen=cfg['calib']['cell_len'],
-                                qMerge=cfg['calib']['q_merge'])
+                                laneWidth=cfg['laneWidth'],
+                                emgcWidth=cfg['emgcWidth'],
+                                cellLen=cfg['cellLen'],
+                                qMerge=cfg['qMerge'])
             self.clbtor = clbtor
         else:   # 有cfg则读取, 不需要标定
             print('开始接收数据')
             self.clb = loadYaml(clbPath)
-            self.startManager()
+            self.startDetect()
 
-    def calibration(self, msg):
+    def calibration(self, cars: list):
         '''function calibration
 
         input
         -----
-        msg: str | list
-            传感器数据, str | list格式。str为传输信息(不处理), list为传感器数据。
+        cars: list, 某一帧的车辆目标数据, list格式。
 
         return
         ------
-        msg: str | list
-            发送数据, str | list格式。str为传输信息(不处理), list为传感器数据。
+        cars: list, 某一帧的车辆目标数据, list格式。
 
-        接受传感器数据，根据条件判断是否需要标定或结束标定。
+        进行标定, 存储标定所需数据, 达到标定需求时长后计算标定结果。
         '''
         if self.clbtor.count < self.calibFrames:
-            self.clbtor.run(msg)
+            self.clbtor.run(cars)
         else:
+            self.needClb = False
             self.clbtor.calibrate()
             self.clbtor.save()
             print('开始接收数据')
             self.clb = loadYaml(self.clbPath)
-            # 启动管理器
-            self.startManager()
-            self.needClb = False
+            self.startDetect()   # 凯奇事件检测
 
-    def startManager(self):
+    def startDetect(self):
         '''function startManager
 
-        在完成标定或读取标定后启动管理器。
+        在完成标定或读取标定后正式启动事件检测。
         '''
-        # 生成数据驱动器
-        self.drv = Driver()
+        # 生成数据预处理器
+        self.pp = PreProcessor(self.cfg)
         # 生成事件检测器(内含交通参数管理器)
         self.edt = EventDetector(self.clb, self.cfg)
 
@@ -111,8 +106,8 @@ class Controller:
 
         return
         ------
-        msg: str | list, 传感器车辆数据。str为传输信息(不处理), list为传感器数据。
-        event: list, 事件检测结果。
+        msg: list, 某一帧的车辆目标数据, list格式。
+        events: list, 事件检测结果。
 
         接受传感器数据，返回发送数据、事件检测结果。
         '''
@@ -120,14 +115,14 @@ class Controller:
         valid, cars = self.drv.receive(msg)
         if not valid:
             return
-        # calibration road cells
+        # 接收标定
         if self.needClb:
             self.calibration(cars)
+            return
         # 预处理
-        cars = pre_processing.preProcess(cars, self.trm)
+        cars = self.pp.run(cars)
         # 事件检测(内含交通流参数计算+事件检测)
         events = self.edt.run(cars)
         # 发送数据
         msg = self.drv.send(cars)
-        # print(msg)
         return msg, events
