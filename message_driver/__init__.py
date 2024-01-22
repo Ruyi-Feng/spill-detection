@@ -19,7 +19,8 @@ for key in interface.keys():
     interface_back[interface[key]] = key
 
 # count记录最大值(达到后重置)
-maxCount = 172800000    # fps=20时, 10天重置1次
+maxCount = 60000
+# maxCount = 172800000    # fps=20时, 10天重置1次
 
 
 class Driver():
@@ -125,6 +126,7 @@ class Driver():
         # 可以转化成unix时间戳(统一确定了一个时间原点), 再将这个s为单位的数据转化为ms为单位
         # 统一将时间戳记为以毫秒ms为单位
         car['timeStamp'] = self.count * 100
+        car['secMark'] = car['timeStamp']       # 用于complete使用
 
     def _formatTransInner2Outer(self, car: dict):
         '''function _formatTransInner2Outer
