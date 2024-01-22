@@ -58,12 +58,12 @@ class Driver():
         self.count %= maxCount
         return True, msg
 
-    def send(self, msg: list, events: dict) -> (list, list):
+    def send(self, cars: list, events: dict) -> (list, list):
         '''function send
 
         input
         ------
-        msg: list, 代码内流通的数据格式。msg元素为代表一个车辆目标的dict。
+        cars: list, 代码内流通的数据格式。msg元素为代表一个车辆目标的dict。
         events: dict, 代码内部的事件信息。
 
         return
@@ -77,8 +77,10 @@ class Driver():
         将事件信息转化为输出需要的格式。
         '''
         # 数据格式转化
-        for i in range(len(msg)):
-            self._formatTransInner2Outer(msg[i])
+        msg = []
+        for i in range(len(cars)):
+            newCar = self._formatTransInner2Outer(cars[i])
+            msg.append(newCar)
         # 事件格式转化
         outEvents = self._eventsInner2Outer(events)
         return msg, outEvents
@@ -128,7 +130,7 @@ class Driver():
         car['timeStamp'] = self.count * 100
         car['secMark'] = car['timeStamp']       # 用于complete使用
 
-    def _formatTransInner2Outer(self, car: dict):
+    def _formatTransInner2Outer(self, car: dict) -> dict:
         '''function _formatTransInner2Outer
 
         input
@@ -138,24 +140,26 @@ class Driver():
         将代码内部处理的car数据形式, 返还成msg中传输来的原始格式。
         原地修改
         '''
+        newCar = car.copy()
         # 处理特殊属性
-        if car['laneNeedAdd']:
-            car['laneID'] += 100
-        del car['laneNeedAdd']
+        if newCar['laneNeedAdd']:
+            newCar['laneID'] += 100
+        del newCar['laneNeedAdd']
         # 调整属性名称
         for key in interface_back.keys():
-            car[interface_back[key]] = car[key]
-            del car[key]
+            newCar[interface_back[key]] = newCar[key]
+            del newCar[key]
         # 删除增加属性
-        del car['a']
-        del car['speed']
+        del newCar['a']
+        del newCar['speed']
 
         # 调整时间戳格式
         # TODO 暂时在接收数据时按照接收count为数据赋值时间戳
         # TODO 后续根据具体情况, 将时间戳转化为以毫秒ms为单位的时间戳
         # 可以转化成unix时间戳(统一确定了一个时间原点), 再将这个s为单位的数据转化为ms为单位
         # 统一将时间戳记为以毫秒ms为单位
-        del car['timeStamp']
+        del newCar['timeStamp']
+        return newCar
 
     def _eventsInner2Outer(self, events: dict) -> list:
         '''function _eventsInner2Outer
@@ -170,6 +174,6 @@ class Driver():
         for type in events.keys():
             if not events[type]['occured']:
                 continue
-            for event in events[type]['items']:
-                outerEvents.append(event)
+            for eventID in events[type]['items']:
+                outerEvents.append(events[type]['items'][eventID])
         return outerEvents
