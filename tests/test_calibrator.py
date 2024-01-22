@@ -4,6 +4,7 @@ from road_calibration import Calibrator
 import yaml
 from tests.test_data.standardClb import standardClb
 
+
 # 通过
 def test_calibrator():
     '''test function calibrator
@@ -46,7 +47,7 @@ def test_calibrator():
 
     # 标定器保存
     clb = calibrator.save()
-    
+
     # 检查点1
     # 标定器标定结果与标准结果相同
     assert clb == standardClb

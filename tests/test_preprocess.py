@@ -17,7 +17,7 @@ def test_preprocess():
     d = Driver()
     # 生成预处理器
     pp = PreProcessor(comMaxFrm=cfg['maxCompleteTime'],
-                       smthA=cfg['smoothAlpha'])
+                      smthA=cfg['smoothAlpha'])
     # 仿真器读取数据
     while True:
         msg = smltor.run()

@@ -93,7 +93,8 @@ class Controller:
         在完成标定或读取标定后正式启动事件检测。
         '''
         # 生成数据预处理器
-        self.pp = PreProcessor(self.cfg['maxCompleteTime'], self.cfg['smoothAlpha'])
+        self.pp = PreProcessor(self.cfg['maxCompleteTime'],
+                               self.cfg['smoothAlpha'])
         # 生成事件检测器(内含交通参数管理器)
         self.edt = EventDetector(self.clb, self.cfg)
 

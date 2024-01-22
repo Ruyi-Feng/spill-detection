@@ -1,10 +1,12 @@
-from pre_processing.utils import *
+from pre_processing.utils import framesCombination, getCurrentFrame
+
 
 '''Define the smooth algorithm class.'''
 
+
 class Exponential:
     """一次指数平滑算法
-    
+
     1. 合并历史帧数据与当前帧数据
     2. 找到参与者上一帧的轨迹
     3. 通过指数平滑函数对最新轨迹点进行平滑

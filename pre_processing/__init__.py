@@ -25,9 +25,12 @@ class PreProcessor():
         1. 更新除tgtInLastFrm, IDInLastFrm以外的所有属性。
         2. 进行补全, 平滑运算。
         3. 更新tgtInLastFrm, IDInLastFrm。
+        note
+        -----
+        算法会原地实时修改历史数据。
         '''
         # 初次启动
-        if (self.lastTimestamp == None) & (len(curFrame) != 0):
+        if (self.lastTimestamp is None) & (len(curFrame) != 0):
             self.lastTimestamp = curFrame[0]['timeStamp']
         # dict组织方便索引
         curFrame = carsList2Dict(curFrame)
@@ -41,7 +44,6 @@ class PreProcessor():
                                                      self.lastTimestamp)
         # 计算a属性
         curFrame = self._calAcceleration(self.contextFrames, curFrame)
-        # TODO 更新history？看补全平滑是否已经实现补充数据
         # 返回为list形式车辆
         curFrame = carsDict2List(curFrame)
         return curFrame
@@ -63,11 +65,17 @@ class PreProcessor():
         newCurFrame = dict()
         for key in curFrame.keys():
             newCurFrame[key] = curFrame[key]
-            newCurFrame[key]['a'] = 0
             if key in contextFrames.keys():
                 if len(contextFrames[key]) > 1:
-                    # TODO 看这里是否已经对context做了补充，补充了则索引-2，未补充则索引-1
-                    newCurFrame[key]['a'] = \
-                        (curFrame[key]['vx'] - contextFrames[key][-2]['vx']) / \
-                        (curFrame[key]['timeStamp'] - contextFrames[key][-2]['timeStamp'])
+                    # 这里已经对context做了当前帧补充，因此上一帧的索引为-2
+                    deltaVx = curFrame[key]['vx'] - \
+                        contextFrames[key][-2]['vx']
+                    deltaVy = curFrame[key]['vy'] - \
+                        contextFrames[key][-2]['vy']
+                    deltaT = (curFrame[key]['timeStamp'] -
+                              contextFrames[key][-2]['timeStamp']) / 1000
+                    newCurFrame[key]['ax'] = deltaVx / deltaT
+                    newCurFrame[key]['ay'] = deltaVy / deltaT
+                    newCurFrame[key]['a'] = (newCurFrame[key]['ax']**2 +
+                                             newCurFrame[key]['ay']**2)**0.5
         return newCurFrame

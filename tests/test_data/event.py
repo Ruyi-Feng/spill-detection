@@ -2,14 +2,14 @@ events = {
     'spill': {
         'name': 'spill',
         'occured': True,
-        'items': 
+        'items':
         {
             'A0000010':
             {
                 'type': 'spill',
                 'eventID': 'A0000010',
                 'time': 200,
-                'laneID': 5, 
+                'laneID': 5,
                 'order': 2,
                 'start': 100,
                 'end': 150,
@@ -27,7 +27,7 @@ events = {
         'occured': False,
         'items': {}
         },
-    'highSpeed': 
+    'highSpeed':
     {
         'name': 'highSpeed',
         'occured': True,
@@ -39,7 +39,7 @@ events = {
                 'eventID': 'D0000340',
                 'time': 234,
                 'carID': 5800,
-                'laneID': 5, 
+                'laneID': 5,
                 'x': 14.94,
                 'y': 228.8,
                 'vx': -0.72,
@@ -57,7 +57,7 @@ events = {
     'incident': {
         'name': 'incident',
         'occured': True,
-        'items': 
+        'items':
         {
             'F0000010':
             {
@@ -86,7 +86,7 @@ events = {
     'crowd': {
         'name': 'crowd',
         'occured': True,
-        'items': 
+        'items':
         {
             'G0000010':
             {
@@ -113,7 +113,7 @@ outerEvents = [
         'type': 'spill',
         'eventID': 'A0000010',
         'time': 200,
-        'laneID': 5, 
+        'laneID': 5,
         'order': 2,
         'start': 100,
         'end': 150,
@@ -124,7 +124,7 @@ outerEvents = [
         'eventID': 'D0000340',
         'time': 234,
         'carID': 5800,
-        'laneID': 5, 
+        'laneID': 5,
         'x': 14.94,
         'y': 228.8,
         'vx': -0.72,

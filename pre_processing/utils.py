@@ -17,7 +17,6 @@ def frameDelete(contextFrames: dict, lastTimestamp: int) -> None:
 
     删除同一guid过老旧数据, 以及删除过久没有更新过的guid所有数据。进行原地修改。
     """
-    # 
     guid_list = list(contextFrames.keys())
     for guid in guid_list:
         if (
@@ -37,18 +36,18 @@ def framesCombination(
     contextFrames: dict, currentFrame: dict, lastTimestamp: int
 ) -> tuple:
     """function framesCombination
-    
+
     input
     -----
     contextFrames: dict, 历史帧数据
     currentFrame: dict, 当前帧数据
     lastTimestamp: int, 上一帧的时间戳
-    
+
     output
     ------
     latestIdSet: set, 当前帧中出现的id, 用于判断那些id没有被更新, 从而不参与算法计算。
     lastTimestamp: int, 当前帧的时间戳
-    
+
     将当前帧数据添加到历史帧数据中, 同时重置时间戳, 保证时间戳恒增。进行原地修改。
     """
     if len(currentFrame) == 0:
@@ -86,7 +85,7 @@ def framesCombination(
 
 def getCurrentFrame(frames: dict, lastTimestamp: int) -> dict:
     """function getCurrentFrame
-    
+
     input
     -----
     frames: dict, 历史帧数据(包含当前最新帧)

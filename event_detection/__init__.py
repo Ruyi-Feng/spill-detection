@@ -394,7 +394,9 @@ class EventDetector(TrafficMng):
                 event = f"事件: id={id}车道拥堵, 车道密度: {k}辆/km, 车道速度: {v}km/h。"
                 print(event)
                 # 真正用生成事件
-                self.eventMng.run('crowd', cars[0]['timeStamp'], self.lanes[id])
+                self.eventMng.run('crowd',
+                                  cars[0]['timeStamp'],
+                                  self.lanes[id])
 
     def _illegalOccupationDetect(self, cars: list):
         '''function illegalOccupationDetect
@@ -417,7 +419,9 @@ class EventDetector(TrafficMng):
                     f", 已持续时间{str(self.illegalOccupationDict[id]/self.fps)}s。"
                 print(event)
                 # 真正用生成事件
-                self.eventMng.run('illegalOccupation', cars[0]['timeStamp'], car)
+                self.eventMng.run('illegalOccupation',
+                                  cars[0]['timeStamp'],
+                                  car)
 
     def _isCarStop(self, car: dict) -> bool:
         '''function _isCarStop
