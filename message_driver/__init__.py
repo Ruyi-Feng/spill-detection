@@ -136,6 +136,10 @@ class Driver():
         将代码内部处理的car数据形式, 返还成msg中传输来的原始格式。
         原地修改
         '''
+        # 处理特殊属性
+        if car['laneNeedAdd']:
+            car['laneID'] += 100
+        del car['laneNeedAdd']
         # 调整属性名称
         for key in interface_back.keys():
             car[interface_back[key]] = car[key]
@@ -143,9 +147,7 @@ class Driver():
         # 删除增加属性
         del car['a']
         del car['speed']
-        if car['laneNeedAdd']:
-            car['laneID'] += 100
-        del car['laneNeedAdd']
+
         # 调整时间戳格式
         # TODO 暂时在接收数据时按照接收count为数据赋值时间戳
         # TODO 后续根据具体情况, 将时间戳转化为以毫秒ms为单位的时间戳
@@ -162,5 +164,10 @@ class Driver():
 
         将代码内部的事件信息转化为传输格式的事件信息。
         '''
-        # TODO
-        pass
+        outerEvents = []
+        for type in events.keys():
+            if not events[type]['occured']:
+                continue
+            for event in events[type]['items']:
+                outerEvents.append(event)
+        return outerEvents
