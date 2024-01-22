@@ -50,7 +50,7 @@ class Controller:
         self.calibFrames = cfg['calibSeconds'] * cfg['fps']
         self.calibCount = 0
         if not (os.path.exists(clbPath)) | self.cfg['ifRecalib']:
-            print('开始标定过程')
+            print('******开始标定过程******')
             # 没有cfg或者配置需要则标定
             self.needClb = True
             clbtor = Calibrator(clbPath=clbPath, fps=cfg['fps'],
@@ -60,7 +60,7 @@ class Controller:
                                 qMerge=cfg['qMerge'])
             self.clbtor = clbtor
         else:   # 有cfg则读取, 不需要标定
-            print('开始接收数据')
+            print('******开始接收数据******')
             self.clb = loadYaml(clbPath)
             self.startDetect()
 
@@ -83,7 +83,7 @@ class Controller:
             self.needClb = False
             self.clbtor.calibrate()
             self.clbtor.save()
-            print('开始接收数据')
+            print('******开始接收数据******')
             self.clb = loadYaml(self.clbPath)
             self.startDetect()   # 凯奇事件检测
 
@@ -93,7 +93,7 @@ class Controller:
         在完成标定或读取标定后正式启动事件检测。
         '''
         # 生成数据预处理器
-        self.pp = PreProcessor(self.cfg)
+        self.pp = PreProcessor(self.cfg['maxCompleteTime'], self.cfg['smoothAlpha'])
         # 生成事件检测器(内含交通参数管理器)
         self.edt = EventDetector(self.clb, self.cfg)
 
@@ -114,15 +114,15 @@ class Controller:
         # 接受数据
         valid, cars = self.drv.receive(msg)
         if not valid:
-            return
+            return None, None
         # 接收标定
         if self.needClb:
             self.calibration(cars)
-            return
+            return None, None
         # 预处理
         cars = self.pp.run(cars)
         # 事件检测(内含交通流参数计算+事件检测)
         events = self.edt.run(cars)
         # 发送数据
-        msg = self.drv.send(cars)
+        msg, events = self.drv.send(cars.copy(), events)
         return msg, events
