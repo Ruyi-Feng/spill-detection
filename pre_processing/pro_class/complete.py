@@ -1,5 +1,5 @@
 import math
-from pre_processing.utils import *
+import pre_processing.utils as utils
 
 
 class Interpolation:
@@ -28,10 +28,9 @@ class Interpolation:
         max_speed_non_motor: 非机动车最大允许补全点的速度
         max_speed_pedestrian: 行人最大允许补全点的速度
         """
-        self._lag_time = lag_time
-        # 延误帧数
+        self._lag_time = lag_time   # 延误帧数
         self._speed_coefficient = 3.6
-        # 行人最大时速, 若需补全的数据超过此时速, 则判为异常
+        # 若需补全的数据超过此时速, 则判为异常
         self._speed_dict = {
             "motor": max_speed_motor / self._speed_coefficient,
             "non-motor": max_speed_non_motor / self._speed_coefficient,
@@ -54,12 +53,12 @@ class Interpolation:
         updated_latest_frame: 完成处理后的最新帧数据
         last_timestamp: 下次调用的当前帧数据的时间戳
         """
-        _, last_timestamp = frames_combination(
+        _, last_timestamp = utils.frames_combination(
             context_frames, current_frame, last_timestamp
         )
         return (
             self._handle_interpolation(
-                context_frames, self._find_delay_sec_mark(context_frames)
+                context_frames, self._find_delay_secMark(context_frames)
             ),
             last_timestamp,
         )
@@ -72,9 +71,9 @@ class Interpolation:
         return index
 
     def _is_frame_valid(
-        self, obj_info: dict, index: int, delay_sec_mark: int
+        self, obj_info: dict, index: int, delay_secMark: int
     ) -> bool:
-        if obj_info[index]["timeStamp"] <= delay_sec_mark:
+        if obj_info[index]["timeStamp"] <= delay_secMark:
             return False
         # 判断id下一次再出现时是否是位移过远, 是否是无效数据
         dis_x = obj_info[index]["x"] - obj_info[index - 1]["x"]
@@ -88,45 +87,45 @@ class Interpolation:
         return speed_max > speed
 
     def _complete_obj(
-        self, objs_info: list, index: int, delay_sec_mark: int
+        self, objs_info: list, index: int, delay_secMark: int
     ) -> None:
         # 补全指定的帧号下指定 id的轨迹点
         objs_info.insert(index, objs_info[index].copy())
         for i in ("x", "y"):
             objs_info[index][i] = objs_info[index - 1][i] + (
                 objs_info[index + 1][i] - objs_info[index - 1][i]
-            ) * (delay_sec_mark - objs_info[index - 1]["timeStamp"]) / (
+            ) * (delay_secMark - objs_info[index - 1]["timeStamp"]) / (
                 objs_info[index + 1]["timeStamp"]
                 - objs_info[index - 1]["timeStamp"]
             )
-        objs_info[index]["timeStamp"] = delay_sec_mark
-        objs_info[index]["secMark"] = delay_sec_mark % utils.MaxSecMark
+        objs_info[index]["timeStamp"] = delay_secMark
+        objs_info[index]["secMark"] = delay_secMark % utils.MaxSecMark
 
-    def _find_delay_sec_mark(self, frames: dict) -> int:
-        # 找到 delay_sec_mark, 并更新原 frames的 secmark
+    def _find_delay_secMark(self, frames: dict) -> int:
+        # 找到 delay_secMark, 并更新原 frames的 secmark
         max_sec = 0
         for objs_info in frames.values():
             max_sec_each_id = objs_info[-1]["timeStamp"]
             max_sec = max(max_sec_each_id, max_sec)
-        delay_sec_mark = max_sec
+        delay_secMark = max_sec
         for objs_info in frames.values():
             for fr in objs_info:
                 if fr["timeStamp"] >= max_sec - self._lag_time:
-                    delay_sec_mark = min(fr["timeStamp"], delay_sec_mark)
+                    delay_secMark = min(fr["timeStamp"], delay_secMark)
                     break
-        return delay_sec_mark
+        return delay_secMark
 
-    def _handle_interpolation(self, frames: dict, delay_sec_mark: int) -> dict:
+    def _handle_interpolation(self, frames: dict, delay_secMark: int) -> dict:
         # 判断是否需要做补全, 并调相应函数做补全处理
         updated_latest_frame = {}
         for objs_info in frames.values():
-            sec_mark_list = [fr["timeStamp"] for fr in objs_info]
-            index = self._find_nearest(sec_mark_list, delay_sec_mark)
+            secMark_list = [fr["timeStamp"] for fr in objs_info]
+            index = self._find_nearest(secMark_list, delay_secMark)
             if index != 0:
-                if self._is_frame_valid(objs_info, index, delay_sec_mark):
-                    self._complete_obj(objs_info, index, delay_sec_mark)
+                if self._is_frame_valid(objs_info, index, delay_secMark):
+                    self._complete_obj(objs_info, index, delay_secMark)
                 for i in range(len(objs_info) - 1, -1, -1):
-                    if objs_info[i]["timeStamp"] == delay_sec_mark:
-                        obj_id = objs_info[i]["global_track_id"]
+                    if objs_info[i]["timeStamp"] == delay_secMark:
+                        obj_id = objs_info[i]["id"]
                         updated_latest_frame[obj_id] = objs_info[i]
         return updated_latest_frame
