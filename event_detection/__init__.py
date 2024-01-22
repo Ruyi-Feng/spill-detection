@@ -481,8 +481,8 @@ class EventDetector(TrafficMng):
 
         判断车辆是否急刹车
         '''
-        # TODO a可能要考虑改为ax,ay,a
-        return (abs(car['a']) > self.aEmgcBrake) & (car['a'] * car['vy'] <= 0)
+        return ((abs(car['ay']) > self.aEmgcBrake) &
+                (car['ay'] * car['vy'] <= 0))
 
     def _isCarIllegalOccupation(self, car: dict) -> bool:
         '''function _isCarIllegalOccupation
