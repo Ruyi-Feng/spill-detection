@@ -69,21 +69,3 @@ class PropCalculator:
         '''
         tgt['speed'] = math.sqrt(tgt['VDecVx']**2 + tgt['VDecVy']**2)
         return tgt
-
-    def __run_cell(self, tgt: dict, cellLine: list) -> dict:
-        '''function __run_cell
-
-        input
-        -----
-        tgt: dict
-            当前帧车辆目标信息
-        cellLine: list
-            元胞划分线
-
-        return
-        ------
-        tgt: dict
-            计算后的当前帧车辆目标信息
-
-        '''
-        return tgt

@@ -1,6 +1,6 @@
 from rsu_simulator import Smltor
 from message_driver import Driver
-from pre_processing import TargetManager
+from pre_processing import PreProcessor
 import yaml
 
 
@@ -16,7 +16,7 @@ def test_preprocess():
     # 生成驱动器
     d = Driver()
     # 生成预处理器
-    tm = TargetManager(comMaxFrm=cfg['maxCompleteFrames'],
+    tm = PreProcessor(comMaxFrm=cfg['maxCompleteFrames'],
                        smthA=cfg['smoothAlpha'])
     # 仿真器读取数据
     while True:
