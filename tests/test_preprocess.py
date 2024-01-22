@@ -16,7 +16,7 @@ def test_preprocess():
     # 生成驱动器
     d = Driver()
     # 生成预处理器
-    tm = PreProcessor(comMaxFrm=cfg['maxCompleteTime'],
+    pp = PreProcessor(comMaxFrm=cfg['maxCompleteTime'],
                        smthA=cfg['smoothAlpha'])
     # 仿真器读取数据
     while True:
@@ -27,7 +27,7 @@ def test_preprocess():
         if not valid:
             continue
         # 预处理接收数据
-        cars = tm.run(cars)
+        cars = pp.run(cars)
         # 检查点1
         # 预处理后的数据为列表
         assert type(cars) == list
@@ -42,3 +42,7 @@ def test_preprocess():
     #     assert valid == True
     #     cars = tm.run(cars)
     #     assert type(cars) == list
+
+
+if __name__ == "__main__":
+    test_preprocess()
