@@ -1,4 +1,8 @@
+'''Define the send and receive interface processor of message.'''
+
+
 # 数据格式接口, 从接收数据转化为内部处理数据
+# TODO 根据实际接收数据情况修改
 interface = {'TargetId': 'id',
              'XDecx': 'x',
              'YDecy': 'y',
@@ -14,6 +18,9 @@ interface_back = dict()
 for key in interface.keys():
     interface_back[interface[key]] = key
 
+# count记录最大值(达到后重置)
+maxCount = 172800000    # fps=20时, 10天重置1次
+
 
 class Driver():
     '''class Driver
@@ -21,6 +28,9 @@ class Driver():
     数据格式转化驱动器，将传感器数据转化为代码内部流通的数据格式，
     将代码内部流通的数据格式转化为输出数据。
     '''
+    def __init__(self):
+        self.count = 0
+
     def receive(self, msg: list) -> (bool, list):
         '''function receive
 
@@ -51,6 +61,15 @@ class Driver():
             if msg[i]['laneID'] > 100:
                 msg[i]['laneID'] -= 100
                 msg[i]['laneNeedAdd'] = True
+
+            # TODO 暂时在接收数据时按照接收count为数据赋值时间戳
+            # TODO 后续根据具体情况, 将时间戳转化为以毫秒ms为单位的时间戳
+            # 可以转化成unix时间戳(统一确定了一个时间原点), 再将这个s为单位的数据转化为ms为单位
+            # 统一将时间戳记为以毫秒ms为单位
+            msg[i]['timeStamp'] = self.count * 100
+        # 更新时间戳count
+        self.count += 1
+        self.count %= maxCount
         return True, msg
 
     def send(self, msg: list) -> list:
@@ -79,6 +98,7 @@ class Driver():
             if msg[i]['laneNeedAdd']:
                 msg[i][interface_back['laneID']] += 100
                 del msg[i]['laneNeedAdd']
+            del msg[i]['timeStamp']
 
         return msg
 
