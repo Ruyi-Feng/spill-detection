@@ -199,8 +199,7 @@ class EventDetector(TrafficMng):
                             f"持续时间: {self.dangerDict[(id, order)]/self.fps}s。"
                         print(event)
                         # 真正用生成事件
-                        # TODO 有时间戳数据后更新self.count为时间戳
-                        self.eventMng.run('spill', self.count,
+                        self.eventMng.run('spill', cars[0]['timeStamp'],
                                           self.lanes[id].cells[order])
                 else:   # 未达到1, 检查是否在记录表内, 若在则删除
                     if (id, order) in self.dangerDict.keys():
@@ -227,8 +226,7 @@ class EventDetector(TrafficMng):
                     f", 已持续时间{str(self.stopDict[id]/self.fps)}s。"
                 print(event)
                 # 真正用生成事件
-                # TODO 有时间戳数据后更新self.count为时间戳
-                self.eventMng.run('stop', self.count, car)
+                self.eventMng.run('stop', cars[0]['timeStamp'], car)
 
     def _lowSpeedDetect(self, cars: list):
         '''function lowSpeedDetect
@@ -251,8 +249,7 @@ class EventDetector(TrafficMng):
                     f", 已持续时间{str(self.lowSpeedDict[id]/self.fps)}s。"
                 print(event)
                 # 真正用生成事件
-                # TODO 有时间戳数据后更新self.count为时间戳
-                self.eventMng.run('lowSpeed', self.count, car)
+                self.eventMng.run('lowSpeed', cars[0]['timeStamp'], car)
 
     def _highSpeedDetect(self, cars: list):
         '''function highSpeedDetect
@@ -275,8 +272,7 @@ class EventDetector(TrafficMng):
                     f", 已持续时间{str(self.highSpeedDict[id]/self.fps)}s。"
                 print(event)
                 # 真正用生成事件
-                # TODO 有时间戳数据后更新self.count为时间戳
-                self.eventMng.run('highSpeed', self.count, car)
+                self.eventMng.run('highSpeed', cars[0]['timeStamp'], car)
 
     def _emgcBrakeDetect(self, cars: list):
         '''function intensiveSpeedReductionDetect
@@ -300,8 +296,7 @@ class EventDetector(TrafficMng):
                     f", 已持续时间{str(self.emgcBrakeDict[id]/self.fps)}s。"
                 print(event)
                 # 真正用生成事件
-                # TODO 有时间戳数据后更新self.count为时间戳
-                self.eventMng.run('emgcBrake', self.count, car)
+                self.eventMng.run('emgcBrake', cars[0]['timeStamp'], car)
 
     def _incidentDetect(self, cars: list):
         '''function incidentDetect
@@ -365,8 +360,7 @@ class EventDetector(TrafficMng):
                     getCarBaseInfo(car1) + getCarBaseInfo(car2)
                 print(event)
                 # 真正用生成事件
-                # TODO 有时间戳数据后更新self.count为时间戳
-                self.eventMng.run('incident', self.count, car1, car2)
+                self.eventMng.run('incident', cars[0]['timeStamp'], car1, car2)
                 # 删除记录
                 key2delete.append(ids)
             else:   # 碰撞后的过程, 速度下降但未趋于0时, 计数
@@ -400,8 +394,7 @@ class EventDetector(TrafficMng):
                 event = f"事件: id={id}车道拥堵, 车道密度: {k}辆/km, 车道速度: {v}km/h。"
                 print(event)
                 # 真正用生成事件
-                # TODO 有时间戳数据后更新self.count为时间戳
-                self.eventMng.run('crowd', self.count, self.lanes[id])
+                self.eventMng.run('crowd', cars[0]['timeStamp'], self.lanes[id])
 
     def _illegalOccupationDetect(self, cars: list):
         '''function illegalOccupationDetect
@@ -424,8 +417,7 @@ class EventDetector(TrafficMng):
                     f", 已持续时间{str(self.illegalOccupationDict[id]/self.fps)}s。"
                 print(event)
                 # 真正用生成事件
-                # TODO 有时间戳数据后更新self.count为时间戳
-                self.eventMng.run('illegalOccupation', self.count, car)
+                self.eventMng.run('illegalOccupation', cars[0]['timeStamp'], car)
 
     def _isCarStop(self, car: dict) -> bool:
         '''function _isCarStop
