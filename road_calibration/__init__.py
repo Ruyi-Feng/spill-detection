@@ -85,21 +85,6 @@ class Calibrator():
         '''
         self.count += 1
         for target in msg:
-            # MARK 输出指定id信息
-            # if target['TargetId'] == 7390:
-            #     # {'TargetId': 5087, 'XDecx': 2.57, 'YDecy': 7, 'ZDecz': 0,
-            #     # 'VDecVx': 0.13, 'VDecVy': -19.3, 'Xsize': 0.47,
-            #     # 'TargetType': 1, 'Longitude': 118.87387669811856,
-            #     #  'Latitude': 31.935760760137626,
-            #     # 'Confidence': 1, 'EventType': 0, 'LineNum': 1}
-            #     # 只保留id和xy与vxvy, 删除其他
-            #     keysToDelete = ['ZDecz', 'Xsize', 'Ysize',
-            #                     'TargetType', 'Longitude', 'Latitude',
-            #                     'Confidence', 'EventType']
-            #     for k in keysToDelete:
-            #         del target[k]
-            #     print(target, ',', sep='')
-
             laneID = target['laneID'] - 100 if target['laneID'] > 100 \
                 else target['laneID']
 
