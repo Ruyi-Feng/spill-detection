@@ -42,7 +42,7 @@ def frames_combination(
             latest_id_set.add(guid)
             obj_info["timeStamp"] = obj_info["secMark"]
             while obj_info["timeStamp"] < last_timestamp:
-                obj_info["timeStamp"] += MaxSecMark
+                obj_info["timeStamp"] += MaxSecMark     # tdy?
             context_frames.setdefault(guid, [])
             if (
                 len(context_frames[guid])
@@ -52,8 +52,8 @@ def frames_combination(
                 context_frames[guid][-1] = obj_info
             else:
                 context_frames[guid].append(obj_info)
-            current_sec_mark = obj_info["timeStamp"]
-        last_timestamp = current_sec_mark
+            current_secMark = obj_info["timeStamp"]
+        last_timestamp = current_secMark
         frame_delete(context_frames, last_timestamp)
         return latest_id_set, last_timestamp
     # 如果历史数据为空, 直接添加
@@ -71,6 +71,6 @@ def get_current_frame(frames: dict, last_timestamp: int) -> dict:
     latest_frame = {}
     for obj_info in frames.values():
         if obj_info[-1]["timeStamp"] == last_timestamp:
-            obj_id = obj_info[-1]["global_track_id"]
+            obj_id = obj_info[-1]["id"]
             latest_frame[obj_id] = obj_info[-1]
     return latest_frame
