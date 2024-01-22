@@ -49,58 +49,38 @@ class Driver():
         valid = self._ifValid(msg)
         if not valid:
             return False, msg
+        # 转化数据格式
         for i in range(len(msg)):
-            # 修改属性名称
-            for key in interface.keys():
-                msg[i][interface[key]] = msg[i][key]
-                del msg[i][key]
-            # TODO 暂时在driver中加入，应当放在prepro中
-            msg[i]['a'] = 0
-            msg[i]['speed'] = (msg[i]['vx']**2 + msg[i]['vy']**2)**0.5
-            msg[i]['laneNeedAdd'] = False
-            if msg[i]['laneID'] > 100:
-                msg[i]['laneID'] -= 100
-                msg[i]['laneNeedAdd'] = True
-
-            # TODO 暂时在接收数据时按照接收count为数据赋值时间戳
-            # TODO 后续根据具体情况, 将时间戳转化为以毫秒ms为单位的时间戳
-            # 可以转化成unix时间戳(统一确定了一个时间原点), 再将这个s为单位的数据转化为ms为单位
-            # 统一将时间戳记为以毫秒ms为单位
-            msg[i]['timeStamp'] = self.count * 100
+            self._formatTransOuter2Inner(msg[i])
         # 更新时间戳count
         self.count += 1
         self.count %= maxCount
         return True, msg
 
-    def send(self, msg: list) -> list:
+    def send(self, msg: list, events: dict) -> (list, list):
         '''function send
 
         input
         ------
         msg: list, 代码内流通的数据格式。msg元素为代表一个车辆目标的dict。
+        events: dict, 代码内部的事件信息。
 
         return
         ------
         msg: list, 输出到外部的数据。
+        events: dict, 向外传输格式的事件信息。
 
         将代码内部流通的数据, 转化为输出需要的格式。返回值与代码内流通相比相比:
         具体为: 还原代码内部流通数据为原始数据属性名称的属性名称,
         并删除内部增加的属性。
+        将事件信息转化为输出需要的格式。
         '''
+        # 数据格式转化
         for i in range(len(msg)):
-            # 还原属性名称
-            for key in interface_back.keys():
-                msg[i][interface_back[key]] = msg[i][key]
-                del msg[i][key]
-            # TODO 除del外的操作, 暂时在driver中加入, 应当放在prepro中
-            del msg[i]['a']
-            del msg[i]['speed']
-            if msg[i]['laneNeedAdd']:
-                msg[i][interface_back['laneID']] += 100
-                del msg[i]['laneNeedAdd']
-            del msg[i]['timeStamp']
-
-        return msg
+            self._formatTransInner2Outer(msg[i])
+        # 事件格式转化
+        outEvents = self._eventsInner2Outer(events)
+        return msg, outEvents
 
     def _ifValid(self, msg) -> bool:
         '''function _ifValid
@@ -117,3 +97,70 @@ class Driver():
         判断数据是否有效, 若为str信息则返回False。
         '''
         return type(msg) == list
+
+    def _formatTransOuter2Inner(self, car: dict):
+        '''function _formatTransOuter2Inner
+
+        input
+        -----
+        car: dict, 传感器的单车数据, dict格式。
+
+        将msg中car的数据格式转化为代码内部的处理数据格式。
+        原地修改
+        '''
+        # 调整属性名称
+        for key in interface.keys():
+            car[interface[key]] = car[key]
+            del car[key]
+        # 处理特殊属性
+        car['a'] = 0    # TODO a的计算暂时在driver中加入，应当放在prepro中
+        car['speed'] = (car['vx']**2 + car['vy']**2)**0.5
+        car['laneNeedAdd'] = False
+        if car['laneID'] > 100:
+            car['laneID'] -= 100
+            car['laneNeedAdd'] = True
+        # 调整时间戳格式
+        # TODO 暂时在接收数据时按照接收count为数据赋值时间戳
+        # TODO 后续根据具体情况, 将时间戳转化为以毫秒ms为单位的时间戳
+        # 可以转化成unix时间戳(统一确定了一个时间原点), 再将这个s为单位的数据转化为ms为单位
+        # 统一将时间戳记为以毫秒ms为单位
+        car['timeStamp'] = self.count * 100
+
+    def _formatTransInner2Outer(self, car: dict):
+        '''function _formatTransInner2Outer
+
+        input
+        -----
+        car: dict, 代码内部的处理数据格式, dict格式。
+
+        将代码内部处理的car数据形式, 返还成msg中传输来的原始格式。
+        原地修改
+        '''
+        # 调整属性名称
+        for key in interface_back.keys():
+            car[interface_back[key]] = car[key]
+            del car[key]
+        # 删除增加属性
+        del car['a']
+        del car['speed']
+        if car['laneNeedAdd']:
+            car['laneID'] += 100
+        del car['laneNeedAdd']
+        # 调整时间戳格式
+        # TODO 暂时在接收数据时按照接收count为数据赋值时间戳
+        # TODO 后续根据具体情况, 将时间戳转化为以毫秒ms为单位的时间戳
+        # 可以转化成unix时间戳(统一确定了一个时间原点), 再将这个s为单位的数据转化为ms为单位
+        # 统一将时间戳记为以毫秒ms为单位
+        del car['timeStamp']
+
+    def _eventsInner2Outer(self, events: dict) -> list:
+        '''function _eventsInner2Outer
+
+        input
+        -----
+        events: dict, 代码内部的事件信息, dict格式。
+
+        将代码内部的事件信息转化为传输格式的事件信息。
+        '''
+        # TODO
+        pass
