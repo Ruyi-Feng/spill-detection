@@ -23,7 +23,7 @@ vStop: 1
 durationStop: 5
 vLow: 2.778
 durationLow: 5
-vHigh: 22.22
+vHigh: 33.33
 durationHigh: 5
 aEmgcBrake: 3
 durationEmgcBrake: 1
