@@ -45,6 +45,9 @@ def printSpecifiedData(idList: list):
                 continue
             for key in keys2Delete:
                 del target[key]
+            # 手动操作生成数值
+            # target['VDecVx'], target['VDecVy'] = 0.13, 5.0  # 低速情况
+            # target['VDecVx'], target['VDecVy'] = 0.13, 1.5  # 停车情况
             print(target, ',', sep='')
 
 
