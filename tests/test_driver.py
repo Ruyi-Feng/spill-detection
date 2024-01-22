@@ -1,6 +1,9 @@
 from rsu_simulator import Smltor
 from message_driver import Driver
 
+# TODO 测试用events内部格式数据
+innerEvents = dict()
+
 
 # 通过
 def test_driver():
@@ -39,9 +42,13 @@ def test_driver():
                 assert key not in cars[0].keys()
 
         # 发送数据
-        msg = d.send(cars)
+        msg, events = d.send(cars, innerEvents)
         # 检查点2: 成功删除属性
         if len(cars) > 0:
             for key in interface.keys():
                 assert interface[key] not in cars[0].keys()
                 assert key in cars[0].keys()
+        # 检查点3: 将events转为输出格式
+        # TODO
+        assert type(events) == list
+
