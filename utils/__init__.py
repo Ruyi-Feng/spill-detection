@@ -38,7 +38,7 @@ def loadConfig(path: str) -> dict:
     读取confgig.yml文件, 返回dict, 并为没有设置的参数置为默认值。
     '''
     with open(path, 'r') as f:
-        cfg = yaml.load(f)
+        cfg = yaml.load(f, Loader=yaml.FullLoader)
     # 为缺失的配置设置默认值
     for param in defaultConfig:
         cfg.setdefault(param, defaultConfig[param])
