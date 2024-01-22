@@ -27,20 +27,18 @@ class Exponential:
 
     def run(
         self, context_frames: dict, current_frame: dict, last_timestamp: int
-    ) -> tuple:
+    ) -> (dict, any | int):
         """External call function.
 
         input
         -----
         context_frames: 算法的历史帧数据, 从上一次调用的结果中获得
-
-        current_frame: 最新的帧数据, AID格式
-
+        current_frame: 最新的帧数据
         last_timestamp: 上次调用算法函数时的当前帧数据时间戳
 
         output
         ------
-        updated_latest_frame: 平滑处理后的最新帧数据, AID格式
+        updated_latest_frame: 平滑处理后的最新帧数据
         last_timestamp:用于下次调用的当前帧数据的时间戳
         """
         # 将历史数据与最新帧数据合并
@@ -61,7 +59,7 @@ class Exponential:
             return obj_info
         if any(
             [
-                obj_info[-1]["global_track_id"] not in latest_id_set,
+                obj_info[-1]["id"] not in latest_id_set,
                 len(obj_info) == 1,
             ]
         ):
