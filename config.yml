@@ -7,7 +7,7 @@ emgcWidth: 3.5
 cellLen: 50
 qMerge: 0
 
-maxCompleteFrames: 20
+maxCompleteTime: 2
 smoothAlpha: 0.1
 
 qDuration: 300
