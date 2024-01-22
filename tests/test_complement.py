@@ -1,8 +1,8 @@
 from pre_processing.pro_class.complete import Interpolation
 
 
-def test_complement_interpolation():
-    his_frames = {
+def testComplementInterpolation():
+    hisFrames = {
         "ab8756de": [
             {
                 "id": "ab8756de",
@@ -110,7 +110,7 @@ def test_complement_interpolation():
             },
         ],
     }
-    latest_frame = {
+    latestFrame = {
         "ab8756de": {
             "id": "ab8756de",
             "ptcType": "motor",
@@ -139,17 +139,17 @@ def test_complement_interpolation():
             "heading": 7200,
         },
     }
-    last_timestamp = 60300
+    lastTimestamp = 60300
     pred = Interpolation()
-    pred.run(his_frames, latest_frame, last_timestamp)
+    pred.run(hisFrames, latestFrame, lastTimestamp)
 
-    assert len(his_frames["ab8756de"]) == 5
-    assert len(his_frames["ab8701de"]) == 5
-    assert len(his_frames["ab8756an"]) == 4
-    assert his_frames["ab8756de"][2]["x"] == 99.0
-    assert his_frames["ab8756de"][2]["y"] == 100
-    assert his_frames["ab8756de"][2]["secMark"] == 200
+    assert len(hisFrames["ab8756de"]) == 5
+    assert len(hisFrames["ab8701de"]) == 5
+    assert len(hisFrames["ab8756an"]) == 4
+    assert hisFrames["ab8756de"][2]["x"] == 99.0
+    assert hisFrames["ab8756de"][2]["y"] == 100
+    assert hisFrames["ab8756de"][2]["secMark"] == 200
 
 
 if __name__ == "__main__":
-    test_complement_interpolation()
+    testComplementInterpolation()
