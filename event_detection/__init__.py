@@ -65,7 +65,7 @@ class EventDetector(TrafficMng):
         cfg: dict, 配置参数字典
         event_types: list, 需要检测的事件列表
 
-        生成事件检测器，用于检测交通事件。
+        生成事件检测器, 用于检测交通事件。
         '''
         # 令TrafficMng方法初始化给自身
         super().__init__(clb, cfg)
@@ -99,7 +99,7 @@ class EventDetector(TrafficMng):
         self.illegalOccupationDict = dict()
         # 高级记录器, 记录事故监测
         self.incidentDict = dict()  # 以两辆车id为索引, 记录监测时间
-        # 高级记录器，记录抛洒物监测
+        # 高级记录器, 记录抛洒物监测
         self.dangerDict = dict()    # 以车道id+cell order为索引, 记录持续帧数
 
     def run(self, cars: list) -> dict:
@@ -149,7 +149,7 @@ class EventDetector(TrafficMng):
     def detect(self, cars: list):
         '''function detect
 
-        检测交通事件，输出并返回事件列表。
+        检测交通事件, 输出并返回事件列表。
         部分检测子函数中, cars仅用于为报警事件提供信息。
         input
         ------
@@ -316,14 +316,14 @@ class EventDetector(TrafficMng):
 
         检测多车事故事件, 输出并返回事件列表
         '''
-        # 异常运动车辆少于2，不可能有事故
+        # 异常运动车辆少于2, 不可能有事故
         if (len(self.stopDict) + len(self.lowSpeedDict) +
                 len(self.highSpeedDict) + len(self.emgcBrakeDict)) < 2:
             return
         # 组合异常车辆id列表, 求并集
         abIDs = set(self.stopDict.keys()) | set(self.lowSpeedDict.keys()) |\
             set(self.highSpeedDict.keys()) | set(self.emgcBrakeDict.keys())
-        # 利用集合运算，删除不在currentIDs中的id
+        # 利用集合运算, 删除不在currentIDs中的id
         abIDs = abIDs & set(self.currentIDs)
         abIDs = list(abIDs)
         # 两两组合记录潜在事件
@@ -389,7 +389,7 @@ class EventDetector(TrafficMng):
         ------
         events: list, 事件列表, 元素为event的衍生类
 
-        检测拥堵事件，输出并返回事件列表
+        检测拥堵事件, 输出并返回事件列表
         '''
         # 遍历车道实例
         for id in self.lanes:

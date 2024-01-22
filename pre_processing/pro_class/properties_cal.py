@@ -4,7 +4,7 @@ import math
 class PropCalculator:
     '''class PropCalculator
 
-    用于计算车辆目标的新增属性，包括：
+    用于计算车辆目标的新增属性, 包括: 
     1. 车辆目标的加速度
     2. 车辆目标的速度值
     '''

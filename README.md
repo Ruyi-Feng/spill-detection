@@ -2,28 +2,28 @@
 核心功能为抛洒物检测。
 
 ## 1. 数据说明
-**数据来源**：金科院
+**数据来源**: 金科院
 <br>
-**数据场景**：南京高速
+**数据场景**: 南京高速
 <br>
-**路段长度**：约400m
+**路段长度**: 约400m
 <br>
-**采集设备**：雷达
+**采集设备**: 雷达
 <br>
-**帧率**：20FPS
+**帧率**: 20FPS
 <br>
-**开始时间戳**：2023-10-20 10:03:41.883
+**开始时间戳**: 2023-10-20 10:03:41.883
 <br>
-**开始帧数**：62748
+**开始帧数**: 62748
 
 ### 数据格式
-离线模拟场景：从txt文件读取接受
+离线模拟场景: 从txt文件读取接受
 <br>
-每帧传来数据为list，list元素为代表目标信息的dict，即：
+每帧传来数据为list, list元素为代表目标信息的dict, 即: 
 <br>
-第n帧： [car1, car2, ...]
+第n帧:  [car1, car2, ...]
 <br>
-各car目标的dict形式为：
+各car目标的dict形式为: 
 <br>
 TargetId | XDecx | YDecy | ZDecz | VDecVx | VDecVy | Xsize | Ysize | TargetType | Longitude | Latitude | Confidence | EventType | LineNum | Frame
 <br>
@@ -33,11 +33,11 @@ TargetId | XDecx | YDecy | ZDecz | VDecVx | VDecVy | Xsize | Ysize | TargetType 
 
 
 #### 数据内容说明
-**targetType**：0-未定义目标，1-小车，2-大车，3-摩托，4-自行车，5-行人
+**targetType**: 0-未定义目标, 1-小车, 2-大车, 3-摩托, 4-自行车, 5-行人
 
-**距离单位**：m
+**距离单位**: m
 
-**速度单位**：m/s
+**速度单位**: m/s
 
 ## 2. 思维导图
 <p>
@@ -64,7 +64,7 @@ width="100%"
 ### 4.1 确定detection layer数据格式
 laneid从1开始（与传输数据保持一致）
 cellOrder从0开始（方便调用不用再做处理）
-列出所有需要的参数，参数数据结构。
+列出所有需要的参数, 参数数据结构。
 <p>
 traffic变量
 </p>

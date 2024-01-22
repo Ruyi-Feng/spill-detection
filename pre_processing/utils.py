@@ -2,14 +2,14 @@
 
 
 MaxSecMark = 60000
-# 以下参数根据算法所需数据量确定，算法最多需要2s的历史数据，大于2.5s的数据即可删除
+# 以下参数根据算法所需数据量确定, 算法最多需要2s的历史数据, 大于2.5s的数据即可删除
 HistoricalInterval = 1600  # 同一id容纳的历史数据时间范围
 UpdateInterval = 1600  # 某一id可容忍的不更新数据的时间范围
 
 
 def frame_delete(context_frames: dict, last_timestamp: int) -> None:
     """Delete invalid frame data in historical data."""
-    # 删除同一guid过老旧数据，以及删除过久没有更新过的guid所有数据
+    # 删除同一guid过老旧数据, 以及删除过久没有更新过的guid所有数据
     guid_list = list(context_frames.keys())
     for guid in guid_list:
         if (
@@ -30,8 +30,8 @@ def frames_combination(
 ) -> tuple:
     """Combine historical frame data and current frame data."""
     # 把最新帧数据添加到历史数据中
-    # 同时重置时间戳，保证时间戳恒增
-    # latest_id_set 用于帮助算法判断那些id没有被更新，从而不参与算法计算
+    # 同时重置时间戳, 保证时间戳恒增
+    # latest_id_set 用于帮助算法判断那些id没有被更新, 从而不参与算法计算
     if len(current_frame) == 0:
         return set(), last_timestamp
     # 如果历史数据不为空
@@ -56,7 +56,7 @@ def frames_combination(
         last_timestamp = current_sec_mark
         frame_delete(context_frames, last_timestamp)
         return latest_id_set, last_timestamp
-    # 如果历史数据为空，直接添加
+    # 如果历史数据为空, 直接添加
     latest_id_set = set()
     for guid, obj_info in current_frame.items():
         last_timestamp = obj_info["timeStamp"] = obj_info["secMark"]

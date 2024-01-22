@@ -1,18 +1,13 @@
 from pre_processing.pro_class.smooth import Exponential
 from pre_processing.pro_class.complete import Interpolation
-from utils.car_utils import carsList2Dict  # carsDict2List
+from utils.car_utils import carsList2Dict, carsDict2List
 
 
 class PreProcessor():
     def __init__(self, comMaxFrm: int, smthA: float) -> None:
-        # self.tgtInLastFrm = dict()      # 存储活跃状态的各ID车辆target, 按ID索引
-        # self.tgtInCurFrm = dict()       # 存储当前帧各ID车辆target, 按ID索引
-        # self.IDInLastFrm = []           # 存储上一帧车辆目标的ID
-        # self.IDInCurFrm = []            # 存储当前帧车辆目标的ID
-        # self.lostIDs = []               # 存储当前帧丢失的ID
-        # self.newIDs = []                # 存储当前帧新出现的ID
         self.cmp = Interpolation(comMaxFrm)     # 补全器
         self.smth = Exponential(smthA)          # 平滑器
+        self.history = dict()                   # 按id索引历史数据
 
     def run(self, curFrame: list) -> list:
         '''function run
@@ -32,38 +27,10 @@ class PreProcessor():
         2. 进行补全, 平滑运算。
         3. 更新tgtInLastFrm, IDInLastFrm。
         '''
+        # dict组织方便索引
         curFrame = carsList2Dict(curFrame)
-        # TODO 计算新增属性
-        # TODO 形成历史数据存储
-        # self._update(curFrame)
         # TODO 接入cerebum的补全平滑
-        curFrame, cmpltIDs = self._run_complt(curFrame)
-        curFrame = self._run_smooth(curFrame)
-        # self._update_last()
-        # curFrame = carsDict2List(curFrame)
+        # TODO 计算新增属性
+        # 返回为list形式车辆
+        curFrame = carsDict2List(curFrame)
         return curFrame
-
-    # def _update(self, curFrame):
-    #     '''
-    #     接受每帧传输来的目标信息, 更新targetList
-    #     '''
-    #     # 更新target
-
-    def _run_complt(self, curFrame):
-        '''
-        '''
-        curFrame = self.cmp.run(curFrame)
-        return curFrame
-
-    def _run_smooth(self, curFrame):
-        '''
-        '''
-        curFrame = self.smth.run(curFrame, curFrame)
-        return curFrame
-
-    # def _update_last(self):
-    #     '''
-    #     更新上一帧的目标信息
-    #     '''
-    #     self.tgtInLastFrm = self.tgtInCurFrm
-    #     self.IDInLastFrm = self.IDInCurFrm

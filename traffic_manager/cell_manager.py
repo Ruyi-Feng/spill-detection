@@ -97,7 +97,7 @@ class CellMng:
         # 缓存
         self.cache = []    # list内按顺序索引, 用dict反而会有遍历的消耗
         self.cacheRet = cacheRet
-        # 每帧更新r2是否被加，加上了就不再加了, 每帧更新r2时重置为False
+        # 每帧更新r2是否被加, 加上了就不再加了, 每帧更新r2时重置为False
         self.r2added = False
 
     def updateCache(self, cars: list):

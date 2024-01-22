@@ -25,7 +25,7 @@ maxCount = 172800000    # fps=20时, 10天重置1次
 class Driver():
     '''class Driver
 
-    数据格式转化驱动器，将传感器数据转化为代码内部流通的数据格式，
+    数据格式转化驱动器, 将传感器数据转化为代码内部流通的数据格式, 
     将代码内部流通的数据格式转化为输出数据。
     '''
     def __init__(self):
@@ -113,7 +113,7 @@ class Driver():
             car[interface[key]] = car[key]
             del car[key]
         # 处理特殊属性
-        car['a'] = 0    # TODO a的计算暂时在driver中加入，应当放在prepro中
+        car['a'] = 0    # TODO a的计算暂时在driver中加入, 应当放在prepro中
         car['speed'] = (car['vx']**2 + car['vy']**2)**0.5
         car['laneNeedAdd'] = False
         if car['laneID'] > 100:

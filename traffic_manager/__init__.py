@@ -5,7 +5,7 @@ from typing import Dict     # 引入以方便调用类方法
 class TrafficMng():
     '''class TrafficManager
 
-    交通流计算类，根据传感器信息计算交通流。
+    交通流计算类, 根据传感器信息计算交通流。
     对外接口函数: `update(cars), updateDanger()`, 返回值为None。
     实现tm对车辆进行按帧缓存, 并每隔一定时间计算交通流参数。
 
@@ -23,7 +23,7 @@ class TrafficMng():
         接收计数。计算时若持续时间小于qd, 则通过count进行比例计算。
         note: count不能一直累加, 达到某一足够大的数值后应当进行清理。
               或者让count达到检测时间后自动清零。代码中采用第二种方法。
-        如果能拿到时间戳，利用时间戳计算会方便一些。
+        如果能拿到时间戳, 利用时间戳计算会方便一些。
     lanes: dict
         车道管理器, 按照车道管理车道属性和交通流参数
     cacheRet: int

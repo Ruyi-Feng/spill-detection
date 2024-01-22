@@ -19,15 +19,15 @@ class Controller:
     clbPath: str
         标定参数文件路径
     dataPath: str
-        传感器数据文件路径, 该参数仅在离线模拟时使用，用于读取离线数据。
+        传感器数据文件路径, 该参数仅在离线模拟时使用, 用于读取离线数据。
 
     methods
     -------
     startManager(msg): 在完成标定或读取标定后启动管理器。
-    calibration(msg):  接受标定数据，更新标定器。
-    run(msg):          接受传感器数据，返回发送数据、交通流参数、事件检测结果。
+    calibration(msg):  接受标定数据, 更新标定器。
+    run(msg):          接受传感器数据, 返回发送数据、交通流参数、事件检测结果。
 
-    生成控制器，用于控制整个算法流程。
+    生成控制器, 用于控制整个算法流程。
     '''
     def __init__(self, cfgPath: str, clbPath: str):
         '''function __init__
@@ -109,7 +109,7 @@ class Controller:
         msg: list, 某一帧的车辆目标数据, list格式。
         events: list, 事件检测结果。
 
-        接受传感器数据，返回发送数据、事件检测结果。
+        接受传感器数据, 返回发送数据、事件检测结果。
         '''
         # 接受数据
         valid, cars = self.drv.receive(msg)

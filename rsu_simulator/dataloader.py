@@ -40,7 +40,7 @@ def loadDataAsDict(path: str) -> dict:
 
     从txt文件中加载msg, 以{frame:[]target}的组织格式返回。
     '''
-    # 存储到整体dict，帧为索引
+    # 存储到整体dict, 帧为索引
     allData = dict()
     frame = 0
     # 读取数据
@@ -72,7 +72,7 @@ def loadDataAsList(path: str) -> list:
 
     从txt文件中加载msg, 以[[]target, []target, []target, ...]的组织格式返回。
     '''
-    # 存储到整体dict，帧为索引
+    # 存储到整体dict, 帧为索引
     allData = []
     frame = 0
     # 读取数据

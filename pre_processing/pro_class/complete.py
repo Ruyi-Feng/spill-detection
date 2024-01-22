@@ -1,12 +1,11 @@
 import math
-from pre_processing.uitls import (frame_delete, frames_combination,
-                                  get_current_frame)
+from pre_processing.utils import *
 
 
 class Interpolation:
     """插值补全算法
 
-    结构逻辑：
+    结构逻辑: 
     1. 将历史帧数据与当前帧数据合并
     2. 根据延迟时间确定需要补全的时刻
     3. 根据缺失时刻前后轨迹速度判断是否合理
@@ -32,7 +31,7 @@ class Interpolation:
         self._lag_time = lag_time
         # 延误帧数
         self._speed_coefficient = 3.6
-        # 行人最大时速，若需补全的数据超过此时速，则判为异常
+        # 行人最大时速, 若需补全的数据超过此时速, 则判为异常
         self._speed_dict = {
             "motor": max_speed_motor / self._speed_coefficient,
             "non-motor": max_speed_non_motor / self._speed_coefficient,
@@ -77,10 +76,10 @@ class Interpolation:
     ) -> bool:
         if obj_info[index]["timeStamp"] <= delay_sec_mark:
             return False
-        # 判断id下一次再出现时是否是位移过远，是否是无效数据
+        # 判断id下一次再出现时是否是位移过远, 是否是无效数据
         dis_x = obj_info[index]["x"] - obj_info[index - 1]["x"]
         dis_y = obj_info[index]["y"] - obj_info[index - 1]["y"]
-        # 1000 用于毫秒转秒，计算速度
+        # 1000 用于毫秒转秒, 计算速度
         time_interval = (
             obj_info[index]["timeStamp"] - obj_info[index - 1]["timeStamp"]
         ) / 1000
@@ -104,7 +103,7 @@ class Interpolation:
         objs_info[index]["secMark"] = delay_sec_mark % utils.MaxSecMark
 
     def _find_delay_sec_mark(self, frames: dict) -> int:
-        # 找到 delay_sec_mark，并更新原 frames的 secmark
+        # 找到 delay_sec_mark, 并更新原 frames的 secmark
         max_sec = 0
         for objs_info in frames.values():
             max_sec_each_id = objs_info[-1]["timeStamp"]
@@ -118,7 +117,7 @@ class Interpolation:
         return delay_sec_mark
 
     def _handle_interpolation(self, frames: dict, delay_sec_mark: int) -> dict:
-        # 判断是否需要做补全，并调相应函数做补全处理
+        # 判断是否需要做补全, 并调相应函数做补全处理
         updated_latest_frame = {}
         for objs_info in frames.values():
             sec_mark_list = [fr["timeStamp"] for fr in objs_info]

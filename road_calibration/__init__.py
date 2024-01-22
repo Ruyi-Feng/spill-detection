@@ -25,7 +25,7 @@ class Calibrator():
     save(path)
         将标定结果保存到path。
 
-    生成标定器，用于标定检测区域的有效行驶片区和应急车道。
+    生成标定器, 用于标定检测区域的有效行驶片区和应急车道。
     '''
 
     def __init__(self, clbPath: str, fps: float,
@@ -48,7 +48,7 @@ class Calibrator():
         qMerge: float
             判定元胞为合流区域的流量, 小于qMerge判定该cell不可用。
 
-        生成标定器，用于标定检测区域的有效行驶片区和应急车道。
+        生成标定器, 用于标定检测区域的有效行驶片区和应急车道。
         '''
         # 初始化属性
         self.clbPath = clbPath                  # 标定结果保存路径
