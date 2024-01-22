@@ -21,12 +21,12 @@ class EventMng():
 
     事件events格式
     events = {'spill': {'name': 'spill', 'occured': False,
-                        'items': {eventID1: event1,
-                                    eventID2: event2,
-                                    ...}}
+                        'items': {eventID1: event1--dtct,
+                                  eventID2: event2--dtct,
+                                  ...}}
               'stop': {'name': 'stop', 'occured': False,
-                         'items': {eventID1: event1,
-                                   eventID2: event2,
+                         'items': {eventID1: event1--dtct,
+                                   eventID2: event2--dtct,
                                    ...}}
             ...}
     '''
@@ -70,12 +70,12 @@ class EventMng():
         eventID = self.typeCharDict[type] + \
             int2strID(self.eventIdCount[type], idLen)
         self.eventIdCount[type] += 1
-        self.eventIdCount[type] %= 10 ^ (idLen - 1)
+        self.eventIdCount[type] %= (10 ** (idLen - 1))
         # formulate event info
         event = self._generateEvent(type, eventID, time, info)
         # add event to events
         self.events[type]['occured'] = True
-        self.events[type]['items'][eventID] = event
+        self.events[type]['items'][eventID] = vars(event)
 
     def clear(self):
         '''function clear
