@@ -102,7 +102,7 @@ class EventDetector(TrafficMng):
         # 高级记录器，记录抛洒物监测
         self.dangerDict = dict()    # 以车道id+cell order为索引, 记录持续帧数
 
-    def run(self, cars: list) -> list:
+    def run(self, cars: list) -> dict:
         ''' function run
 
         input
