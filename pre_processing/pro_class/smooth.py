@@ -27,7 +27,7 @@ class Exponential:
 
     def run(
         self, context_frames: dict, current_frame: dict, last_timestamp: int
-    ) -> (dict, any | int):
+    ) -> (dict, int):
         """External call function.
 
         input
