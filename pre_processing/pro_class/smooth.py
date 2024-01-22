@@ -1,88 +1,83 @@
-class Smoother():
-    '''class Smoother
+'''Define the smooth algorithm class.'''
 
-    利用上一帧平滑轨迹计算当前帧的轨迹平滑结果。
-    原理: 三次指数平滑。
-    三次指数平滑公式
-    -----
+class Exponential:
+    """一次指数平滑算法
+    
+    1. 合并历史帧数据与当前帧数据
+    2. 找到参与者上一帧的轨迹
+    3. 通过指数平滑函数对最新轨迹点进行平滑
+    """
 
-    '''
-    def __init__(self, alpha: float):
-        '''function __init__
+    def __init__(
+        self, smooth_index: float = 0.8, smooth_threshold: float = 2 * 1000
+    ) -> None:
+        """Class initialization.
 
-        input
-        -----
-        alpha: int
-            三次指数平滑的平滑指数。0 < alpha < 1
+        smooth_index:
+        The parameter of the smoothing formula
 
-        '''
-        self.alpha = alpha
+        smooth_threshold:
+        Time threshold of trajectory points that can be used for smoothing
 
-    def run(self, curTgt: list, lastTgt: list) -> list:
-        '''function run
+        """
+        self._smooth_threshold = smooth_threshold
+        # The parameter of the smoothing formula
+        self._smooth_index = smooth_index
 
-        input
-        -----
-        curTgt: list
-            当前帧车辆目标信息
-        lastTgt: list
-            上一帧车辆目标信息
+    def run(
+        self, context_frames: dict, current_frame: dict, last_timestamp: int
+    ) -> tuple:
+        """External call function.
 
-        return
-        ------
-        curTgt: list
-            计算后的当前帧车辆目标信息
+        Input:
+        context_frames:
+        Algorithm's historical frame data, obtained from the result of the last
+        call, AID format
 
-        '''
-        resultTgt = []
-        for tgt in curTgt:
-            resultTgt.append(tgt)
+        current_frame:
+        latest frame data, AID format
 
-        return resultTgt
+        last_timestamp:
+        The current frame data timestamp when the algorithm function was last
+        called
 
-    def __smooth(self, tgt: dict, lastTgt: dict) -> dict:
-        '''function __smooth
+        Output:
+        updated_latest_frame:
+        The latest frame data after smooth processing, AID format
 
-        input
-        -----
-        tgt: dict
-            当前帧车辆目标信息
-        lastTgt: list
-            上一帧车辆目标信息
+        last_timestamp:
+        Timestamp of current frame data for the next call
 
-        return
-        ------
-        tgt: dict
-            计算后的当前帧车辆目标信息
+        """
+        # 将历史数据与最新帧数据合并
+        latest_id_set, last_timestamp = utils.frames_combination(
+            context_frames, current_frame, last_timestamp
+        )
+        for obj_info in context_frames.values():
+            self._smooth_one(obj_info, latest_id_set)
+        return (
+            utils.get_current_frame(context_frames, last_timestamp),
+            last_timestamp,
+        )
 
-        '''
-
-        # tgt['x'] = exp3Smooth(tgt['x'], self.alpha,
-        #                           lastTgt['smth']['x'])
-        # tgt['y'] = exp3Smooth(tgt['y'], self.alpha,
-        #                           lastTgt['smth']['y'])
-        return tgt
-
-
-def exp3Smooth(now: float, alpha: float, last: list) -> float:
-    '''function exp3Smooth
-
-    input
-    -----
-    now: float
-        当前时刻数据
-    alpha: float
-        平滑指数
-    last: list
-        上一时刻的1次平滑, 2次平滑, 3次平滑数值
-
-    return
-    ------
-    result: float
-        三次指数平滑结果
-
-    利用三次指数平滑方法，输入当前接收的未平滑数据, 平滑指数α,
-    以及上一时刻接收的1, 2, 3平滑值, 返回当前时刻的平滑预测值。
-    '''
-    result = 0
-    return result
+    def _smooth_one(self, obj_info: list, latest_id_set: set) -> list:
+        try:
+            current = obj_info[-1]
+        except IndexError:
+            return obj_info
+        if any(
+            [
+                obj_info[-1]["global_track_id"] not in latest_id_set,
+                len(obj_info) == 1,
+            ]
+        ):
+            return obj_info
+        last = obj_info[-2]
+        delta_time = current["timeStamp"] - last["timeStamp"]
+        if delta_time > self._smooth_threshold:
+            return obj_info
+        for j in ("x", "y"):
+            current[j] = current[j] * self._smooth_index + last[j] * (
+                1 - self._smooth_index
+            )
+        return obj_info
