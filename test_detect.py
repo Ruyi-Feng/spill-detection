@@ -4,8 +4,8 @@ from message_driver import Driver
 from rsu_simulator import Smltor
 
 
-def test_detect():
-    # 1. 离线数据测试
+def testDetect():
+    '''离线数据测试'''
     # 读取配置文件
     configPath = './config.yml'
     with open(configPath, 'r') as f:
@@ -36,12 +36,45 @@ def test_detect():
         # 数据事件类型为list
         assert type(events) == dict
 
-    # 2. 备用数据测试
-    # 非法占用应急车道数据, 备用
 
-    # for car in dataIllegalOccupation:
-    #     cars = [car]   # 模拟传输来的1条信息
-    #     valid, cars = d.receive(cars)
-    #     assert valid
-    #     event = ed.run(cars)
-    #     assert type(event) == list
+def testSpill():
+    pass
+
+
+def testStop():
+    pass
+
+
+def testLowSpeed():
+    pass
+
+def testHighSpeed():
+    pass
+
+
+def testIllegalOccupation():
+    pass
+
+
+def testEmgcBrake():
+    pass
+
+
+def testIncident():
+    pass
+
+
+def testCrowd():
+    pass
+
+
+if __name__ == "__main__":
+    testDetect()
+    testSpill()
+    testStop()
+    testLowSpeed()
+    testHighSpeed()
+    testIllegalOccupation()
+    testEmgcBrake()
+    testIncident()
+    testCrowd()
