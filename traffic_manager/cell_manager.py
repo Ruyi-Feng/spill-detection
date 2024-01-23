@@ -189,3 +189,10 @@ class CellMng:
         if not self.r2added:    # 已经被加过就不加了
             self.danger += self.r2
             self.r2added = True
+
+    def resetCellDetermineStatus(self):
+        '''function resetCellDetermineStatus
+
+        重置cell的determine状态
+        '''
+        self.r2added = False
