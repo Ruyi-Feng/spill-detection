@@ -130,7 +130,6 @@ class EventDetector(TrafficMng):
 
         更新潜在事件记录变量, 将对应车辆的id和持续帧数记录在字典中。
         潜在事件包括: 静止, 低速, 超速, 急刹车, 非法占道。
-        关于为啥这个函数套了5个小函数, 因为直接写在这个里面flake8会提示复杂了。
         '''
         # 1.遍历车辆
         # 更新当前帧车辆id列表, 检测潜在事件
@@ -292,7 +291,7 @@ class EventDetector(TrafficMng):
             if self.emgcBrakeDict[id] == self.durationEmgcBrake:
                 car = getCarFromCars(cars, id)
                 event = f"事件: id={str(id)}车辆急刹车, " + getCarBaseInfo(car) + \
-                    f"加速度: {cars[id]['a']}" + \
+                    f"加速度: {car['a']}" + \
                     f", 已持续时间{str(self.emgcBrakeDict[id]/self.fps)}s。"
                 print(event)
                 # 真正用生成事件
@@ -436,7 +435,7 @@ class EventDetector(TrafficMng):
 
         判断车辆是否静止
         '''
-        return abs(car['vy']) <= self.vStop
+        return abs(car['speed']) <= self.vStop
 
     def _isCarLowSpeed(self, car: dict) -> bool:
         '''function _isCarLowSpeed
@@ -451,7 +450,7 @@ class EventDetector(TrafficMng):
 
         判断车辆是否低速
         '''
-        return self.vStop < abs(car['vy']) <= self.vLow
+        return self.vStop < abs(car['speed']) <= self.vLow
 
     def _isCarHighSpeed(self, car: dict) -> bool:
         '''function _isCarHighSpeed
@@ -466,7 +465,7 @@ class EventDetector(TrafficMng):
 
         判断车辆是否高速
         '''
-        return abs(car['vy']) > self.vHigh
+        return abs(car['speed']) > self.vHigh
 
     def _isCarEmgcBrake(self, car: dict) -> bool:
         '''function _isCarEmgcBrake
