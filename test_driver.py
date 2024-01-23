@@ -48,3 +48,7 @@ def test_driver():
                 assert key in msg[0].keys()
         # 检查点3: 将events转为输出格式
         assert events2send == outerEvents
+
+
+if __name__ == "__main__":
+    test_driver()
