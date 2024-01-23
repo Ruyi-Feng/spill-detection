@@ -1,3 +1,4 @@
+from copy import deepcopy
 from utils import int2strID
 from traffic_manager.lane_manager import LaneMng
 from traffic_manager.cell_manager import CellMng
@@ -82,7 +83,7 @@ class EventMng():
 
         清空events, 在每帧事件检测结束后调用, 即ed.run()末尾。
         '''
-        self.events = self.eventsFormat.copy()
+        self.events = deepcopy(self.eventsFormat)
 
     def _generateEvent(self, type: str, eventID: str, time: str, info: any):
         '''function _generateEvent
@@ -269,7 +270,7 @@ class CrowdEvent(BaseEvent):
         lane: LaneMng, 事件发生的lane
         '''
         super().__init__(type, eventID, time)
-        self.laneID = lane.laneID
+        self.laneID = lane.ID
         self.q = lane.q
         self.k = lane.k
         self.v = lane.v
