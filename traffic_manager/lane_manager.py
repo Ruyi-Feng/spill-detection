@@ -205,6 +205,14 @@ class LaneMng:
                         continue
                     self.cells[frontOrder].updateDangerPassive()
 
+    def resetCellDetermineStatus(self):
+        '''function resetCellDetermineStatus
+
+        重置cell的determine状态
+        '''
+        for order in self.cells:
+            self.cells[order].resetCellDetermineStatus()
+
     def _carsByCell(self, cars: list) -> dict:
         '''function _carsByCell
 
