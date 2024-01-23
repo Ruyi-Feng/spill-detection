@@ -220,7 +220,7 @@ class EventDetector(TrafficMng):
         '''
         for id in self.stopDict.keys():
             # 检查事件
-            if self.stopDict[id] == self.ds:
+            if self.stopDict[id] == self.durationStop:
                 car = getCarFromCars(cars, id)
                 event = f"事件: id={str(id)}车辆准静止, " + getCarBaseInfo(car) + \
                     f", 已持续时间{str(self.stopDict[id]/self.fps)}s。"
