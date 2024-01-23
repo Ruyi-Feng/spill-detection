@@ -170,11 +170,9 @@ class TrafficMng():
         carsByLane: dict
             键为车道id, 值为所分配车辆的列表, 无车辆则为空列表
 
-        确定车辆所在车道, 按车道组织车辆, 车道号大于100则减去100。
+        确定车辆所在车道, 按车道组织车辆。
         '''
         carsByLane = {id: [] for id in self.lanes}
         for car in cars:
-            laneID = car['laneID'] - 100 if car['laneID'] > 100 \
-                else car['laneID']     # 大于100的减去100
-            carsByLane[laneID].append(car)
+            carsByLane[car['laneID']].append(car)
         return carsByLane
