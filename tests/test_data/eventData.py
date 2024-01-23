@@ -1,22 +1,34 @@
-from tests.test_data.eventData.illegalOccupation import dataIllegalOccupation
-from tests.test_data.eventData.highSpeed import dataHighSpeed
-from tests.test_data.eventData.lowSpeed import dataLowSpeed
-from tests.test_data.eventData.stop import dataStop
+from tests.test_data.eachEventData.illegalOccupation import (
+    dataIllegalOccupation, dataIllegalOccupationEvent)
+from tests.test_data.eachEventData.highSpeed import (
+    dataHighSpeed, dataHighSpeedEvent)
+from tests.test_data.eachEventData.lowSpeed import (
+    dataLowSpeed, dataLowSpeedEvent)
+from tests.test_data.eachEventData.stop import (
+    dataStop, dataStopEvent)
+from tests.test_data.eachEventData.emgcBrake import (
+    dataEmgcBrake, dataEmgcBrakeEvent)
+from tests.test_data.eachEventData.crowd import dataCrowdEvent
 
 '''Defines the data for the event tests.'''
 
 dataSpill = []
 
 dataStop = dataStop
+dataStopEvent = dataStopEvent
 
 dataLowSpeed = dataLowSpeed
+dataLowSpeedEvent = dataLowSpeedEvent
 
 dataHighSpeed = dataHighSpeed
+dataHighSpeedEvent = dataHighSpeedEvent
 
-dataEmgcBrake = []
+dataEmgcBrake = dataEmgcBrake
+dataEmgcBrakeEvent = dataEmgcBrakeEvent
 
 dataIllegalOccupation = dataIllegalOccupation
+dataIllegalOccupationEvent = dataIllegalOccupationEvent
 
 dataIncident = []
 
-dataCrowd = []
+dataCrowd = dataCrowdEvent
