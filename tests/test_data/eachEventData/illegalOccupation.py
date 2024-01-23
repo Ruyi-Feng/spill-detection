@@ -273,10 +273,10 @@ dataIllegalOccupationEvent = {
             'eventID': 'H0000000',
             'time': 59000,
             'carID': 5819,
-             'laneID': 8,
+            'laneID': 8,
             'x': 20.82,
             'y': 467.6,
-            'vx': 0.04, 
+            'vx': 0.04,
             'vy': 19.49,
             'speed': 19,
             'a': 0

@@ -446,7 +446,7 @@ dataStopEvent = {
             'carID': 9934,
             'laneID': 4,
             'x': 4.72,
-            'y': 292.35, 
+            'y': 292.35,
             'vx': 0.13,
             'vy': 0.5,
             'speed': 1,

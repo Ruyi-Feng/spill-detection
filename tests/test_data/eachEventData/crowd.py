@@ -3,7 +3,7 @@ dataCrowdEvent = {
     'occured': True,
     'items':
     {
-        'G0000000': 
+        'G0000000':
         {
             'type': 'crowd',
             'eventID': 'G0000000',
