@@ -106,6 +106,14 @@ class TrafficMng():
         '''
         for id in self.lanes:
             self.lanes[id].updateDanger()
+    
+    def resetCellDetermineStatus(self):
+        '''function resetCellDetermineStatus
+
+        重置cell的determine状态
+        '''
+        for id in self.lanes:
+            self.lanes[id].resetCellDetermineStatus()
 
     def _updateCache(self, cars: list):
         '''function _updateCache
