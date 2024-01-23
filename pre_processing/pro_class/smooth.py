@@ -1,89 +1,77 @@
-class Smoother():
-    '''class Smoother
+from pre_processing.utils import framesCombination, getCurrentFrame
 
-    利用上一帧平滑轨迹计算当前帧的轨迹平滑结果。
-    原理: 三次指数平滑。
-    三次指数平滑公式
-    -----
 
-    '''
-    def __init__(self, alpha: float):
-        '''function __init__
+'''Define the smooth algorithm class.'''
 
-        input
-        -----
-        alpha: int
-            三次指数平滑的平滑指数。0 < alpha < 1
 
-        '''
-        self.alpha = alpha
+class Exponential:
+    """一次指数平滑算法
 
-    def run(self, curTgt: list, lastTgt: list) -> list:
-        '''function run
+    1. 合并历史帧数据与当前帧数据
+    2. 找到参与者上一帧的轨迹
+    3. 通过指数平滑函数对最新轨迹点进行平滑
+    """
+
+    def __init__(
+        self, smoothAlpha: float = 0.8, smoothThreshold: float = 2 * 1000
+    ) -> None:
+        """Class initialization.
 
         input
         -----
-        curTgt: list
-            当前帧车辆目标信息
-        lastTgt: list
-            上一帧车辆目标信息
+        smoothAlpha: 平滑系数
+        smoothThreshold: 可用于平滑的轨迹点的时间阈值
 
-        return
+        """
+        self._smoothThreshold = smoothThreshold
+        # The parameter of the smoothing formula
+        self._smoothAlpha = smoothAlpha
+
+    def run(
+        self, contextFrames: dict, currentFrame: dict, lastTimestamp: int
+    ) -> (dict, int):
+        """External call function.
+
+        input
+        -----
+        contextFrames: 算法的历史帧数据, 从上一次调用的结果中获得
+        currentFrame: 最新的帧数据
+        lastTimestamp: 上次调用算法函数时的当前帧数据时间戳
+
+        output
         ------
-        curTgt: list
-            计算后的当前帧车辆目标信息
+        updatedLatestFrame: 平滑处理后的最新帧数据
+        lastTimestamp:用于下次调用的当前帧数据的时间戳
+        """
+        # 将历史数据与最新帧数据合并
+        latestIdSet, lastTimestamp = framesCombination(
+            contextFrames, currentFrame, lastTimestamp
+        )
+        for objInfo in contextFrames.values():
+            self._smooth_one(objInfo, latestIdSet)
+        return (
+            getCurrentFrame(contextFrames, lastTimestamp),
+            lastTimestamp,
+        )
 
-        '''
-        resultTgt = []
-        for tgt in curTgt:
-            tgt = self.__smooth(tgt, lastTgt[0])
-            resultTgt.append(tgt)
-
-        return resultTgt
-
-    def __smooth(self, tgt: dict, lastTgt: dict) -> dict:
-        '''function __smooth
-
-        input
-        -----
-        tgt: dict
-            当前帧车辆目标信息
-        lastTgt: list
-            上一帧车辆目标信息
-
-        return
-        ------
-        tgt: dict
-            计算后的当前帧车辆目标信息
-
-        '''
-
-        tgt['XDecx'] = exp3Smooth(tgt['XDecx'], self.alpha,
-                                  lastTgt['smth']['x'])
-        tgt['YDecy'] = exp3Smooth(tgt['YDecy'], self.alpha,
-                                  lastTgt['smth']['y'])
-        return tgt
-
-
-def exp3Smooth(now: float, alpha: float, last: list) -> float:
-    '''function exp3Smooth
-
-    input
-    -----
-    now: float
-        当前时刻数据
-    alpha: float
-        平滑指数
-    last: list
-        上一时刻的1次平滑, 2次平滑, 3次平滑数值
-
-    return
-    ------
-    result: float
-        三次指数平滑结果
-
-    利用三次指数平滑方法，输入当前接收的未平滑数据, 平滑指数α,
-    以及上一时刻接收的1, 2, 3平滑值, 返回当前时刻的平滑预测值。
-    '''
-    result = 0
-    return result
+    def _smooth_one(self, objInfo: list, latestIdSet: set) -> list:
+        try:
+            current = objInfo[-1]
+        except IndexError:
+            return objInfo
+        if any(
+            [
+                objInfo[-1]["id"] not in latestIdSet,
+                len(objInfo) == 1,
+            ]
+        ):
+            return objInfo
+        last = objInfo[-2]
+        deltaTime = current["timeStamp"] - last["timeStamp"]
+        if deltaTime > self._smoothThreshold:
+            return objInfo
+        for j in ("x", "y"):
+            current[j] = current[j] * self._smoothAlpha + last[j] * (
+                1 - self._smoothAlpha
+            )
+        return objInfo

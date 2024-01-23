@@ -1,10 +1,12 @@
 import os
-import yaml
 from road_calibration import Calibrator
 from message_driver import Driver
-import pre_processing
-from traffic_manager import TrafficMng
+from pre_processing import PreProcessor
 from event_detection import EventDetector
+from utils import loadConfig, loadYaml
+
+
+'''Controller is to control the whole process of the project.'''
 
 
 class Controller:
@@ -12,153 +14,116 @@ class Controller:
 
     properties
     ----------
-    configPath: str
+    cfgPath: str
         算法参数文件路径
     clbPath: str
         标定参数文件路径
     dataPath: str
-        传感器数据文件路径, 该参数仅在离线模拟时使用，用于读取离线数据。
+        传感器数据文件路径, 该参数仅在离线模拟时使用, 用于读取离线数据。
 
     methods
     -------
-    receive(msg)
-        接受传感器数据，返回发送数据、交通流参数、事件检测结果。
-    calibrate(msg)
-        接受标定数据，更新标定器。
-    run(msg)
-        接受传感器数据，返回发送数据、交通流参数、事件检测结果。
-    _loadfile(path)
-        读取json文件, 返回dict。
-    _saveCalib()
-        保存标定结果到clbPath。
+    startManager(msg): 在完成标定或读取标定后启动管理器。
+    calibration(msg):  接受标定数据, 更新标定器。
+    run(msg):          接受传感器数据, 返回发送数据、交通流参数、事件检测结果。
 
-    生成控制器，用于控制整个算法流程。
+    生成控制器, 用于控制整个算法流程。
     '''
-    def __init__(self, configPath: str, clbPath: str):
+    def __init__(self, cfgPath: str, clbPath: str):
         '''function __init__
 
         input
         -----
-        configPath: str
-            算法参数文件路径
-        clbPath: str
-            标定参数文件路径
-
+        cfgPath: str, 算法参数文件路径
+        clbPath: str, 标定参数文件路径
         '''
-        # 控制器启动
-        self.configPath = configPath
-        self.clbPath = clbPath
-        # 算法参数
-        config = self._loadyaml(configPath)
-        self.config = config
+        # 读取配置
+        self.cfgPath = cfgPath
+        cfg = loadConfig(cfgPath)
+        self.cfg = cfg
+        # 生成数据驱动器
+        self.drv = Driver()
         # 是否标定
+        self.clbPath = clbPath
         self.needClb = False
         self.clbtor = None
-        self.calibFrames = config['calib']['calib_seconds'] * config['fps']
+        self.calibFrames = cfg['calibSeconds'] * cfg['fps']
         self.calibCount = 0
-        if not (os.path.exists(clbPath)) | self.config['calib']['if_recalib']:
-            print('开始标定过程')
-            # 没有config或者配置需要则标定
+        if not (os.path.exists(clbPath)) | self.cfg['ifRecalib']:
+            print('******开始标定过程******')
+            # 没有cfg或者配置需要则标定
             self.needClb = True
-            clbtor = Calibrator(clbPath=clbPath, fps=config['fps'],
-                                laneWidth=config['calib']['laneWidth'],
-                                emgcWidth=config['calib']['emgcWidth'],
-                                cellLen=config['calib']['cell_len'],
-                                qMerge=config['calib']['q_merge'])
+            clbtor = Calibrator(clbPath=clbPath, fps=cfg['fps'],
+                                laneWidth=cfg['laneWidth'],
+                                emgcWidth=cfg['emgcWidth'],
+                                cellLen=cfg['cellLen'],
+                                qMerge=cfg['qMerge'])
             self.clbtor = clbtor
-        else:   # 有config则读取, 不需要标定
-            print('开始接收数据')
-            self.clb = self._loadyaml(clbPath)
-            self.startManager()
+        else:   # 有cfg则读取, 不需要标定
+            print('******开始接收数据******')
+            self.clb = loadYaml(clbPath)
+            self.startDetect()
 
-    def calibration(self, msg):
+    def calibration(self, cars: list):
         '''function calibration
 
         input
         -----
-        msg: str | list
-            传感器数据, str | list格式。str为传输信息(不处理), list为传感器数据。
+        cars: list, 某一帧的车辆目标数据, list格式。
 
         return
         ------
-        msg: str | list
-            发送数据, str | list格式。str为传输信息(不处理), list为传感器数据。
-        ? traffic: dict
-            交通流参数, dict格式。
-        ? event: dict
-            事件检测结果, dict格式。
+        cars: list, 某一帧的车辆目标数据, list格式。
 
-        接受传感器数据，返回发送数据、交通流参数、事件检测结果。
-        根据条件判断是否需要标定，若需要则标定。
+        进行标定, 存储标定所需数据, 达到标定需求时长后计算标定结果。
         '''
         if self.clbtor.count < self.calibFrames:
-            self.clbtor.run(msg)
+            self.clbtor.run(cars)
         else:
+            self.needClb = False
             self.clbtor.calibrate()
             self.clbtor.save()
-            print('开始接收数据')
-            self.clb = self._loadyaml(self.clbPath)
-            # 启动管理器
-            self.startManager()
-            self.needClb = False
+            print('******开始接收数据******')
+            self.clb = loadYaml(self.clbPath)
+            self.startDetect()   # 凯奇事件检测
 
-    def startManager(self):
+    def startDetect(self):
         '''function startManager
 
-        在完成标定或读取标定后启动管理器。
+        在完成标定或读取标定后正式启动事件检测。
         '''
-        # 生成数据驱动器
-        self.drv = Driver()
-        # 生成交通管理器
-        self.tm = TrafficMng(self.clb, self.config)
-        # 生成事件检测器
-        self.edt = EventDetector(self.config['fps'],
-                                 self.config['event']['event_types'],
-                                 self.config['event']['v_low'],
-                                 self.config['event']['v_high'],
-                                 self.config['event']['t_tolerance'],
-                                 self.config['event']['q_standard'],
-                                 self.config['event']['rate2'],
-                                 self.config['event']['d_touch'],
-                                 self.config['event']['density_crowd'],
-                                 self.config['event']['v_crowd'],
-                                 self.config['event']['a_intense'],
-                                 self.config['event']['duration_intense'],
-                                 self.config['event']['duration_low'],
-                                 self.config['event']['duration_high'])
+        # 生成数据预处理器
+        self.pp = PreProcessor(self.cfg['maxCompleteTime'],
+                               self.cfg['smoothAlpha'])
+        # 生成事件检测器(内含交通参数管理器)
+        self.edt = EventDetector(self.clb, self.cfg)
 
     def run(self, msg: list) -> (list, list):
-        # 接受数据
-        valid, cars = self.drv.receive(msg)
-        if not valid:
-            return
-        # calibration road cells
-        if self.needClb:
-            self.calibration(cars)
-        # 预处理
-        cars = pre_processing.preProcess(cars, self.trm)
-        # 交通流参数计算
-        traffic = self.tm.run(cars)
-        # 事件检测
-        event = self.edt.run(cars, traffic)
-        # 发送数据
-        msg = self.drv.send(cars)
-        # print(msg)
-        return msg, event
-
-    def _loadyaml(self, path: str) -> dict:
-        '''function _loadParam
+        '''function run
 
         input
         -----
-        path: str
-            文件路径
+        msg: str | list, 传感器车辆数据。str为传输信息(不处理), list为传感器数据。
 
         return
         ------
-        config: dict
-            配置参数
+        msg: list, 某一帧的车辆目标数据, list格式。
+        events: list, 事件检测结果。
+
+        接受传感器数据, 返回发送数据、事件检测结果。
         '''
-        with open(path, 'r') as f:
-            config = yaml.load(f, Loader=yaml.FullLoader)
-        return config
+        # 接受数据
+        valid, cars = self.drv.receive(msg)
+        if not valid:
+            return None, None
+        # 接收标定
+        if self.needClb:
+            self.calibration(cars)
+            return None, None
+        # 预处理
+        cars = self.pp.run(cars)
+        # 事件检测(内含交通流参数计算+事件检测)
+        events = self.edt.run(cars)
+        # 发送数据
+        msg, events = self.drv.send(cars.copy(), events)
+        return msg, events

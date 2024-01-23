@@ -6,7 +6,6 @@ if __name__ == "__main__":
     clbPath = './road_calibration/clb.yml'
     dataPath = './data/result.txt'
 
-    # 应在主代码开头生成控制器
     controller = Controller(configPath, clbPath)
     smltor = Smltor(dataPath)
 
@@ -15,6 +14,4 @@ if __name__ == "__main__":
         msg = smltor.run()
         if msg == '':   # 读取到文件末尾
             break
-
-        msg, event = controller.run(msg)  # msg为控制器返回的需要发送的数据
-        print(msg[0])
+        msg, events = controller.run(msg)  # msg为控制器返回的需要发送的数据

@@ -1,82 +1,84 @@
-from pre_processing.pro_class.smooth import Smoother
-from pre_processing.pro_class.complete import Completer
-from pre_processing.pro_class.id_correct import IDCorrector
+from pre_processing.pro_class.smooth import Exponential
+from pre_processing.pro_class.complete import Interpolation
+from utils.car_utils import carsList2Dict, carsDict2List
 
 
-class TargetManager():
+class PreProcessor():
     def __init__(self, comMaxFrm: int, smthA: float) -> None:
-        self.tgtInLastFrm = dict()      # 存储活跃状态的各ID车辆target, 按ID索引
-        self.tgtInCurFrm = dict()       # 存储当前帧各ID车辆target, 按ID索引
-        self.IDInLastFrm = []           # 存储上一帧车辆目标的ID
-        self.IDInCurFrm = []            # 存储当前帧车辆目标的ID
-        self.lostIDs = []               # 存储当前帧丢失的ID
-        self.newIDs = []                # 存储当前帧新出现的ID
-        self.crt = IDCorrector()        # ID跳变修正器, 可能要设置到completer之下的一个属性TODO
-        self.cmp = Completer(comMaxFrm)          # 补全器
-        self.smth = Smoother(smthA)          # 平滑器
+        self.cmp = Interpolation(comMaxFrm * 1000)  # 补全器(输入ms)
+        self.smth = Exponential(smthA)              # 平滑器
+        self.contextFrames = dict()                 # 按id索引的历史数据
+        self.lastTimestamp = None                   # 上一帧时间戳
 
-    def run(self, curTgt: list) -> list:
+    def run(self, curFrame: list) -> list:
         '''function run
 
         input
         -----
-        curTgt: list
-            当前帧车辆目标信息
+        curFrame: list, 当前帧车辆目标信息
 
         return
         ------
-        curTgt: list
-            预处理后的当前帧车辆目标信息
+        curFrame: list, 预处理后的当前帧车辆目标信息
 
         接收当前帧的传感器数据:
         1. 更新除tgtInLastFrm, IDInLastFrm以外的所有属性。
         2. 进行补全, 平滑运算。
         3. 更新tgtInLastFrm, IDInLastFrm。
+        note
+        -----
+        算法会原地实时修改历史数据。
         '''
-        self._update(curTgt)
-        curTgt, cmpltIDs = self._run_complt(curTgt)
-        curTgt, _ = self.crt.run(curTgt, cmpltIDs)
-        curTgt = self._run_smooth(curTgt)
-        self._update_last()
-        return curTgt
+        # 初次启动
+        if (self.lastTimestamp is None) & (len(curFrame) != 0):
+            self.lastTimestamp = curFrame[0]['timeStamp']
+        # dict组织方便索引
+        curFrame = carsList2Dict(curFrame)
+        # 补全
+        curFrame, self.lastTimestamp = self.cmp.run(self.contextFrames,
+                                                    curFrame,
+                                                    self.lastTimestamp)
+        # 平滑
+        curFrame, self.lastTimestamp = self.smth.run(self.contextFrames,
+                                                     curFrame,
+                                                     self.lastTimestamp)
+        # 计算a属性
+        curFrame = self._calAcceleration(self.contextFrames, curFrame)
+        # 返回为list形式车辆
+        curFrame = carsDict2List(curFrame)
+        return curFrame
 
-    def _update(self, curTgt):
-        '''
-        接受每帧传输来的目标信息, 更新targetList
-        '''
-        # 更新target
-
-    def _run_IDCorrect(self, curTgt):
-        '''function __run_IDCorrect
+    def _calAcceleration(self, contextFrames: dict, curFrame: dict) -> dict:
+        '''function _calAcceleration
 
         input
         -----
-        curTgt: list
-            当前帧车辆目标信息
+        contextFrames: dict, 历史帧数据
+        curFrame: dict, 当前帧数据
 
         return
         ------
-        curTgt: list
-            当前帧车辆目标信息
+        curFrame: dict, 计算加速度后的当前帧数据
 
+        根据历史数据contextFrame与当前帧数据curFrame, 利用数据已有的vx与vy计算加速度a
         '''
-        self.crt.run()
-
-    def _run_complt(self, curTgt):
-        '''
-        '''
-        curTgt = self.cmp.run(curTgt)
-        return curTgt
-
-    def _run_smooth(self, curTgt):
-        '''
-        '''
-        curTgt = self.smth.run(curTgt, curTgt)
-        return curTgt
-
-    def _update_last(self):
-        '''
-        更新上一帧的目标信息
-        '''
-        self.tgtInLastFrm = self.tgtInCurFrm
-        self.IDInLastFrm = self.IDInCurFrm
+        newCurFrame = dict()
+        for key in curFrame.keys():
+            newCurFrame[key] = curFrame[key]
+            newCurFrame[key]['ax'] = 0
+            newCurFrame[key]['ay'] = 0
+            newCurFrame[key]['a'] = 0
+            if key in contextFrames.keys():
+                if len(contextFrames[key]) > 1:
+                    # 这里已经对context做了当前帧补充，因此上一帧的索引为-2
+                    deltaVx = curFrame[key]['vx'] - \
+                        contextFrames[key][-2]['vx']
+                    deltaVy = curFrame[key]['vy'] - \
+                        contextFrames[key][-2]['vy']
+                    deltaT = (curFrame[key]['timeStamp'] -
+                              contextFrames[key][-2]['timeStamp']) / 1000
+                    newCurFrame[key]['ax'] = deltaVx / deltaT
+                    newCurFrame[key]['ay'] = deltaVy / deltaT
+                    newCurFrame[key]['a'] = (newCurFrame[key]['ax']**2 +
+                                             newCurFrame[key]['ay']**2)**0.5
+        return newCurFrame

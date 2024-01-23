@@ -25,7 +25,7 @@ class Calibrator():
     save(path)
         将标定结果保存到path。
 
-    生成标定器，用于标定检测区域的有效行驶片区和应急车道。
+    生成标定器, 用于标定检测区域的有效行驶片区和应急车道。
     '''
 
     def __init__(self, clbPath: str, fps: float,
@@ -48,7 +48,7 @@ class Calibrator():
         qMerge: float
             判定元胞为合流区域的流量, 小于qMerge判定该cell不可用。
 
-        生成标定器，用于标定检测区域的有效行驶片区和应急车道。
+        生成标定器, 用于标定检测区域的有效行驶片区和应急车道。
         '''
         # 初始化属性
         self.clbPath = clbPath                  # 标定结果保存路径
@@ -85,38 +85,23 @@ class Calibrator():
         '''
         self.count += 1
         for target in msg:
-            # MARK 输出指定id信息
-            # if target['TargetId'] == 7390:
-            #     # {'TargetId': 5087, 'XDecx': 2.57, 'YDecy': 7, 'ZDecz': 0,
-            #     # 'VDecVx': 0.13, 'VDecVy': -19.3, 'Xsize': 0.47,
-            #     # 'TargetType': 1, 'Longitude': 118.87387669811856,
-            #     #  'Latitude': 31.935760760137626,
-            #     # 'Confidence': 1, 'EventType': 0, 'LineNum': 1}
-            #     # 只保留id和xy与vxvy, 删除其他
-            #     keysToDelete = ['ZDecz', 'Xsize', 'Ysize',
-            #                     'TargetType', 'Longitude', 'Latitude',
-            #                     'Confidence', 'EventType']
-            #     for k in keysToDelete:
-            #         del target[k]
-            #     print(target, ',', sep='')
-
-            laneID = target['LineNum'] - 100 if target['LineNum'] > 100 \
-                else target['LineNum']
+            laneID = target['laneID'] - 100 if target['laneID'] > 100 \
+                else target['laneID']
 
             # 分配dict索引()
             if laneID not in self.xyByLane:
                 self.xyByLane[laneID] = []
                 self.vxyCount[laneID] = {'x': 0, 'y': 0}
             # 存储vxy
-            self.xyByLane[laneID].append([target['XDecx'], target['YDecy']])
+            self.xyByLane[laneID].append([target['x'], target['y']])
             # 更新vxyCount
-            if target['VDecVx'] > 0:
+            if target['vx'] > 0:
                 self.vxyCount[laneID]['x'] += 1
-            elif target['VDecVx'] < 0:
+            elif target['vx'] < 0:
                 self.vxyCount[laneID]['x'] -= 1
-            if target['VDecVy'] > 0:
+            if target['vy'] > 0:
                 self.vxyCount[laneID]['y'] += 1
-            elif target['VDecVy'] < 0:
+            elif target['vy'] < 0:
                 self.vxyCount[laneID]['y'] -= 1
 
     def calibrate(self):
