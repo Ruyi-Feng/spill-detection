@@ -20,7 +20,7 @@ def drawLanes():
     # 读取配置文件
     with open("./config.yml", 'r') as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
-    cellLen = config['calib']['cell_len']
+    cellLen = config['cellLen']
     # 读取标定文件
     with open("./road_calibration/clb.yml", 'r') as f:
         clb = yaml.load(f, Loader=yaml.FullLoader)
@@ -63,7 +63,7 @@ def drawLanes():
         plt.plot(xArr, yArr,
                  label='lane'+str(laneID), c=colormap[laneID], marker='o')
         # 绘制车道方向
-        s, e, step = len(yArr)-1, 0, vDir[laneID]  # step与vDir相反因为画图的顺序
+        s, e, step = len(yArr)-1, 0, -vDir[laneID]  # step与vDir相反因为画图的顺序
         if step == 1:
             s, e = e, s
         for i in range(s, e, step):
