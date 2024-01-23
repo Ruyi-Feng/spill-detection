@@ -1,27 +1,37 @@
-from event_detection import EventDetector
-import yaml
-from message_driver import Driver
 from rsu_simulator import Smltor
+from message_driver import Driver
+from event_detection import EventDetector
+from pre_processing import PreProcessor
+from utils import loadConfig, loadYaml
+from tests.test_data.eventData import (dataSpill,
+                                       dataStop, dataStopEvent,
+                                       dataLowSpeed, dataLowSpeedEvent,
+                                       dataHighSpeed, dataHighSpeedEvent,
+                                       dataIllegalOccupation,
+                                       dataIllegalOccupationEvent,
+                                       dataEmgcBrake, dataEmgcBrakeEvent,
+                                       dataIncident,
+                                       dataCrowdEvent)
+
+# 读取配置文件
+configPath = './config.yml'
+cfg = loadConfig(configPath)
+# 读取标定文件
+calibPath = './road_calibration/clb.yml'
+clb = loadYaml(calibPath)
 
 
 def testDetect():
     '''离线数据测试'''
-    # 读取配置文件
-    configPath = './config.yml'
-    with open(configPath, 'r') as f:
-        config = yaml.load(f, Loader=yaml.FullLoader)
-    # 读取标定文件
-    calibPath = './road_calibration/clb.yml'
-    with open(calibPath, 'r') as f:
-        clb = yaml.load(f, Loader=yaml.FullLoader)
     # 生成仿真器
     dataPath = './data/result.txt'
     smltor = Smltor(dataPath)
     # 生成驱动器
     d = Driver()
+    # 生成预处理器
+    pp = PreProcessor(cfg['maxCompleteTime'], cfg['smoothAlpha'])
     # 生成检测器(内含交通管理器)
-    ed = EventDetector(clb, config)
-
+    ed = EventDetector(clb, cfg)
     # 仿真器读取数据
     while True:
         msg = smltor.run()
@@ -30,6 +40,8 @@ def testDetect():
         valid, cars = d.receive(msg)
         if not valid:
             continue
+        # 数据预处理
+        cars = pp.run(cars)
         # 事件检测
         events = ed.run(cars)
         # 检查点1
@@ -42,23 +54,79 @@ def testSpill():
 
 
 def testStop():
-    pass
+    # 生成检测器
+    ed = EventDetector(clb, cfg)
+    ed.eventTypes = ['stop']
+    # 迭代dataStop检测
+    for frame in dataStop:
+        events = ed.run(frame)
+        # 非stop类的events应为False
+        # 当stop为True时, events应为dataStopEvent
+        for type in events:
+            if type != 'stop':
+                assert not events[type]['occured']
+            elif events[type]['occured']:
+                assert events[type] == dataStopEvent
 
 
 def testLowSpeed():
-    pass
+    # 生成检测器
+    ed = EventDetector(clb, cfg)
+    ed.eventTypes = ['lowSpeed']
+    # 迭代dataLowSpeed检测
+    for frame in dataLowSpeed:
+        events = ed.run(frame)
+        # 非lowSpeed类的events应为False
+        for type in events:
+            if type != 'lowSpeed':
+                assert not events[type]['occured']
+            elif events[type]['occured']:
+                assert events[type] == dataLowSpeedEvent
 
 
 def testHighSpeed():
-    pass
+    # 生成检测器
+    ed = EventDetector(clb, cfg)
+    ed.eventTypes = ['highSpeed']
+    # 迭代dataHighSpeed检测
+    for frame in dataHighSpeed:
+        events = ed.run(frame)
+        # 非highSpeed类的events应为False
+        for type in events:
+            if type != 'highSpeed':
+                assert not events[type]['occured']
+            elif events[type]['occured']:
+                assert events[type] == dataHighSpeedEvent
 
 
 def testIllegalOccupation():
-    pass
+    # 生成检测器
+    ed = EventDetector(clb, cfg)
+    ed.eventTypes = ['illegalOccupation']
+    # 迭代dataIllegalOccupation检测
+    for frame in dataIllegalOccupation:
+        events = ed.run(frame)
+        # 非illegalOccupation类的events应为False
+        for type in events:
+            if type != 'illegalOccupation':
+                assert not events[type]['occured']
+            elif events[type]['occured']:
+                assert events[type] == dataIllegalOccupationEvent
 
 
 def testEmgcBrake():
-    pass
+    # 生成检测器
+    ed = EventDetector(clb, cfg)
+    ed.eventTypes = ['emgcBrake']
+    # 迭代dataEmgcBrake检测
+    for frame in dataEmgcBrake:
+        events = ed.run(frame)
+        # 非emgcBrake类的events应为False
+        for type in events:
+            if type != 'emgcBrake':
+                assert not events[type]['occured']
+            elif events[type]['occured']:
+                assert events[type] == dataEmgcBrakeEvent
 
 
 def testIncident():
@@ -66,16 +134,37 @@ def testIncident():
 
 
 def testCrowd():
-    pass
+    # 生成检测器(内含交通管理器)
+    ed = EventDetector(clb, cfg)
+    ed.lanes[3].k = 30
+    ed.lanes[3].v = 3
+    cars = [{'id': 1, 'x': 0.1, 'y': 3.0, 'vx': 0.13, 'vy': 3.0, 'laneID': 3,
+             'ay': 0, 'ax': 0, 'a': 0, 'timeStamp': 200, 'speed': 3.0}]
+    ed.eventTypes = ['crowd']
+    events = ed.run(cars)
+    for type in events:
+        if type != 'crowd':
+            assert not events[type]['occured']
+        else:
+            assert events[type] == dataCrowdEvent
 
 
 if __name__ == "__main__":
-    testDetect()
+    print('-------离线数据测试-------')
+    # testDetect()
+    print('-------抛洒物检测测试-------')
     testSpill()
-    testStop()
-    testLowSpeed()
-    testHighSpeed()
-    testIllegalOccupation()
-    testEmgcBrake()
+    print('-------停车检测测试-------')
+    # testStop()
+    print('-------低速检测测试-------')
+    # testLowSpeed()
+    print('-------高速检测测试-------')
+    # testHighSpeed()
+    print('-------非法占用应急车道检测测试-------')
+    # testIllegalOccupation()
+    print('-------紧急刹车检测测试-------')
+    # testEmgcBrake()
+    print('-------事件检测测试-------')
     testIncident()
-    testCrowd()
+    print('-------拥堵检测测试-------')
+    # testCrowd()
