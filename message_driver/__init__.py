@@ -18,6 +18,9 @@ interface_back = dict()
 for key in interface.keys():
     interface_back[interface[key]] = key
 
+# 从内部数据输出到外部应删除的键值
+keys2delete = ['laneNeedAdd', 'speed', 'a', 'ax', 'ay','timeStamp', 'secMark']
+
 # count记录最大值(达到后重置)
 maxCount = 60000
 # maxCount = 172800000    # fps=20时, 10天重置1次
@@ -143,19 +146,15 @@ class Driver():
         # 处理特殊属性
         if newCar['laneNeedAdd']:
             newCar['laneID'] += 100
-        del newCar['laneNeedAdd']
         # 调整属性名称
         for key in interface_back.keys():
             newCar[interface_back[key]] = newCar[key]
             del newCar[key]
-        # 删除增加属性
-        del newCar['speed']
-        del newCar['a']
-        del newCar['ax']
-        del newCar['ay']
-        # TODO 要保留原始的时间戳
-        del newCar['timeStamp']
-        del newCar['secMark']
+        # TODO 注意要保留原始的时间戳
+        for k in keys2delete:
+            if k in newCar.keys():
+                del newCar[k]
+
         return newCar
 
     def _eventsInner2Outer(self, events: dict) -> list:
