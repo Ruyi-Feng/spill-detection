@@ -181,12 +181,9 @@ class EventDetector(TrafficMng):
                 # 检查危险度达到1否, 若则报警
                 if self.lanes[id].cells[order].danger >= 1:
                     # 记录
-                    if (id, order) in self.dangerDict.keys():
-                        self.dangerDict[(id, order)] += 1
-                    else:
-                        self.dangerDict[(id, order)] = 1
+                    updateDictCount(self.dangerDict, (id, order))
                     # 报警
-                    if self.dangerDict[(id, order)] % self.spillWarnFreq == 0:
+                    if self.dangerDict[(id, order)] % self.spillWarnFreq == 1:
                         cellStart = self.lanes[id].cells[order].start
                         cellEnd = self.lanes[id].cells[order].end
                         if cellStart >= cellEnd:
@@ -203,6 +200,7 @@ class EventDetector(TrafficMng):
                 else:   # 未达到1, 检查是否在记录表内, 若在则删除
                     if (id, order) in self.dangerDict.keys():
                         del self.dangerDict[(id, order)]
+        self.resetCellDetermineStatus()
 
     def _stopDetect(self, cars: list):
         '''function stopDetect
