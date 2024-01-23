@@ -106,7 +106,7 @@ class TrafficMng():
         '''
         for id in self.lanes:
             self.lanes[id].updateDanger()
-    
+
     def resetCellDetermineStatus(self):
         '''function resetCellDetermineStatus
 

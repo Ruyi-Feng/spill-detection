@@ -19,9 +19,9 @@ for key in interface.keys():
     interface_back[interface[key]] = key
 
 # 从内部数据输出到外部应删除的键值
-keys2delete = ['laneNeedAdd', 'speed', 'a', 'ax', 'ay','timeStamp', 'secMark']
+keys2delete = ['laneNeedAdd', 'speed', 'a', 'ax', 'ay', 'timeStamp', 'secMark']
 
-# count记录最大值(达到后重置)
+# count记录最大值(达到后重置)ss
 maxCount = 60000
 # maxCount = 172800000    # fps=20时, 10天重置1次
 
