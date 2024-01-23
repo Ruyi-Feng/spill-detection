@@ -1,4 +1,5 @@
 from rsu_simulator import Smltor
+from message_driver import Driver
 
 # 数据格式
 # {
@@ -29,9 +30,19 @@ def printSpecifiedData(idList: list):
     '''
     dataPath = './data/result.txt'
     smltor = Smltor(dataPath)
+    # 修改键名
+    interface = {
+        'TargetId': 'id',
+        'XDecx': 'x',
+        'YDecy': 'y',
+        'VDecVx': 'vx',
+        'VDecVy': 'vy',
+        'LineNum': 'laneID'
+        }
     # 保留键值
-    keys2Delete = ['ZDecz', 'Xsize', 'TargetType',
+    keys2Delete = ['ZDecz', 'TargetType', 'Xsize', 'Ysize',
                    'Longitude', 'Latitude', 'Confidence', 'EventType']
+    tsCount = 0
     # 模拟接受数据
     while True:
         msg = smltor.run()
@@ -39,16 +50,29 @@ def printSpecifiedData(idList: list):
             break
         if type(msg) == str:
             continue
-
         for target in msg:
             if target['TargetId'] not in idList:
                 continue
+            # 修改键名
+            for key in interface.keys():
+                target[interface[key]] = target[key]
+                del target[key]
+            # 删除键值
             for key in keys2Delete:
                 del target[key]
+            # 增加必要键值
+            target['ax'], target['ay'], target['a'] = 0, 0, 0
+            
+            target['timeStamp'] = tsCount *1000
+            tsCount += 1
             # 手动操作生成数值
-            # target['VDecVx'], target['VDecVy'] = 0.13, 5.0  # 低速情况
-            # target['VDecVx'], target['VDecVy'] = 0.13, 1.5  # 停车情况
-            print(target, ',', sep='')
+            # target['vx'], target['vy'] = 0.13, 5.0  # 低速情况
+            target['vx'], target['vy'] = 0.13, 0.5  # 停车情况
+            # target['ax'], target['ay'] = 0.13, 4      # 急刹车
+
+            target['speed'] = (target['vx']**2 + target['vy']**2)**0.5
+            target['speed'] = round(target['speed'])
+            print([target], end=',\n')
 
 
 if __name__ == "__main__":
