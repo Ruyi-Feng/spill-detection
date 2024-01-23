@@ -116,7 +116,6 @@ class Driver():
             car[interface[key]] = car[key]
             del car[key]
         # 处理特殊属性
-        car['a'] = 0    # TODO a的计算暂时在driver中加入, 应当放在prepro中
         car['speed'] = (car['vx']**2 + car['vy']**2)**0.5
         car['laneNeedAdd'] = False
         if car['laneID'] > 100:
@@ -128,7 +127,7 @@ class Driver():
         # 可以转化成unix时间戳(统一确定了一个时间原点), 再将这个s为单位的数据转化为ms为单位
         # 统一将时间戳记为以毫秒ms为单位
         car['timeStamp'] = self.count * 100
-        car['secMark'] = car['timeStamp']       # 用于complete使用
+        car['secMark'] = car['timeStamp'] % maxCount           # 用于complete使用
 
     def _formatTransInner2Outer(self, car: dict) -> dict:
         '''function _formatTransInner2Outer
@@ -150,15 +149,13 @@ class Driver():
             newCar[interface_back[key]] = newCar[key]
             del newCar[key]
         # 删除增加属性
-        del newCar['a']
         del newCar['speed']
-
-        # 调整时间戳格式
-        # TODO 暂时在接收数据时按照接收count为数据赋值时间戳
-        # TODO 后续根据具体情况, 将时间戳转化为以毫秒ms为单位的时间戳
-        # 可以转化成unix时间戳(统一确定了一个时间原点), 再将这个s为单位的数据转化为ms为单位
-        # 统一将时间戳记为以毫秒ms为单位
+        del newCar['a']
+        del newCar['ax']
+        del newCar['ay']
+        # TODO 要保留原始的时间戳
         del newCar['timeStamp']
+        del newCar['secMark']
         return newCar
 
     def _eventsInner2Outer(self, events: dict) -> list:
