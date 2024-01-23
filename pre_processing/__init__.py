@@ -65,6 +65,9 @@ class PreProcessor():
         newCurFrame = dict()
         for key in curFrame.keys():
             newCurFrame[key] = curFrame[key]
+            newCurFrame[key]['ax'] = 0
+            newCurFrame[key]['ay'] = 0
+            newCurFrame[key]['a'] = 0
             if key in contextFrames.keys():
                 if len(contextFrames[key]) > 1:
                     # 这里已经对context做了当前帧补充，因此上一帧的索引为-2
