@@ -30,5 +30,5 @@ durationEmgcBrake: 1
 dTouch: 5
 tSupervise: 20
 densityCrowd: 18
-vCrowd: 16.667
+vCrowd: 5.555
 durationOccupation: 3
