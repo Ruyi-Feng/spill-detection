@@ -10,7 +10,7 @@ from tests.test_data.eventData import (dataSpill, dataSpillEvent,
                                        dataIllegalOccupation,
                                        dataIllegalOccupationEvent,
                                        dataEmgcBrake, dataEmgcBrakeEvent,
-                                       dataIncident,
+                                       dataIncident, dataIncidentEvent,
                                        dataCrowdEvent)
 
 
@@ -143,7 +143,18 @@ def testEmgcBrake():
 
 
 def testIncident():
-    pass
+    # 生成检测器
+    ed = EventDetector(clb, cfg)
+    ed.eventTypes = ['incident']
+    # 迭代dataIncident检测
+    for frame in dataIncident:
+        events = ed.run(frame)
+        # 非incident类的events应为False
+        for type in events:
+            if type != 'incident':
+                assert not events[type]['occured']
+            elif events[type]['occured']:
+                assert events[type] == dataIncidentEvent
 
 
 def testCrowd():
@@ -164,20 +175,20 @@ def testCrowd():
 
 if __name__ == "__main__":
     print('-------离线数据测试-------')
-    # testDetect()
+    testDetect()
     print('-------抛洒物检测测试-------')
     testSpill()
     print('-------停车检测测试-------')
-    # testStop()
+    testStop()
     print('-------低速检测测试-------')
-    # testLowSpeed()
+    testLowSpeed()
     print('-------高速检测测试-------')
-    # testHighSpeed()
+    testHighSpeed()
     print('-------非法占用应急车道检测测试-------')
-    # testIllegalOccupation()
+    testIllegalOccupation()
     print('-------紧急刹车检测测试-------')
-    # testEmgcBrake()
+    testEmgcBrake()
     print('-------事件检测测试-------')
     testIncident()
     print('-------拥堵检测测试-------')
-    # testCrowd()
+    testCrowd()
