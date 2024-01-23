@@ -3,7 +3,7 @@ from message_driver import Driver
 from event_detection import EventDetector
 from pre_processing import PreProcessor
 from utils import loadConfig, loadYaml
-from tests.test_data.eventData import (dataSpill,
+from tests.test_data.eventData import (dataSpill, dataSpillEvent,
                                        dataStop, dataStopEvent,
                                        dataLowSpeed, dataLowSpeedEvent,
                                        dataHighSpeed, dataHighSpeedEvent,
@@ -51,7 +51,19 @@ def testDetect():
 
 
 def testSpill():
-    pass
+    # 生成检测器(内含交通管理器)
+    ed = EventDetector(clb, cfg)
+    ed.eventTypes = ['spill']
+    # 迭代dataSpill检测
+    for frame in dataSpill:
+        events = ed.run(frame)
+        # 非spill类的events应为False
+        # 当spill为True时, events应为dataSpillEvent
+        for type in events:
+            if type != 'spill':
+                assert not events[type]['occured']
+            elif events[type]['occured']:
+                assert events[type] == dataSpillEvent
 
 
 def testStop():
