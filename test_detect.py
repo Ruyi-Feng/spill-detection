@@ -13,6 +13,7 @@ from tests.test_data.eventData import (dataSpill,
                                        dataIncident,
                                        dataCrowdEvent)
 
+
 # 读取配置文件
 configPath = './config.yml'
 cfg = loadConfig(configPath)

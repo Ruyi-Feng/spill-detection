@@ -1,5 +1,5 @@
 from rsu_simulator import Smltor
-from message_driver import Driver
+
 
 # 数据格式
 # {
@@ -62,8 +62,8 @@ def printSpecifiedData(idList: list):
                 del target[key]
             # 增加必要键值
             target['ax'], target['ay'], target['a'] = 0, 0, 0
-            
-            target['timeStamp'] = tsCount *1000
+
+            target['timeStamp'] = tsCount * 1000
             tsCount += 1
             # 手动操作生成数值
             # target['vx'], target['vy'] = 0.13, 5.0  # 低速情况
