@@ -29,7 +29,7 @@ def test_calibrator():
     dataPath = './data/result.txt'
     smltor = Smltor(dataPath)
     # 生成驱动器
-    d = Driver()
+    d = Driver(cfg['fps'])
 
     # 仿真器读取数据
     while True:

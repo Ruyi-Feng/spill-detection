@@ -21,7 +21,7 @@ def testManager():
     # 生成仿真器
     sm = Smltor(dataPath)
     # 生成驱动器
-    d = Driver()
+    d = Driver(config['fps'])
     # 生成路口管理器
     tm = TrafficMng(clb, config)
     # 开始运行

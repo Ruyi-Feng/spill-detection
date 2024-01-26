@@ -28,7 +28,7 @@ def testDetect():
     dataPath = './data/result.txt'
     smltor = Smltor(dataPath)
     # 生成驱动器
-    d = Driver()
+    d = Driver(cfg['fps'])
     # 生成预处理器
     pp = PreProcessor(cfg['maxCompleteTime'], cfg['smoothAlpha'])
     # 生成检测器(内含交通管理器)

@@ -14,7 +14,7 @@ def test_preprocess():
     dataPath = './data/result.txt'
     smltor = Smltor(dataPath)
     # 生成驱动器
-    d = Driver()
+    d = Driver(cfg['fps'])
     # 生成预处理器
     pp = PreProcessor(comMaxFrm=cfg['maxCompleteTime'],
                       smthA=cfg['smoothAlpha'])

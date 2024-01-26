@@ -42,7 +42,7 @@ class Controller:
         cfg = loadConfig(cfgPath)
         self.cfg = cfg
         # 生成数据驱动器
-        self.drv = Driver()
+        self.drv = Driver(cfg['fps'])
         # 是否标定
         self.clbPath = clbPath
         self.needClb = False
