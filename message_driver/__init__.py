@@ -32,8 +32,10 @@ class Driver():
     数据格式转化驱动器, 将传感器数据转化为代码内部流通的数据格式,
     将代码内部流通的数据格式转化为输出数据。
     '''
-    def __init__(self):
+    def __init__(self, fps: float):
         self.count = 0
+        self.fps = fps
+        self.timeIntervalMs = int(1000 / fps)
 
     def receive(self, msg: list) -> (bool, list):
         '''function receive
@@ -129,7 +131,7 @@ class Driver():
         # TODO 后续根据具体情况, 将时间戳转化为以毫秒ms为单位的时间戳
         # 可以转化成unix时间戳(统一确定了一个时间原点), 再将这个s为单位的数据转化为ms为单位
         # 统一将时间戳记为以毫秒ms为单位
-        car['timeStamp'] = self.count * 100
+        car['timeStamp'] = self.count * self.timeIntervalMs
         car['secMark'] = car['timeStamp'] % maxCount           # 用于complete使用
 
     def _formatTransInner2Outer(self, car: dict) -> dict:
