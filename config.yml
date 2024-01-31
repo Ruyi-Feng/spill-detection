@@ -1,3 +1,8 @@
+ip: 'loacalhost:9092'
+topic: 'trafficTrajectory'
+group: 'group'
+key: None
+
 fps: 20
 
 ifRecalib: false
