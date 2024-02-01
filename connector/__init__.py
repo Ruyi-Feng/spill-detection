@@ -12,7 +12,7 @@ class KafkaConsumer():
     ----------
     consumer: KafkaConsumer, kafka消费者
     用法:
-    message = consumer.consumeData()
+    message = consumer.run()
     从broker接收数据, 得到message
     '''
     def __init__(self, ip, topic, groupid='kafka', key=None):
@@ -28,8 +28,8 @@ class KafkaConsumer():
         self.consumer = KafkaConsumer(topic, bootstrap_servers=ip,
                                       group_id=groupid)
 
-    def consumeData(self) -> dict:
-        '''function consumeData
+    def run(self) -> dict:
+        '''function run
 
         output
         ------

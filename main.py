@@ -36,7 +36,7 @@ def main():
     # 接收
     while True:
         # 持续性运行接收
-        msg = kc.consumeData()
+        msg = kc.run()
         if (msg is None) or (msg == '') or (not msg):
             continue     # 接收到空数据
         # 算法检测
