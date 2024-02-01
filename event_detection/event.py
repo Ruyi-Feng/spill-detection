@@ -2,6 +2,7 @@ from copy import deepcopy
 from utils import int2strID
 from traffic_manager.lane_manager import LaneMng
 from traffic_manager.cell_manager import CellMng
+from event_detection import defaultEventTypes
 
 '''This is to define the event class and event manager class.'''
 
@@ -37,10 +38,12 @@ class EventMng():
         初始化事件管理器
         '''
         # encode event types
-        num = len(eventTypes)
+        defaultEventNum = len(defaultEventTypes)
         self.eventTypes = eventTypes
-        self.typeIdDict = {eventTypes[i]: i for i in range(num)}
-        self.typeCharDict = ({eventTypes[i]: chr(i+65) for i in range(num)})
+        self.typeIdDict = {defaultEventTypes[i]: i for i in
+                           range(defaultEventNum)}
+        self.typeCharDict = ({defaultEventTypes[i]: chr(i+65) for i in
+                              range(defaultEventNum)})
         # formulate event format
         self.eventsFormat = dict()
         for type in self.eventTypes:
@@ -154,6 +157,8 @@ class SpillEvent(BaseEvent):
     start: float, 事件发生的lane的起点
     end: float, 事件发生的lane的终点
     danger: float, 事件发生的lane的危险系数
+    lat: int, 事件发生的元胞的order
+    lon: int, 事件发生的元胞的start
     '''
     def __init__(self, type: str, eventID: str,
                  startTime: str, endTime:str,
@@ -177,6 +182,8 @@ class SpillEvent(BaseEvent):
         self.start = start
         self.end = end
         self.danger = cell.danger
+        self.lat = self.order      # for compatibility
+        self.lon = cell.start      # for compatibility
 
 
 class SingleCarEvent(BaseEvent):
@@ -196,6 +203,8 @@ class SingleCarEvent(BaseEvent):
     vx, vy: float, 事件发生的车辆速度
     speed: float, 事件发生的车辆速度
     a: float, 事件发生的车辆加速度
+    lat: float, 事件发生的车辆纬度
+    lon: float, 事件发生的车辆经度
     '''
     def __init__(self, type: str, eventID: str,
                  startTime: str, endTime:str,
@@ -217,6 +226,8 @@ class SingleCarEvent(BaseEvent):
         self.vx, self.vy = car['vx'], car['vy']
         self.speed = car['speed']
         self.a = car['a']
+        self.lat = car['latitude']
+        self.lon = car['longitude']
 
 
 class IncidentEvent(BaseEvent):
@@ -234,6 +245,7 @@ class IncidentEvent(BaseEvent):
     vx1, vy1, vx2, vy2: float, 事件发生的车辆速度
     speed1, speed2: float, 事件发生的车辆速度
     a1, a2: float, 事件发生的车辆加速度
+    lat1, lon1, lat2, lon2: float, 事件发生的车辆经纬度
     '''
     def __init__(self, type: str, eventID: str,
                  startTime: str, endTime:str,
@@ -262,6 +274,10 @@ class IncidentEvent(BaseEvent):
         self.speed2 = car2['speed']
         self.a1 = car1['a']
         self.a2 = car2['a']
+        self.lat1 = car1['latitude']
+        self.lon1 = car1['longitude']
+        self.lat2 = car2['latitude']
+        self.lon2 = car2['longitude']
 
 
 class CrowdEvent(BaseEvent):
@@ -298,3 +314,5 @@ class CrowdEvent(BaseEvent):
         self.q = lane.q
         self.k = lane.k
         self.v = lane.v
+        self.lat = lane.ID  # for compatibility
+        self.lon = lane.q   # for compatibility

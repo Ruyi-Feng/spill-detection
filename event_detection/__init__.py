@@ -1,10 +1,14 @@
 from traffic_manager import TrafficMng
 from event_detection.event import EventMng
-from utils import updateDictCount, delDictKeys, strCapitalize
+from utils import delDictKeys, strCapitalize
 from utils.car_utils import getCarFromCars, getCarBaseInfo
 
 
 '''The module is to detect events. Params are defined in config.json.'''
+
+
+defaultEventTypes = ["spill", "stop", "lowSpeed", "highSpeed",
+                     "emgcBrake", "incident", "crowd", "illegalOccupation"]
 
 
 class EventDetector(TrafficMng):
