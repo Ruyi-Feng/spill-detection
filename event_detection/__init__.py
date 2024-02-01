@@ -211,7 +211,6 @@ class EventDetector(TrafficMng):
                     deltaTms = self.dangerDict[(id, order)][1] - \
                         self.dangerDict[(id, order)][0]
                     deltaTs = deltaTms / 1000
-                    # print(deltaTs)
                     # 报警
                     if deltaTs % self.spillWarnFreq == 0:
                         cellStart = self.lanes[id].cells[order].start
