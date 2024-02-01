@@ -1,3 +1,6 @@
+from event_detection import typeIdDict
+
+
 '''Define the send and receive interface processor of message.'''
 
 
@@ -161,7 +164,7 @@ class DriverOffline:
         for car in cars:
             self._formatTransInner2Outer(car)
         # 事件格式转化
-        outEvents = eventsInner2Outer(events)
+        outEvents = self._eventsInner2Outer(events)
         return cars, outEvents
 
     def _formatTransOuter2Inner(self, car: dict):
@@ -209,6 +212,24 @@ class DriverOffline:
         for k in self.keys2delete:
             if k in car.keys():
                 del car[k]
+
+    def _eventsInner2Outer(events: dict) -> list:
+        '''function _eventsInner2OuterOffline
+
+        input
+        -----
+        events: dict, 代码内部的事件信息, dict格式。
+
+        将代码内部的事件信息转化为传输格式的事件信息。
+        '''
+        outerEvents = []
+        for type in events.keys():
+            if not events[type]['occured']:
+                continue
+            for eventID in events[type]['items']:
+                outerEvents.append(events[type]['items'][eventID])
+
+        return outerEvents
 
 
 class DriverOnline:
@@ -286,7 +307,7 @@ class DriverOnline:
         '''
         # 若需输出目标数据, 在这里重新组织, 调用_formatTransInner2Outer()修改属性
         # 事件格式转化
-        outEvents = eventsInner2Outer(events)
+        outEvents = self._eventsInner2Outer(events)
         return cars, outEvents
 
     def _formatTransOuter2Inner(self, car: dict):
@@ -335,38 +356,96 @@ class DriverOnline:
 
         return newCar
 
+    def _eventsInner2Outer(events: dict) -> list:
+        '''function _eventsInner2OuterOffline
 
-def eventsInner2Outer(events: dict) -> list:
-    '''function _eventsInner2OuterOffline
+        input
+        -----
+        events: dict, 代码内部的事件信息, dict格式。
 
-    input
-    -----
-    events: dict, 代码内部的事件信息, dict格式。
+        将代码内部的事件信息转化为传输格式的事件信息。
+        转化后格式应为:
+        {
+            "type": 1,
+            "level": 1,
+            "start_time": "2023-12-06 11:11:11",
+            "end_time": "2023-12-06 11:11:11",
+            "lane": 1,
+            "raw_class": 1,
+            "point_wgs84": {
+                "lat": 33.33,
+                "lon": 111.11
+            },
+            "device_type": 1,
+            "device_id": "K70+800"
+        }
+        '''
+        outerEvents = []
+        for type in events.keys():
+            if not events[type]['occured']:
+                continue
+            for eventID in events[type]['items']:
+                event = events[type]['items'][eventID]  # dict型
 
-    将代码内部的事件信息转化为传输格式的事件信息。
-    转化后格式应为:
-    {
-        "type": 1,
-        "level": 1,
-        "start_time": "2023-12-06 11:11:11",
-        "end_time": "2023-12-06 11:11:11",
-        "lane": 1,
-        "raw_class": 1,
-        "point_wgs84": {
-            "lat": 33.33,
-            "lon": 111.11
-        },
-        "device_type": 1,
-        "device_id": "K70+800"
-    }
-    '''
-    outerEvents = []
-    for type in events.keys():
-        if not events[type]['occured']:
-            continue
-        for eventID in events[type]['items']:
-            outerEvents.append(events[type]['items'][eventID])
-    # 将type映射到int型
-    # 
+                outerEvents.append(event)
+        # 将type映射到int型
+        # 
 
-    return outerEvents
+        return outerEvents
+
+    def _eventInner2Outer(self, event: dict) -> dict:
+        '''function _eventInner2Outer
+
+        input
+        -----
+        event: dict, 代码内部的事件信息, dict格式。
+        
+        修改event格式为协议中的格式。
+        修改前:
+        {
+            'type': 'illegalOccupation',
+            'eventID': 'H0000000',
+            'startTime': 0,
+            'endTime': -1,
+            'carID': 5819,
+            'laneID': 8,
+            'x': 21.7,
+            'y': 413.3,
+            'vx': 0.06,
+            'vy': 19.36,
+            'speed': 19,
+            'lat': 0,
+            'lon': 0,
+            'a': 0
+        }
+        修改后:
+        {
+            "type": 1,
+            "level": 1,
+            "start_time": "2023-12-06 11:11:11",
+            "end_time": "2023-12-06 11:11:11",
+            "lane": 1,
+            "raw_class": 1,
+            "point_wgs84": {
+                "lat": 33.33,
+                "lon": 111.11
+            },
+            "device_type": 1,
+            "device_id": "K70+800"
+        }
+        '''
+        newEvent = dict()
+        newEvent['type'] = typeIdDict[event['type']]
+        newEvent['level'] = 1
+        newEvent['start_time'] = event['startTime']
+        newEvent['end_time'] = event['endTime']
+        newEvent['lane'] = event['laneID']
+        newEvent['raw_class'] = event['class']
+        newEvent['point_wgs84'] = {
+            'lat': event['lat'],
+            'lon': event['lon']
+        }
+        newEvent['device_type'] = event['deviceType']
+        newEvent['device_id'] = event['deviceID']
+
+        return newEvent
