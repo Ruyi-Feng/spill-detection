@@ -211,6 +211,7 @@ class EventDetector(TrafficMng):
                     deltaTms = self.dangerDict[(id, order)][1] - \
                         self.dangerDict[(id, order)][0]
                     deltaTs = deltaTms / 1000
+                    # print(deltaTs)
                     # 报警
                     if deltaTs % self.spillWarnFreq == 0:
                         cellStart = self.lanes[id].cells[order].start
@@ -221,12 +222,15 @@ class EventDetector(TrafficMng):
                         event = f"事件: id={id}车道可能有抛洒物, " + \
                             f"元胞起点: {cellStart}, 元胞终点: {cellEnd}, " + \
                             f"危险度: {self.lanes[id].cells[order].danger}, " + \
-                            f"持续时间: {self.dangerDict[(id, order)]/self.fps}s。"
+                            f"开始时间: {self.dangerDict[(id, order)][0]}, " + \
+                            f"当前时间: {self.dangerDict[(id, order)][1]}"
                         print(event)
                         # 真正用生成事件
+                        # ifNewEventID = True if deltaTs == 0 else False
                         self.eventMng.run('spill',
                                           self.dangerDict[(id, order)][0],
-                                          -1, self.dangerDict[(id, order)][2])
+                                          -1, # ifNewEventID,
+                                          self.dangerDict[(id, order)][2])
                 else:   # 未达到1, 检查是否在记录表内, 若在则删除
                     if (id, order) in self.dangerDict.keys():
                         # 生成结束事件告警
@@ -255,10 +259,10 @@ class EventDetector(TrafficMng):
             # 检查事件
             deltaTms = self.stopDict[id][1] - self.stopDict[id][0]
             deltaTs = deltaTms / 1000
-            if abs(deltaTs - self.durationStop) < (1 / self.fps):
+            if abs(deltaTs - self.durationStop) < (1 / self.fps) * 0.99:
                 car = getCarFromCars(cars, id)
                 event = f"事件: id={str(id)}车辆准静止, " + getCarBaseInfo(car) + \
-                    f", 已持续时间{str(self.stopDict[id]/self.fps)}s。"
+                    f", 开始时间{str(self.stopDict[id][0])}。 "
                 print(event)
                 # 真正用生成事件
                 self.eventMng.run('stop', self.stopDict[id][0], -1, car)
@@ -279,10 +283,10 @@ class EventDetector(TrafficMng):
             # 检查事件
             deltaTms = self.lowSpeedDict[id][1] - self.lowSpeedDict[id][0]
             deltaTs = deltaTms / 1000
-            if abs(deltaTs - self.durationLow) < (1 / self.fps):
+            if abs(deltaTs - self.durationLow) < (1 / self.fps) * 0.99:
                 car = getCarFromCars(cars, id)
                 event = f"事件: id={str(id)}车辆低速行驶, " + getCarBaseInfo(car) + \
-                    f", 已持续时间{str(self.lowSpeedDict[id]/self.fps)}s。"
+                    f", 开始时间{str(self.lowSpeedDict[id][0])}。 "
                 print(event)
                 # 真正用生成事件
                 self.eventMng.run('lowSpeed', self.lowSpeedDict[id][0], -1, car)
@@ -304,10 +308,10 @@ class EventDetector(TrafficMng):
             # 检查事件
             deltaTms = self.highSpeedDict[id][1] - self.highSpeedDict[id][0]
             deltaTs = deltaTms / 1000
-            if abs(deltaTs - self.durationHigh) < (1 / self.fps):
+            if abs(deltaTs - self.durationHigh) < (1 / self.fps) * 0.99:
                 car = getCarFromCars(cars, id)
                 event = f"事件: id={str(id)}车辆超速行驶, " + getCarBaseInfo(car) + \
-                    f", 已持续时间{str(self.highSpeedDict[id]/self.fps)}s。"
+                    f", 开始时间{str(self.highSpeedDict[id][0])}。 "
                 print(event)
                 # 真正用生成事件
                 self.eventMng.run('highSpeed', self.highSpeedDict[id][0], -1, car)
@@ -329,11 +333,11 @@ class EventDetector(TrafficMng):
             # 检查事件
             deltaTms = self.emgcBrakeDict[id][1] - self.emgcBrakeDict[id][0]
             deltaTs = deltaTms / 1000
-            if abs(deltaTs - self.durationEmgcBrake) < (1 / self.fps):
+            if abs(deltaTs - self.durationEmgcBrake) < (1 / self.fps) * 0.99:
                 car = getCarFromCars(cars, id)
                 event = f"事件: id={str(id)}车辆急刹车, " + getCarBaseInfo(car) + \
                     f"加速度: {car['a']}" + \
-                    f", 已持续时间{str(self.emgcBrakeDict[id]/self.fps)}s。"
+                    f", 开始时间{str(self.emgcBrakeDict[id][0])}。 "
                 print(event)
                 # 真正用生成事件
                 self.eventMng.run('emgcBrake', self.emgcBrakeDict[id][0], -1, car)
@@ -455,8 +459,10 @@ class EventDetector(TrafficMng):
                     event = f"事件: id={id}车道拥堵, 车道密度: {k}辆/km, 车道速度: {v}km/h。"
                     print(event)
                     # 真正用生成事件
+                    ifNewEventID = True if deltaTs == 0 else False
                     self.eventMng.run('crowd',
-                                      cars[0]['timestamp'], -1, self.lanes[id])
+                                      cars[0]['timestamp'], -1,
+                                      self.lanes[id])
             else:   # 不满足拥堵条件, 检查是否在记录表内, 若在则删除
                 if id in self.crowdDict.keys():
                     # 生成结束event
@@ -484,10 +490,10 @@ class EventDetector(TrafficMng):
             deltaTms = self.illegalOccupationDict[id][1] - \
                 self.illegalOccupationDict[id][0]
             deltaTs = deltaTms / 1000
-            if abs(deltaTs - self.durationOccupation) < (1 / self.fps):
+            if abs(deltaTs - self.durationOccupation) < (1 / self.fps) * 0.99:
                 car = getCarFromCars(cars, id)
                 event = f"事件: id={str(id)}车辆占用应急车道, " + getCarBaseInfo(car) +\
-                    f", 已持续时间{str(self.illegalOccupationDict[id]/self.fps)}s。"
+                    f", 开始时间{str(self.illegalOccupationDict[id][0])}。 "
                 print(event)
                 # 真正用生成事件
                 self.eventMng.run('illegalOccupation',
