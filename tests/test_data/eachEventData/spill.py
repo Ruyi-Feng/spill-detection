@@ -1,3 +1,6 @@
+from copy import deepcopy
+
+
 elementData = [
     {'id': 9934, 'x': 2.36, 'y': 25, 'vx': 0.13, 'vy': 20,
      'laneID': 4, 'ax': 0, 'ay': 0, 'a': 0, 'timestamp': 0, 'speed': 20},
@@ -35,10 +38,15 @@ elementData = [
 
 fps = 20
 frameNum = 12000
-dataSpill = [elementData] * frameNum
+# dataSpill = [elementData] * frameNum      # 这种情况每个元素都是引用
+# dataSpill = [elementData.copy() for _ in range(frameNum)]  # 也一样
+dataSpill = [deepcopy(elementData) for _ in range(frameNum)]
+# 重新赋值ms单位的时间戳, 第i帧的所有目标依据公式为i / fps * 1000
 for i in range(frameNum):
-    for object in dataSpill[i]:
-        object['timestamp'] = i / fps * 1000    # ms单位时间戳
+    for j in range(len(dataSpill[i])):
+        dataSpill[i][j]['timestamp'] = i / fps * 1000
+
+
 
 # dataSpillEvent = {
 #     'name': 'spill',
@@ -63,7 +71,7 @@ for i in range(frameNum):
 dataSpillEvent = {
     'type': 'spill',
     'eventID': 'A0000000',
-    'startTime': 599950.0,
+    'startTime': 29400,
     'endTime': -1,
     'laneID': 4,
     'order': 12,
