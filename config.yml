@@ -2,6 +2,7 @@ ip: 'loacalhost:9092'
 topic: 'trafficTrajectory'
 group: 'group'
 key: None
+http: 'http://localhost:5000'
 
 fps: 20
 
