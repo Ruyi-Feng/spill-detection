@@ -2,7 +2,7 @@ from copy import deepcopy
 from utils import int2strID
 from traffic_manager.lane_manager import LaneMng
 from traffic_manager.cell_manager import CellMng
-from event_detection import defaultEventTypes
+from event_detection import defaultEventTypes, typeCharDict, typeIdDict
 
 '''This is to define the event class and event manager class.'''
 
@@ -38,12 +38,9 @@ class EventMng():
         初始化事件管理器
         '''
         # encode event types
-        defaultEventNum = len(defaultEventTypes)
         self.eventTypes = eventTypes
-        self.typeIdDict = {defaultEventTypes[i]: i for i in
-                           range(defaultEventNum)}
-        self.typeCharDict = ({defaultEventTypes[i]: chr(i+65) for i in
-                              range(defaultEventNum)})
+        self.typeIdDict = typeIdDict
+        self.typeCharDict = typeCharDict
         # formulate event format
         self.eventsFormat = dict()
         for type in self.eventTypes:
