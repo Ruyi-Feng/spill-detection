@@ -658,14 +658,15 @@ dataHighSpeedEvent = {
         {
             'type': 'highSpeed',
             'eventID': 'D0000000',
-            'time': 59000,
+            'startTime': 0,
+            'endTime': -1,
             'carID': 9934,
             'laneID': 4,
-            'x': 4.72,
-            'y': 292.35,
-            'vx': 0.28,
-            'vy': -38.18,
-            'speed': 38,
+            'x': 2.44,
+            'y': 399.6,
+            'vx': -0.04,
+            'vy': -37.49,
+            'speed': 37,
             'a': 0
         }
     }

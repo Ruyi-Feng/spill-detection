@@ -33,23 +33,41 @@ elementData = [
      'laneID': 4, 'ax': 0, 'ay': 0, 'a': 0, 'timestamp': 0, 'speed': 20}
 ]
 
-dataSpill = [elementData] * 20
+fps = 20
+frameNum = 12000
+dataSpill = [elementData] * frameNum
+for i in range(frameNum):
+    for object in dataSpill[i]:
+        object['timestamp'] = i / fps * 1000    # ms单位时间戳
+
+# dataSpillEvent = {
+#     'name': 'spill',
+#     'occured': True,
+#     'items':
+#     {
+#         'A0000000':
+#         {
+#             'type': 'spill',
+#             'eventID': 'A0000000',
+#             'startTime': 599950.0,
+#             'endTime': -1,
+#             'laneID': 4,
+#             'order': 12,
+#             'start': 150.0,
+#             'end': 200.0,
+#             'danger': 1.0999999999999999
+#         }
+#     }
+# }
 
 dataSpillEvent = {
-    'name': 'spill',
-    'occured': True,
-    'items':
-    {
-        'A0000000':
-        {
-            'type': 'spill',
-            'eventID': 'A0000000',
-            'time': 0,
-            'laneID': 4,
-            'order': 12,
-            'start': 150.0,
-            'end': 200.0,
-            'danger': 1.0999999999999999
-        }
-    }
+    'type': 'spill',
+    'eventID': 'A0000000',
+    'startTime': 599950.0,
+    'endTime': -1,
+    'laneID': 4,
+    'order': 12,
+    'start': 150.0,
+    'end': 200.0,
+    'danger': 1.0999999999999999
 }

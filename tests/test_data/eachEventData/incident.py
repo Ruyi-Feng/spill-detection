@@ -25,7 +25,8 @@ dataIncidentEvent = {
         {
             'type': 'incident',
             'eventID': 'F0000000',
-            'time': 0,
+            'startTime': 0,
+            'endTime': 0,
             'carID1': 1,
             'carID2': 2,
             'laneID1': 4,
