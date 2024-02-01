@@ -33,6 +33,8 @@ class Driver():
 
         接受传来的数据message, 将原始数据格式转化为代码内流通的数据格式。
         '''
+        if not (self._validMsg(msg)):
+            return False, msg
         if type(msg) == dict:
             # 在线部署情况
             self.mode = 'online'
@@ -41,9 +43,30 @@ class Driver():
             # 离线测试情况
             self.mode = 'offline'
             return True, self.driverOffline.recieve(msg)
-        else:
-            # 传输信息
-            return False, msg
+
+    def _validMsg(self, msg: list | dict | str) -> bool:
+        '''function _validMsg
+
+        input
+        -----
+        msg: list | dict |str, 传感器数据。
+        list为离线数据, dict为在线数据, str为传输信息。
+
+        return
+        ------
+        bool, 判断数据是否有效, 若为str信息,
+        或者为dict时'targets'长度为0,
+        或者list时长度为0, 则返回False。
+        '''
+        if (type(msg) == str):
+            return False
+        elif type(msg) == dict:
+            if len(msg['targets']) == 0:
+                return False
+        elif type(msg) == list:
+            if len(msg) == 0:
+                return False
+        return True
 
     def send(self, cars: list, events: dict) ->  (list, list):
         '''function send
@@ -321,6 +344,21 @@ def eventsInner2Outer(events: dict) -> list:
     events: dict, 代码内部的事件信息, dict格式。
 
     将代码内部的事件信息转化为传输格式的事件信息。
+    转化后格式应为:
+    {
+        "type": 1,
+        "level": 1,
+        "start_time": "2023-12-06 11:11:11",
+        "end_time": "2023-12-06 11:11:11",
+        "lane": 1,
+        "raw_class": 1,
+        "point_wgs84": {
+            "lat": 33.33,
+            "lon": 111.11
+        },
+        "device_type": 1,
+        "device_id": "K70+800"
+    }
     '''
     outerEvents = []
     for type in events.keys():
@@ -328,5 +366,7 @@ def eventsInner2Outer(events: dict) -> list:
             continue
         for eventID in events[type]['items']:
             outerEvents.append(events[type]['items'][eventID])
+    # 将type映射到int型
+    # 
 
     return outerEvents
