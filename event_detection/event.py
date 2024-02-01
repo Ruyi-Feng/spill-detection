@@ -50,7 +50,9 @@ class EventMng():
         # initialize event ID
         self.eventIdCount = {type: 0 for type in eventTypes}  # 每类最多百万
 
-    def run(self, type: str, startTime: int, endTime:int, *info: any):
+    def run(self, type: str, startTime: int, endTime:int,
+            # ifNewEventID: bool,
+            *info: any):
         '''function run
 
         input
@@ -69,10 +71,11 @@ class EventMng():
         '''
         # distribute event ID
         idLen = 7
+        # if ifNewEventID:
+        #     self.eventIdCount[type] += 1
+        #     self.eventIdCount[type] %= (10 ** (idLen - 1))
         eventID = self.typeCharDict[type] + \
             int2strID(self.eventIdCount[type], idLen)
-        self.eventIdCount[type] += 1
-        self.eventIdCount[type] %= (10 ** (idLen - 1))
         # formulate event info
         event = self._generateEvent(type, eventID, startTime, endTime, info)
         # add event to events
