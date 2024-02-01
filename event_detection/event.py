@@ -242,7 +242,7 @@ class IncidentEvent(BaseEvent):
     vx1, vy1, vx2, vy2: float, 事件发生的车辆速度
     speed1, speed2: float, 事件发生的车辆速度
     a1, a2: float, 事件发生的车辆加速度
-    lat1, lon1, lat2, lon2: float, 事件发生的车辆经纬度
+    lat, lon: float, 事件发生的车辆经纬度
     '''
     def __init__(self, type: str, eventID: str,
                  startTime: str, endTime:str,
@@ -271,10 +271,8 @@ class IncidentEvent(BaseEvent):
         self.speed2 = car2['speed']
         self.a1 = car1['a']
         self.a2 = car2['a']
-        self.lat1 = car1['latitude']
-        self.lon1 = car1['longitude']
-        self.lat2 = car2['latitude']
-        self.lon2 = car2['longitude']
+        self.lat = car1['latitude']     # 撞车的两车位置应当一样
+        self.lon = car1['longitude']
 
 
 class CrowdEvent(BaseEvent):
