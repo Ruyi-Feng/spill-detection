@@ -133,4 +133,5 @@ class Controller:
         events = self.edt.run(cars)
         # 发送数据
         msg, events = self.drv.send(cars.copy(), events)
+        # 事件上报(events有多个时，上报多次每次上报一个event)
         return msg, events
