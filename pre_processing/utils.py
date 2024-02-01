@@ -20,13 +20,13 @@ def frameDelete(contextFrames: dict, lastTimestamp: int) -> None:
     guid_list = list(contextFrames.keys())
     for guid in guid_list:
         if (
-            lastTimestamp - contextFrames[guid][0]["timeStamp"]
+            lastTimestamp - contextFrames[guid][0]["timestamp"]
             > HistoricalInterval
         ):
             del contextFrames[guid][0]
         if (
             len(contextFrames[guid]) == 0
-            or lastTimestamp - contextFrames[guid][-1]["timeStamp"]
+            or lastTimestamp - contextFrames[guid][-1]["timestamp"]
             > UpdateInterval
         ):
             del contextFrames[guid]
@@ -58,26 +58,26 @@ def framesCombination(
         for guid, objInfo in currentFrame.items():
             # 记录最新帧出现的目标id
             latestIdSet.add(guid)
-            objInfo["timeStamp"] = objInfo["secMark"]
-            while objInfo["timeStamp"] < lastTimestamp:
-                objInfo["timeStamp"] += MaxSecMark     # tdy?
+            objInfo["timestamp"] = objInfo["secMark"]
+            while objInfo["timestamp"] < lastTimestamp:
+                objInfo["timestamp"] += MaxSecMark     # tdy?
             contextFrames.setdefault(guid, [])
             if (
                 len(contextFrames[guid])
-                and contextFrames[guid][-1]["timeStamp"]
-                == objInfo["timeStamp"]
+                and contextFrames[guid][-1]["timestamp"]
+                == objInfo["timestamp"]
             ):
                 contextFrames[guid][-1] = objInfo
             else:
                 contextFrames[guid].append(objInfo)
-            current_secMark = objInfo["timeStamp"]
+            current_secMark = objInfo["timestamp"]
         lastTimestamp = current_secMark
         frameDelete(contextFrames, lastTimestamp)
         return latestIdSet, lastTimestamp
     # 如果历史数据为空, 直接添加
     latestIdSet = set()
     for guid, objInfo in currentFrame.items():
-        lastTimestamp = objInfo["timeStamp"] = objInfo["secMark"]
+        lastTimestamp = objInfo["timestamp"] = objInfo["secMark"]
         contextFrames[guid] = [objInfo]
         latestIdSet.add(guid)
     return latestIdSet, lastTimestamp
@@ -99,7 +99,7 @@ def getCurrentFrame(frames: dict, lastTimestamp: int) -> dict:
     """
     latestFrame = {}
     for objInfo in frames.values():
-        if objInfo[-1]["timeStamp"] == lastTimestamp:
+        if objInfo[-1]["timestamp"] == lastTimestamp:
             obj_id = objInfo[-1]["id"]
             latestFrame[obj_id] = objInfo[-1]
     return latestFrame

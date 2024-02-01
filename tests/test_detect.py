@@ -163,7 +163,7 @@ def testCrowd():
     ed.lanes[3].k = 30
     ed.lanes[3].v = 3
     cars = [{'id': 1, 'x': 0.1, 'y': 3.0, 'vx': 0.13, 'vy': 3.0, 'laneID': 3,
-             'ay': 0, 'ax': 0, 'a': 0, 'timeStamp': 200, 'speed': 3.0}]
+             'ay': 0, 'ax': 0, 'a': 0, 'timestamp': 200, 'speed': 3.0}]
     ed.eventTypes = ['crowd']
     events = ed.run(cars)
     for type in events:

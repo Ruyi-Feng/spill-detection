@@ -47,7 +47,6 @@ def main():
         hp.postData(events)
 
 
-
 if __name__ == "__main__":
     # simulatedMain()
     main()

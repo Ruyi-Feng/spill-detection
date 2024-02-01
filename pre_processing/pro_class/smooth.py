@@ -67,7 +67,7 @@ class Exponential:
         ):
             return objInfo
         last = objInfo[-2]
-        deltaTime = current["timeStamp"] - last["timeStamp"]
+        deltaTime = current["timestamp"] - last["timestamp"]
         if deltaTime > self._smoothThreshold:
             return objInfo
         for j in ("x", "y"):

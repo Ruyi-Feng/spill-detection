@@ -4,15 +4,15 @@
 dataIncident = [
     [
         {'id': 1, 'x': 2.36, 'y': 25, 'vx': 0.13, 'vy': 20,
-         'laneID': 4, 'ax': 0, 'ay': 10, 'a': 10, 'timeStamp': 0, 'speed': 20},
+         'laneID': 4, 'ax': 0, 'ay': 10, 'a': 10, 'timestamp': 0, 'speed': 20},
         {'id': 2, 'x': 2.36, 'y': 26, 'vx': 0.13, 'vy': 20,
-         'laneID': 4, 'ax': 0, 'ay': 10, 'a': 10, 'timeStamp': 0, 'speed': 20},
+         'laneID': 4, 'ax': 0, 'ay': 10, 'a': 10, 'timestamp': 0, 'speed': 20},
     ],
     [
         {'id': 1, 'x': 2.36, 'y': 26, 'vx': 0, 'vy': 0,
-         'laneID': 4, 'ax': 0, 'ay': 10, 'a': 10, 'timeStamp': 0, 'speed': 20},
+         'laneID': 4, 'ax': 0, 'ay': 10, 'a': 10, 'timestamp': 0, 'speed': 20},
         {'id': 2, 'x': 2.36, 'y': 26.5, 'vx': 0, 'vy': 0,
-         'laneID': 4, 'ax': 0, 'ay': 10, 'a': 10, 'timeStamp': 0, 'speed': 20},
+         'laneID': 4, 'ax': 0, 'ay': 10, 'a': 10, 'timestamp': 0, 'speed': 20},
     ]
 ]
 

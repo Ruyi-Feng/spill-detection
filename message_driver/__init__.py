@@ -19,7 +19,7 @@ for key in interface.keys():
     interface_back[interface[key]] = key
 
 # 从内部数据输出到外部应删除的键值
-keys2delete = ['laneNeedAdd', 'speed', 'a', 'ax', 'ay', 'timeStamp', 'secMark']
+keys2delete = ['laneNeedAdd', 'speed', 'a', 'ax', 'ay', 'timestamp', 'secMark']
 
 # count记录最大值(达到后重置)ss
 maxCount = 60000
@@ -131,8 +131,8 @@ class Driver():
         # TODO 后续根据具体情况, 将时间戳转化为以毫秒ms为单位的时间戳
         # 可以转化成unix时间戳(统一确定了一个时间原点), 再将这个s为单位的数据转化为ms为单位
         # 统一将时间戳记为以毫秒ms为单位
-        car['timeStamp'] = self.count * self.timeIntervalMs
-        car['secMark'] = car['timeStamp'] % maxCount           # 用于complete使用
+        car['timestamp'] = self.count * self.timeIntervalMs
+        car['secMark'] = car['timestamp'] % maxCount           # 用于complete使用
 
     def _formatTransInner2Outer(self, car: dict) -> dict:
         '''function _formatTransInner2Outer
