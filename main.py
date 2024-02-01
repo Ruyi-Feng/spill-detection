@@ -44,7 +44,7 @@ def main():
         if len(events) == 0:
             continue    # 未检测到事件
         # 上报事件
-        hp.postData(events)
+        hp.run(events)
 
 
 if __name__ == "__main__":

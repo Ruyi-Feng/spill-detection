@@ -53,7 +53,7 @@ class HttpPoster():
     url: str, http上报的url
     用法:
     poster = HttpPoster(url)
-    poster.postData(data)
+    poster.run(data)
     将data上报到url
     '''
     def __init__(self, url):
@@ -65,8 +65,11 @@ class HttpPoster():
         '''
         self.url = url
 
-    def postData(self, data):
-        '''function postData
+    def run(self, events: list):
+        pass
+
+    def postData(self, data: dict):
+        '''function run
 
         input
         -----
