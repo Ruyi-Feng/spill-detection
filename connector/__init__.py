@@ -66,6 +66,17 @@ class HttpPoster():
         self.url = url
 
     def run(self, events: list):
+        '''function run
+
+        input
+        -----
+        events: list, 需要上报的事件列表
+
+        将事件列表中的事件以POST形式上传给http.
+        按照协议要求, 逐个上报
+        '''
+        for event in events:
+            self.postData(event)
         pass
 
     def postData(self, data: dict):
