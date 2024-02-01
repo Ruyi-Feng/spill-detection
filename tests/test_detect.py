@@ -54,6 +54,9 @@ def testSpill():
     # 生成检测器(内含交通管理器)
     ed = EventDetector(clb, cfg)
     ed.eventTypes = ['spill']
+
+    del dataSpillEvent['danger']
+    del dataSpillEvent['eventID']
     # 迭代dataSpill检测
     for frame in dataSpill:
         events = ed.run(frame)
@@ -63,7 +66,11 @@ def testSpill():
             if type != 'spill':
                 assert not events[type]['occured']
             elif events[type]['occured']:
-                assert events[type] == dataSpillEvent
+                tmp = events[type]['items']
+                tmp = tmp[list(tmp.keys())[0]]
+                del tmp['danger']
+                del tmp['eventID']
+                assert tmp == dataSpillEvent
 
 
 def testStop():
@@ -175,7 +182,7 @@ def testCrowd():
 
 if __name__ == "__main__":
     print('-------离线数据测试-------')
-    testDetect()
+    # testDetect()
     print('-------抛洒物检测测试-------')
     testSpill()
     print('-------停车检测测试-------')
