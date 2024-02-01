@@ -4,7 +4,7 @@ from message_driver import Driver
 from pre_processing import PreProcessor
 from event_detection import EventDetector
 from utils import loadConfig, loadYaml
-
+import time
 
 '''Controller is to control the whole process of the project.'''
 
@@ -50,7 +50,13 @@ class Controller:
         self.calibFrames = cfg['calibSeconds'] * cfg['fps']
         self.calibCount = 0
         if not (os.path.exists(clbPath)) | self.cfg['ifRecalib']:
-            print('******开始标定过程******')
+            print('******开始标定过程******', end=' ')
+            startTime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+            endTime = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(
+                time.time()+ cfg['calibSeconds']))
+            print(f"开始时刻: {startTime},
+                  标定时长: {cfg['calibSeconds']}s,
+                  预计结束时刻: {endTime}")
             # 没有cfg或者配置需要则标定
             self.needClb = True
             clbtor = Calibrator(clbPath=clbPath, fps=cfg['fps'],
@@ -60,7 +66,6 @@ class Controller:
                                 qMerge=cfg['qMerge'])
             self.clbtor = clbtor
         else:   # 有cfg则读取, 不需要标定
-            print('******开始接收数据******')
             self.clb = loadYaml(clbPath)
             self.startDetect()
 
@@ -83,7 +88,6 @@ class Controller:
             self.needClb = False
             self.clbtor.calibrate()
             self.clbtor.save()
-            print('******开始接收数据******')
             self.clb = loadYaml(self.clbPath)
             self.startDetect()   # 凯奇事件检测
 
@@ -92,6 +96,9 @@ class Controller:
 
         在完成标定或读取标定后正式启动事件检测。
         '''
+        print('******开始事件检测******', end=' ')
+        print('开始时刻: {}'.format(
+            time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
         # 生成数据预处理器
         self.pp = PreProcessor(self.cfg['maxCompleteTime'],
                                self.cfg['smoothAlpha'])
