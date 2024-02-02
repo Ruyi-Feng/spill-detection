@@ -361,7 +361,7 @@ class DriverOnline:
 
         return newCar
 
-    def _eventsInner2Outer(events: dict) -> list:
+    def _eventsInner2Outer(self, events: dict) -> list:
         '''function _eventsInner2OuterOffline
 
         input
@@ -391,7 +391,7 @@ class DriverOnline:
                 continue
             for eventID in events[type]['items']:
                 event = events[type]['items'][eventID]  # dict型
-
+                event = self._eventInner2Outer(event)
                 outerEvents.append(event)
 
         return outerEvents
