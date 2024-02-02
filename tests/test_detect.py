@@ -24,6 +24,7 @@ clb = loadYaml(calibPath)
 
 def testDetect():
     '''离线数据测试'''
+    print('-------离线数据测试-------')
     # 生成仿真器
     dataPath = './data/result.txt'
     smltor = Smltor(dataPath)
@@ -51,6 +52,7 @@ def testDetect():
 
 
 def testSpill():
+    print('-------抛洒物检测测试-------')
     # 生成检测器(内含交通管理器)
     ed = EventDetector(clb, cfg)
     ed.eventTypes = ['spill']
@@ -74,6 +76,7 @@ def testSpill():
 
 
 def testStop():
+    print('-------停车检测测试-------')
     # 生成检测器
     ed = EventDetector(clb, cfg)
     ed.eventTypes = ['stop']
@@ -90,6 +93,7 @@ def testStop():
 
 
 def testLowSpeed():
+    print('-------低速检测测试-------')
     # 生成检测器
     ed = EventDetector(clb, cfg)
     ed.eventTypes = ['lowSpeed']
@@ -105,6 +109,7 @@ def testLowSpeed():
 
 
 def testHighSpeed():
+    print('-------高速检测测试-------')
     # 生成检测器
     ed = EventDetector(clb, cfg)
     ed.eventTypes = ['highSpeed']
@@ -120,6 +125,7 @@ def testHighSpeed():
 
 
 def testIllegalOccupation():
+    print('-------非法占用应急车道检测测试-------')
     # 生成检测器
     ed = EventDetector(clb, cfg)
     ed.eventTypes = ['illegalOccupation']
@@ -135,6 +141,7 @@ def testIllegalOccupation():
 
 
 def testEmgcBrake():
+    print('-------紧急刹车检测测试-------')
     # 生成检测器
     ed = EventDetector(clb, cfg)
     ed.eventTypes = ['emgcBrake']
@@ -150,6 +157,7 @@ def testEmgcBrake():
 
 
 def testIncident():
+    print('-------事件检测测试-------')
     # 生成检测器
     ed = EventDetector(clb, cfg)
     ed.eventTypes = ['incident']
@@ -165,6 +173,7 @@ def testIncident():
 
 
 def testCrowd():
+    print('-------拥堵检测测试-------')
     # 生成检测器(内含交通管理器)
     ed = EventDetector(clb, cfg)
     ed.lanes[3].k = 30
@@ -182,21 +191,12 @@ def testCrowd():
 
 
 if __name__ == "__main__":
-    print('-------离线数据测试-------')
-    # testDetect()
-    print('-------抛洒物检测测试-------')
-    testSpill()
-    print('-------停车检测测试-------')
-    testStop()
-    print('-------低速检测测试-------')
-    testLowSpeed()
-    print('-------高速检测测试-------')
-    testHighSpeed()
-    print('-------非法占用应急车道检测测试-------')
-    testIllegalOccupation()
-    print('-------紧急刹车检测测试-------')
-    testEmgcBrake()
-    print('-------事件检测测试-------')
-    testIncident()
-    print('-------拥堵检测测试-------')
-    testCrowd()
+    testDetect()
+    # testSpill()
+    # testStop()
+    # testLowSpeed()
+    # testHighSpeed()
+    # testIllegalOccupation()
+    # testEmgcBrake()
+    # testIncident()
+    # testCrowd()
