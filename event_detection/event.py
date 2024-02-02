@@ -2,7 +2,7 @@ from copy import deepcopy
 from utils import int2strID
 from traffic_manager.lane_manager import LaneMng
 from traffic_manager.cell_manager import CellMng
-from event_detection import typeCharDict, typeIdDict
+from utils.default import typeCharDict, typeIdDict
 
 '''This is to define the event class and event manager class.'''
 

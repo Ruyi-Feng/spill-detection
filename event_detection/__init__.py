@@ -7,14 +7,6 @@ from utils.car_utils import getCarFromCars, getCarBaseInfo
 '''The module is to detect events. Params are defined in config.json.'''
 
 
-defaultEventTypes = ["spill", "stop", "lowSpeed", "highSpeed",
-                     "emgcBrake", "incident", "crowd", "illegalOccupation"]
-typeIdDict = {defaultEventTypes[i]: i for i in
-              range(len(defaultEventTypes))}
-typeCharDict = {defaultEventTypes[i]: chr(i+65) for i in
-                range(len(defaultEventTypes))}
-
-
 class EventDetector(TrafficMng):
     '''class EventDetector
 
@@ -22,12 +14,6 @@ class EventDetector(TrafficMng):
     唯一对外调用函数: `run(cars)`, 用于更新交通流信息, 检测交通事件, 输出并返回事件列表。
     此种定义下, 在外围调用时, 无需生成TrafficMng类,
     只需生成EventDetector类即可, EventDetector可直接调用TrafficMng的方法。
-
-    TODO
-    1. 单车事件报警, 后续可能需要调整为判定一次+结束一次
-    (判定报警已完成, 结束报警应在deleteNoUsePotentialDictKeys中添加)
-    2. 肇事事件报警, 只需判定一次即可。因此其dict的记录与操作与其他不同
-    3. 抛洒物、拥堵事件报警, 需要判定一次+定期n次, 后续每隔一定时间都要报警一次
 
     Properties
     ----------

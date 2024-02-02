@@ -1,4 +1,4 @@
-from event_detection import typeIdDict
+from utils.default import typeIdDict
 
 
 '''Define the send and receive interface processor of message.'''
@@ -110,7 +110,9 @@ class DriverOffline:
                      'Xsize': 'width',
                      'Ysize': 'length',
                      'TargetType': 'class',
-                     'LineNum': 'laneID'
+                     'LineNum': 'laneID',
+                     'Latitude': 'latitude',
+                     'Longitude': 'longitude',
                      }
         # 返还数据格式接口, 从内部处理数据转化为输出数据
         interfaceBack = dict()
@@ -213,7 +215,7 @@ class DriverOffline:
             if k in car.keys():
                 del car[k]
 
-    def _eventsInner2Outer(events: dict) -> list:
+    def _eventsInner2Outer(self, events: dict) -> list:
         '''function _eventsInner2OuterOffline
 
         input
