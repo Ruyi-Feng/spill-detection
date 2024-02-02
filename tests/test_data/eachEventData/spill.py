@@ -76,5 +76,7 @@ dataSpillEvent = {
     'order': 12,
     'start': 150.0,
     'end': 200.0,
-    'danger': 1.0999999999999999
+    'danger': 1.0999999999999999,
+    'lat': 12,
+    'lon': 200
 }
