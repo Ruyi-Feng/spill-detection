@@ -71,7 +71,7 @@ class Driver():
                 return False
         return True
 
-    def send(self, cars: list, events: dict) ->  (list, list):
+    def send(self, cars: list, events: dict) -> (list, list):
         '''function send
         input
         ------
@@ -99,26 +99,26 @@ class DriverOffline:
     '''
     def __init__(self, fps) -> None:
         self.fps = fps
-        self.count = 0                          # 用于开发阶段测试, 不用于实际部署        
+        self.count = 0                          # 用于开发阶段测试, 不用于实际部署
         self.timeIntervalMs = int(1000 / fps)   # 用于开发阶段测试, 不用于实际部署
         # 数据格式接口, 从接收数据转化为内部处理数据
         interface = {'TargetId': 'id',
-                    'XDecx': 'x',
-                    'YDecy': 'y',
-                    'VDecVx': 'vx',
-                    'VDecVy': 'vy',
-                    'Xsize': 'width',
-                    'Ysize': 'length',
-                    'TargetType': 'class',
-                    'LineNum': 'laneID'
-                    }
+                     'XDecx': 'x',
+                     'YDecy': 'y',
+                     'VDecVx': 'vx',
+                     'VDecVy': 'vy',
+                     'Xsize': 'width',
+                     'Ysize': 'length',
+                     'TargetType': 'class',
+                     'LineNum': 'laneID'
+                     }
         # 返还数据格式接口, 从内部处理数据转化为输出数据
         interfaceBack = dict()
         for key in interface.keys():
             interfaceBack[interface[key]] = key
         # 从内部数据输出到外部应删除的键值
         keys2delete = ['laneNeedAdd', 'speed', 'a', 'ax', 'ay',
-                    'timestamp', 'secMark']
+                       'timestamp', 'secMark']
         self.interface = interface
         self.interfaceBack = interfaceBack
         self.keys2delete = keys2delete
@@ -250,6 +250,9 @@ class DriverOnline:
             interfaceBack[interface[key]] = key
         # 从内部数据输出到外部应删除的键值
         keys2delete = ['laneNeedAdd', 'a', 'ax', 'ay', 'secMark']
+        self.interface = interface
+        self.interfaceBack = interfaceBack
+        self.keys2delete = keys2delete
 
     def recieve(self, msg: dict) -> list:
         '''function recieve
@@ -290,7 +293,7 @@ class DriverOnline:
             self._formatTransOuter2Inner(car)
         return msg['targets']
 
-    def send(self, cars: list, events: dict) ->  (list, list):
+    def send(self, cars: list, events: dict) -> (list, list):
         '''function send
         input
         ------
@@ -388,8 +391,6 @@ class DriverOnline:
                 event = events[type]['items'][eventID]  # dict型
 
                 outerEvents.append(event)
-        # 将type映射到int型
-        # 
 
         return outerEvents
 
@@ -399,7 +400,7 @@ class DriverOnline:
         input
         -----
         event: dict, 代码内部的事件信息, dict格式。
-        
+
         修改event格式为协议中的格式。
         修改前:
         {
