@@ -1,5 +1,5 @@
 from kafka import KafkaConsumer
-from requests import post
+import requests
 import json 
 
 '''Connect the server and algorithms by Kafka.'''
@@ -79,7 +79,7 @@ class HttpPoster():
             self.postData(event)
         pass
 
-    def postData(self, data: dict):
+    def postData(self, data: dict) -> requests.Response:
         '''function run
 
         input
@@ -88,4 +88,5 @@ class HttpPoster():
 
         将字典格式的数据以POST形式上传给http
         '''
-        post(self.url, data=data)
+        r = requests.post(self.url, data=data)
+        return r
