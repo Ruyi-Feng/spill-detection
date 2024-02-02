@@ -47,7 +47,6 @@ for i in range(frameNum):
         dataSpill[i][j]['timestamp'] = i / fps * 1000
 
 
-
 # dataSpillEvent = {
 #     'name': 'spill',
 #     'occured': True,
@@ -77,5 +76,7 @@ dataSpillEvent = {
     'order': 12,
     'start': 150.0,
     'end': 200.0,
-    'danger': 1.0999999999999999
+    'danger': 1.0999999999999999,
+    'lat': 12,
+    'lon': 200
 }

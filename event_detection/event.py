@@ -2,7 +2,7 @@ from copy import deepcopy
 from utils import int2strID
 from traffic_manager.lane_manager import LaneMng
 from traffic_manager.cell_manager import CellMng
-from event_detection import defaultEventTypes, typeCharDict, typeIdDict
+from utils.default import typeCharDict, typeIdDict
 
 '''This is to define the event class and event manager class.'''
 
@@ -50,7 +50,7 @@ class EventMng():
         # initialize event ID
         self.eventIdCount = {type: 0 for type in eventTypes}  # 每类最多百万
 
-    def run(self, type: str, startTime: int, endTime:int,
+    def run(self, type: str, startTime: int, endTime: int,
             # ifNewEventID: bool,
             *info: any):
         '''function run
@@ -89,7 +89,8 @@ class EventMng():
         '''
         self.events = deepcopy(self.eventsFormat)
 
-    def _generateEvent(self, type: str, eventID: str, startTime: int, endTime:int, info: any):
+    def _generateEvent(self, type: str, eventID: str,
+                       startTime: int, endTime: int, info: any):
         '''function _generateEvent
 
         生成事件实例, 用于添加到events中
@@ -127,7 +128,7 @@ class BaseEvent():
     -------
     __init__: 初始化事件
     '''
-    def __init__(self, type: str, eventID: str, startTime: str, endTime:str):
+    def __init__(self, type: str, eventID: str, startTime: str, endTime: str):
         '''function __init__
 
         初始化事件
@@ -158,7 +159,7 @@ class SpillEvent(BaseEvent):
     lon: int, 事件发生的元胞的start
     '''
     def __init__(self, type: str, eventID: str,
-                 startTime: str, endTime:str,
+                 startTime: str, endTime: str,
                  cell: CellMng):
         '''function __init__
 
@@ -204,7 +205,7 @@ class SingleCarEvent(BaseEvent):
     lon: float, 事件发生的车辆经度
     '''
     def __init__(self, type: str, eventID: str,
-                 startTime: str, endTime:str,
+                 startTime: str, endTime: str,
                  car: dict):
         '''function __init__
 
@@ -245,7 +246,7 @@ class IncidentEvent(BaseEvent):
     lat, lon: float, 事件发生的车辆经纬度
     '''
     def __init__(self, type: str, eventID: str,
-                 startTime: str, endTime:str,
+                 startTime: str, endTime: str,
                  car1: dict, car2: dict):
         '''function __init__
 
@@ -292,7 +293,7 @@ class CrowdEvent(BaseEvent):
     v: float, 事件发生的lane的v
     '''
     def __init__(self, type: str, eventID: str,
-                 startTime: str, endTime:str,
+                 startTime: str, endTime: str,
                  lane: LaneMng):
         '''function __init__
 

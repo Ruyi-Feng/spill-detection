@@ -1,16 +1,17 @@
 from kafka import KafkaConsumer
 import requests
-import json 
+import json
+
 
 '''Connect the server and algorithms by Kafka.'''
 
 
-class KafkaConsumer():
-    '''class KafkaConsumer
+class MyKafkaConsumer():
+    '''class MyKafkaConsumer
 
     properties
     ----------
-    consumer: KafkaConsumer, kafka消费者
+    consumer: MyKafkaConsumer, kafka消费者
     用法:
     message = consumer.run()
     从broker接收数据, 得到message
@@ -40,7 +41,7 @@ class KafkaConsumer():
                 msgStr = message.value.decode('utf-8')
                 msgDict = json.loads(msgStr)
                 yield msgDict
-        except:
+        except Exception:
             # pass
             yield None
 

@@ -4,4 +4,4 @@ pandas
 PyYAML
 tqdm
 requests
-kafka-python==3.5.1
+kafka-python

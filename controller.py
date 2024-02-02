@@ -52,11 +52,11 @@ class Controller:
         if not (os.path.exists(clbPath)) | self.cfg['ifRecalib']:
             print('******开始标定过程******', end=' ')
             startTime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-            endTime = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(
-                time.time()+ cfg['calibSeconds']))
-            print(f"开始时刻: {startTime},
-                  标定时长: {cfg['calibSeconds']}s,
-                  预计结束时刻: {endTime}")
+            endTime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(
+                time.time() + cfg['calibSeconds']))
+            print(f"开始时刻: {startTime}," +
+                  f"标定时长: {cfg['calibSeconds']}s," +
+                  f"预计结束时刻: {endTime}")
             # 没有cfg或者配置需要则标定
             self.needClb = True
             clbtor = Calibrator(clbPath=clbPath, fps=cfg['fps'],

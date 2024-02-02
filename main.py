@@ -1,7 +1,8 @@
 from controller import Controller
-from connector import KafkaConsumer, HttpPoster
+from connector import MyKafkaConsumer, HttpPoster
 from rsu_simulator import Smltor
 from utils import loadConfig
+
 
 def simulatedMain():
     configPath = './config.yml'
@@ -26,10 +27,10 @@ def main():
     controller = Controller(configPath, clbPath)
     # 生成kafka消费者
     cfg = loadConfig(configPath)
-    kc = KafkaConsumer(cfg['kafka']['ip'],
-                       cfg['kafka']['topic'],
-                       cfg['kafka']['groupid'],
-                       cfg['kafka']['key'])
+    kc = MyKafkaConsumer(cfg['kafka']['ip'],
+                         cfg['kafka']['topic'],
+                         cfg['kafka']['groupid'],
+                         cfg['kafka']['key'])
     # 生成http上报器
     hp = HttpPoster(cfg['http']['url'])
 

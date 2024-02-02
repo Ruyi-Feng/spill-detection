@@ -1,5 +1,5 @@
 import yaml
-from event_detection import defaultEventTypes
+from utils.default import defaultEventTypes
 
 '''Contain commonly used functions.'''
 
