@@ -22,7 +22,7 @@ calInterval: 30
 eventTypes: ["spill", "stop", "lowSpeed", "highSpeed", "emgcBrake", "incident", "crowd", "illegalOccupation"]
 tTolerance: 300
 qStandard: 10000
-vLateral: 0.56
+vLateral: 3
 rate2: 0.0017
 spillWarnFreq: 300
 vStop: 1

@@ -98,7 +98,8 @@ class EventMng():
         # startTime和endTime转化为年月日时分秒格式
 
         if type == 'spill':
-            event = SpillEvent(type, eventID, startTime, endTime, info[0])
+            event = SpillEvent(type, eventID, startTime, endTime,
+                               info[0], info[1], info[2])
         elif type in ['stop', 'lowSpeed', 'highSpeed',
                       'emgcBrake', 'illegalOccupation']:
             event = SingleCarEvent(type, eventID, startTime, endTime, info[0])
@@ -106,7 +107,8 @@ class EventMng():
             event = IncidentEvent(type, eventID, startTime, endTime,
                                   info[0], info[1])
         elif type == 'crowd':
-            event = CrowdEvent(type, eventID, startTime, endTime, info[0])
+            event = CrowdEvent(type, eventID, startTime, endTime,
+                               info[0], info[1], info[2])
         else:
             raise ValueError(f"Invalid event type '{type}' is defined.")
         return event
@@ -160,7 +162,8 @@ class SpillEvent(BaseEvent):
     '''
     def __init__(self, type: str, eventID: str,
                  startTime: str, endTime: str,
-                 cell: CellMng):
+                 cell: CellMng,
+                 deviceID: str, deviceType: str):
         '''function __init__
 
         input
@@ -170,6 +173,8 @@ class SpillEvent(BaseEvent):
         startTime: str, 事件发生时间
         endTime: str, 事件结束时间
         cell: CellMng, 事件发生的cell
+        deviceID: str, 事件发生的设备ID
+        deviceType: str, 事件发生的设备类型
         '''
         super().__init__(type, eventID, startTime, endTime)
         self.laneID = cell.laneID
@@ -182,6 +187,8 @@ class SpillEvent(BaseEvent):
         self.danger = cell.danger
         self.lat = self.order      # for compatibility
         self.lon = cell.start      # for compatibility
+        self.deviceID = deviceID
+        self.deviceType = deviceType
 
 
 class SingleCarEvent(BaseEvent):
@@ -203,6 +210,8 @@ class SingleCarEvent(BaseEvent):
     a: float, 事件发生的车辆加速度
     lat: float, 事件发生的车辆纬度
     lon: float, 事件发生的车辆经度
+    deviceID: str, 事件发生的设备ID
+    deviceType: str, 事件发生的设备类型
     '''
     def __init__(self, type: str, eventID: str,
                  startTime: str, endTime: str,
@@ -226,6 +235,8 @@ class SingleCarEvent(BaseEvent):
         self.a = car['a']
         self.lat = car['latitude']
         self.lon = car['longitude']
+        self.deviceID = car['deviceID']
+        self.deviceType = car['deviceType']
 
 
 class IncidentEvent(BaseEvent):
@@ -244,6 +255,8 @@ class IncidentEvent(BaseEvent):
     speed1, speed2: float, 事件发生的车辆速度
     a1, a2: float, 事件发生的车辆加速度
     lat, lon: float, 事件发生的车辆经纬度
+    deviceID: str, 事件发生的设备ID
+    deviceType: str, 事件发生的设备类型
     '''
     def __init__(self, type: str, eventID: str,
                  startTime: str, endTime: str,
@@ -274,6 +287,8 @@ class IncidentEvent(BaseEvent):
         self.a2 = car2['a']
         self.lat = car1['latitude']     # 撞车的两车位置应当一样
         self.lon = car1['longitude']
+        self.deviceID = car1['deviceID']
+        self.deviceType = car1['deviceType']
 
 
 class CrowdEvent(BaseEvent):
@@ -291,10 +306,15 @@ class CrowdEvent(BaseEvent):
     q: float, 事件发生的lane的q
     k: float, 事件发生的lane的k
     v: float, 事件发生的lane的v
+    lat: int, 事件发生的lane的ID
+    lon: float, 事件发生的lane的q
+    deviceID: str, 事件发生的设备ID
+    deviceType: str, 事件发生的设备类型
     '''
     def __init__(self, type: str, eventID: str,
                  startTime: str, endTime: str,
-                 lane: LaneMng):
+                 lane: LaneMng,
+                 deviceID: str, deviceType: str):
         '''function __init__
 
         input
@@ -312,3 +332,5 @@ class CrowdEvent(BaseEvent):
         self.v = lane.v
         self.lat = lane.ID  # for compatibility
         self.lon = lane.q   # for compatibility
+        self.deviceID = deviceID
+        self.deviceType = deviceType

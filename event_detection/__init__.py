@@ -183,6 +183,9 @@ class EventDetector(TrafficMng):
 
         检测抛洒物事件, 输出并返回事件列表
         '''
+        # 设备信息
+        deviceID = cars[0]['deviceID']
+        deviceType = cars[0]['deviceType']
         self.updateDanger()     # 更新危险度
         # 检查是否存在抛洒物可能
         for id in self.lanes:
@@ -205,6 +208,7 @@ class EventDetector(TrafficMng):
                     deltaTs = deltaTms / 1000
                     # 报警
                     if deltaTs % self.spillWarnFreq == 0:
+                        # 获取报警基础信息
                         cellStart = self.lanes[id].cells[order].start
                         cellEnd = self.lanes[id].cells[order].end
                         if cellStart >= cellEnd:
@@ -221,14 +225,16 @@ class EventDetector(TrafficMng):
                         self.eventMng.run('spill',
                                           self.dangerDict[(id, order)][0],
                                           -1,  # ifNewEventID,
-                                          self.dangerDict[(id, order)][2])
+                                          self.dangerDict[(id, order)][2],
+                                          deviceID, deviceType)
                 else:   # 未达到1, 检查是否在记录表内, 若在则删除
                     if (id, order) in self.dangerDict.keys():
                         # 生成结束事件告警
                         self.eventMng.run('spill',
                                           self.dangerDict[(id, order)][0],
                                           self.dangerDict[(id, order)][1],
-                                          self.dangerDict[(id, order)][2])
+                                          self.dangerDict[(id, order)][2],
+                                          deviceID, deviceType)
                         del self.dangerDict[(id, order)]
 
         self.resetCellDetermineStatus()
@@ -445,6 +451,9 @@ class EventDetector(TrafficMng):
 
         检测拥堵事件, 输出并返回事件列表
         '''
+        # 获取设备信息
+        deviceID = cars[0]['deviceID']
+        deviceType = cars[0]['deviceType']
         # 遍历车道实例
         for id in self.lanes:
             k = self.lanes[id].k
@@ -471,14 +480,16 @@ class EventDetector(TrafficMng):
                     # ifNewEventID = True if deltaTs == 0 else False
                     self.eventMng.run('crowd',
                                       cars[0]['timestamp'], -1,
-                                      self.lanes[id])
+                                      self.lanes[id],
+                                      deviceID, deviceType)
             else:   # 不满足拥堵条件, 检查是否在记录表内, 若在则删除
                 if id in self.crowdDict.keys():
                     # 生成结束event
                     self.eventMng.run('crowd',
                                       self.crowdDict[id][0],
                                       self.crowdDict[id][1],
-                                      self.crowdDict[id][2])
+                                      self.crowdDict[id][2],
+                                      deviceID, deviceType)
                     del self.crowdDict[id]
 
     def _illegalOccupationDetect(self, cars: list):

@@ -120,7 +120,7 @@ class DriverOffline:
             interfaceBack[interface[key]] = key
         # 从内部数据输出到外部应删除的键值
         keys2delete = ['laneNeedAdd', 'speed', 'a', 'ax', 'ay',
-                       'timestamp', 'secMark']
+                       'timestamp', 'secMark', 'deviceID', 'deviceType']
         self.interface = interface
         self.interfaceBack = interfaceBack
         self.keys2delete = keys2delete
@@ -193,6 +193,9 @@ class DriverOffline:
         # 统一将时间戳记为ms的时间戳
         car['timestamp'] = self.count * self.timeIntervalMs
         car['secMark'] = car['timestamp'] % maxCount           # 用于complete使用
+        # 补充在线数据有的属性
+        car['deviceID'] = 'K68+366'
+        car['deviceType'] = 1
 
     def _formatTransInner2Outer(self, car: dict) -> dict:
         '''function _formatTransInner2Outer
@@ -361,7 +364,7 @@ class DriverOnline:
 
         return newCar
 
-    def _eventsInner2Outer(events: dict) -> list:
+    def _eventsInner2Outer(self, events: dict) -> list:
         '''function _eventsInner2OuterOffline
 
         input
@@ -391,7 +394,7 @@ class DriverOnline:
                 continue
             for eventID in events[type]['items']:
                 event = events[type]['items'][eventID]  # dict型
-
+                event = self._eventInner2Outer(event)
                 outerEvents.append(event)
 
         return outerEvents
