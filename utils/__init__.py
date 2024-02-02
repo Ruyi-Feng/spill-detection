@@ -1,4 +1,5 @@
 import yaml
+from event_detection import defaultEventTypes
 
 '''Contain commonly used functions.'''
 
@@ -10,9 +11,7 @@ defaultConfig = {"fps": 20,
                  "cellLen": 50, "q_Merge": 0,
                  "maxCompleteTime": 20, "smoothAlpha": 0.1,
                  "qDuration": 300, "calInterval": 30,
-                 "eventTypes": ["spill", "stop", "lowSpeed", "highSpeed",
-                                "emgcBrake", "incident", "crowd",
-                                "illegalOccupation"],
+                 "eventTypes": defaultEventTypes,
                  "tTolerance": 300, "qStandard": 10000,
                  "vLateral": 0.56, "rate2": 0.1, "spillWarnFreq": 300,
                  "vStop": 2.778, "durationStop": 5,

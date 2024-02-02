@@ -9,7 +9,7 @@ def test_driver():
     # 得到allMessages
     p = './data/result.txt'
     s = Smltor(p)
-    d = Driver()
+    d = Driver(20)
 
     # 测试数据转化接口
     interface = {'TargetId': 'id',

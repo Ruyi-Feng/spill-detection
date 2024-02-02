@@ -31,7 +31,7 @@ class PreProcessor():
         '''
         # 初次启动
         if (self.lastTimestamp is None) & (len(curFrame) != 0):
-            self.lastTimestamp = curFrame[0]['timeStamp']
+            self.lastTimestamp = curFrame[0]['timestamp']
         # dict组织方便索引
         curFrame = carsList2Dict(curFrame)
         # 补全
@@ -75,8 +75,8 @@ class PreProcessor():
                         contextFrames[key][-2]['vx']
                     deltaVy = curFrame[key]['vy'] - \
                         contextFrames[key][-2]['vy']
-                    deltaT = (curFrame[key]['timeStamp'] -
-                              contextFrames[key][-2]['timeStamp']) / 1000
+                    deltaT = (curFrame[key]['timestamp'] -
+                              contextFrames[key][-2]['timestamp']) / 1000
                     newCurFrame[key]['ax'] = deltaVx / deltaT
                     newCurFrame[key]['ay'] = deltaVy / deltaT
                     newCurFrame[key]['a'] = (newCurFrame[key]['ax']**2 +

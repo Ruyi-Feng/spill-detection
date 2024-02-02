@@ -1,0 +1,17 @@
+FROM bitnami:kafka
+
+# Install dependencies
+RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
+    sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \ 
+    apt-get update && apt-get install -y \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install python
+RUN yum makecache fast;
+RUN yum install python3-devel python3-pip -y
+RUN pip3 install -i https://pypi.douban.com/simple flask
+
+# Install python dependencies
+RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+RUN pip install requests numpy pyyaml kafka-python

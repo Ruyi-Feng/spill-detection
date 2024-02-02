@@ -73,14 +73,14 @@ class Interpolation:
     def _isFrameValid(
         self, objInfo: dict, index: int, delaySecMark: int
     ) -> bool:
-        if objInfo[index]["timeStamp"] <= delaySecMark:
+        if objInfo[index]["timestamp"] <= delaySecMark:
             return False
         # 判断id下一次再出现时是否是位移过远, 是否是无效数据
         disX = objInfo[index]["x"] - objInfo[index - 1]["x"]
         disY = objInfo[index]["y"] - objInfo[index - 1]["y"]
         # 1000 用于毫秒转秒, 计算速度
         timeInterval = (
-            objInfo[index]["timeStamp"] - objInfo[index - 1]["timeStamp"]
+            objInfo[index]["timestamp"] - objInfo[index - 1]["timestamp"]
         ) / 1000
         speed = math.hypot(disX, disY) / timeInterval
         speedMax = self._speedDict[objInfo[index]["ptcType"]]
@@ -94,24 +94,24 @@ class Interpolation:
         for i in ("x", "y"):
             objsInfo[index][i] = objsInfo[index - 1][i] + (
                 objsInfo[index + 1][i] - objsInfo[index - 1][i]
-            ) * (delaySecMark - objsInfo[index - 1]["timeStamp"]) / (
-                objsInfo[index + 1]["timeStamp"]
-                - objsInfo[index - 1]["timeStamp"]
+            ) * (delaySecMark - objsInfo[index - 1]["timestamp"]) / (
+                objsInfo[index + 1]["timestamp"]
+                - objsInfo[index - 1]["timestamp"]
             )
-        objsInfo[index]["timeStamp"] = delaySecMark
+        objsInfo[index]["timestamp"] = delaySecMark
         objsInfo[index]["secMark"] = delaySecMark % utils.MaxSecMark
 
     def _findDelaySecMark(self, frames: dict) -> int:
         # 找到 delaySecMark, 并更新原 frames的 secmark
         maxSec = 0
         for objsInfo in frames.values():
-            maxSecEachId = objsInfo[-1]["timeStamp"]
+            maxSecEachId = objsInfo[-1]["timestamp"]
             maxSec = max(maxSecEachId, maxSec)
         delaySecMark = maxSec
         for objsInfo in frames.values():
             for fr in objsInfo:
-                if fr["timeStamp"] >= maxSec - self._lagTime:
-                    delaySecMark = min(fr["timeStamp"], delaySecMark)
+                if fr["timestamp"] >= maxSec - self._lagTime:
+                    delaySecMark = min(fr["timestamp"], delaySecMark)
                     break
         return delaySecMark
 
@@ -119,13 +119,13 @@ class Interpolation:
         # 判断是否需要做补全, 并调相应函数做补全处理
         updatedLatestFrame = {}
         for objsInfo in frames.values():
-            secMarkList = [fr["timeStamp"] for fr in objsInfo]
+            secMarkList = [fr["timestamp"] for fr in objsInfo]
             index = self._findNearest(secMarkList, delaySecMark)
             if index != 0:
                 if self._isFrameValid(objsInfo, index, delaySecMark):
                     self._complete_obj(objsInfo, index, delaySecMark)
                 for i in range(len(objsInfo) - 1, -1, -1):
-                    if objsInfo[i]["timeStamp"] == delaySecMark:
+                    if objsInfo[i]["timestamp"] == delaySecMark:
                         obj_id = objsInfo[i]["id"]
                         updatedLatestFrame[obj_id] = objsInfo[i]
         return updatedLatestFrame

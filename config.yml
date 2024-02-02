@@ -1,3 +1,9 @@
+ip: 'loacalhost:9092'
+topic: 'trafficTrajectory'
+group: 'group'
+key: None
+http: 'http://localhost:5000'
+
 fps: 20
 
 ifRecalib: false
@@ -17,7 +23,7 @@ eventTypes: ["spill", "stop", "lowSpeed", "highSpeed", "emgcBrake", "incident", 
 tTolerance: 300
 qStandard: 10000
 vLateral: 0.56
-rate2: 0.1
+rate2: 0.0017
 spillWarnFreq: 300
 vStop: 1
 durationStop: 3

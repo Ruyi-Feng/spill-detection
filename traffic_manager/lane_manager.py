@@ -196,6 +196,9 @@ class LaneMng:
         更新cell的危险系数
         '''
         for order in self.cells:
+            # 如果cell不可用, 则跳过, 不更新danger
+            if not self.cells[order].valid:
+                continue
             # 按时间增加r1, 并检查是否需要让前方cell增加r2
             PossibleFrontSpill, _ = self.cells[order].updateDanger()
             # 如果当前遍历的cell发现可能有抛洒物, 前方cell更新危险度+r2

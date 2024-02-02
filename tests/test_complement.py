@@ -7,7 +7,7 @@ def testComplementInterpolation():
             {
                 "id": "ab8756de",
                 "secMark": 59900,
-                "timeStamp": 59900,
+                "timestamp": 59900,
                 "ptcType": "motor",
                 "x": 98,
                 "y": 100,
@@ -17,7 +17,7 @@ def testComplementInterpolation():
             {
                 "id": "ab8756de",
                 "secMark": 100,
-                "timeStamp": 60100,
+                "timestamp": 60100,
                 "ptcType": "motor",
                 "x": 98.5,
                 "y": 100,
@@ -27,7 +27,7 @@ def testComplementInterpolation():
             {
                 "id": "ab8756de",
                 "secMark": 300,
-                "timeStamp": 60300,
+                "timestamp": 60300,
                 "ptcType": "motor",
                 "x": 99.5,
                 "y": 100,
@@ -39,7 +39,7 @@ def testComplementInterpolation():
             {
                 "id": "ab8701de",
                 "secMark": 59900,
-                "timeStamp": 59900,
+                "timestamp": 59900,
                 "ptcType": "motor",
                 "x": 46,
                 "y": 100,
@@ -49,7 +49,7 @@ def testComplementInterpolation():
             {
                 "id": "ab8701de",
                 "secMark": 100,
-                "timeStamp": 60100,
+                "timestamp": 60100,
                 "ptcType": "motor",
                 "x": 56,
                 "y": 100,
@@ -59,7 +59,7 @@ def testComplementInterpolation():
             {
                 "id": "ab8701de",
                 "secMark": 200,
-                "timeStamp": 60200,
+                "timestamp": 60200,
                 "ptcType": "motor",
                 "x": 66,
                 "y": 100,
@@ -69,7 +69,7 @@ def testComplementInterpolation():
             {
                 "id": "ab8701de",
                 "secMark": 300,
-                "timeStamp": 60300,
+                "timestamp": 60300,
                 "ptcType": "motor",
                 "x": 77,
                 "y": 100,
@@ -81,7 +81,7 @@ def testComplementInterpolation():
             {
                 "id": "ab8756an",
                 "secMark": 59900,
-                "timeStamp": 59900,
+                "timestamp": 59900,
                 "ptcType": "motor",
                 "x": 98,
                 "y": 100,
@@ -91,7 +91,7 @@ def testComplementInterpolation():
             {
                 "id": "ab8756an",
                 "secMark": 100,
-                "timeStamp": 60100,
+                "timestamp": 60100,
                 "ptcType": "motor",
                 "x": 98.5,
                 "y": 100,
@@ -101,7 +101,7 @@ def testComplementInterpolation():
             {
                 "id": "ab8756an",
                 "secMark": 300,
-                "timeStamp": 60300,
+                "timestamp": 60300,
                 "ptcType": "motor",
                 "x": 120,
                 "y": 130,

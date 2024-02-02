@@ -27,6 +27,52 @@
 <br>
 TargetId | XDecx | YDecy | ZDecz | VDecVx | VDecVy | Xsize | Ysize | TargetType | Longitude | Latitude | Confidence | EventType | LineNum | Frame
 <br>
+TargetType, EventType的数据内容与对应类别, 可在go的转码代码中找到。
+``
+	var clsMap = map[int8]string{
+	0: "未定义目标",
+	1: "小车",
+	2: "大车",
+	3: "摩托",
+	4: "自行车",
+	5: "行人",
+}
+
+var eventMap = map[uint8]string{
+	1:  "逆行",
+	2:  "大车超高速",
+	3:  "小车超高速",
+	4:  "大车超低速",
+	5:  "小车超低速",
+	6:  "停车",
+	7:  "占用应急车道行驶",
+	8:  "压线",
+	9:  "变道",
+	10: "占用应急车道停车",
+	11: "占用应急车道逆行",
+}
+
+func unifiedEventType(eventType uint8) string {
+	switch eventType {
+	case 1, 11:
+		return "机动车逆行"
+	case 2, 3:
+		return "机动车超速"
+	case 4, 5:
+		return "机动车低速"
+	case 6, 10:
+		return "机动车驶停"
+	case 7:
+		return "占用应急车道行驶" // 特有事件
+	case 8:
+		return "压线" // 特有事件
+	case 9:
+		return "变道" // 特有事件
+	default:
+		return "未知"
+	}
+}
+``
 
 #### 数据传输格式
 参见文档<a href="./docs/data_format.txt" >数据格式</a>

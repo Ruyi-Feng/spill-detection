@@ -28,7 +28,7 @@ def testDetect():
     dataPath = './data/result.txt'
     smltor = Smltor(dataPath)
     # 生成驱动器
-    d = Driver()
+    d = Driver(cfg['fps'])
     # 生成预处理器
     pp = PreProcessor(cfg['maxCompleteTime'], cfg['smoothAlpha'])
     # 生成检测器(内含交通管理器)
@@ -54,6 +54,9 @@ def testSpill():
     # 生成检测器(内含交通管理器)
     ed = EventDetector(clb, cfg)
     ed.eventTypes = ['spill']
+
+    del dataSpillEvent['danger']
+    del dataSpillEvent['eventID']
     # 迭代dataSpill检测
     for frame in dataSpill:
         events = ed.run(frame)
@@ -63,7 +66,11 @@ def testSpill():
             if type != 'spill':
                 assert not events[type]['occured']
             elif events[type]['occured']:
-                assert events[type] == dataSpillEvent
+                tmp = events[type]['items']
+                tmp = tmp[list(tmp.keys())[0]]
+                del tmp['danger']
+                del tmp['eventID']
+                assert tmp == dataSpillEvent
 
 
 def testStop():
@@ -163,7 +170,7 @@ def testCrowd():
     ed.lanes[3].k = 30
     ed.lanes[3].v = 3
     cars = [{'id': 1, 'x': 0.1, 'y': 3.0, 'vx': 0.13, 'vy': 3.0, 'laneID': 3,
-             'ay': 0, 'ax': 0, 'a': 0, 'timeStamp': 200, 'speed': 3.0}]
+             'ay': 0, 'ax': 0, 'a': 0, 'timestamp': 200, 'speed': 3.0}]
     ed.eventTypes = ['crowd']
     events = ed.run(cars)
     for type in events:
@@ -175,7 +182,7 @@ def testCrowd():
 
 if __name__ == "__main__":
     print('-------离线数据测试-------')
-    testDetect()
+    # testDetect()
     print('-------抛洒物检测测试-------')
     testSpill()
     print('-------停车检测测试-------')

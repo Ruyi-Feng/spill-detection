@@ -7,7 +7,8 @@ dataCrowdEvent = {
         {
             'type': 'crowd',
             'eventID': 'G0000000',
-            'time': 200,
+            'startTime': 200,
+            'endTime': -1,
             'laneID': 3,
             'q': 0,
             'k': 30,

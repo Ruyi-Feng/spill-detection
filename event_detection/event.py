@@ -2,6 +2,7 @@ from copy import deepcopy
 from utils import int2strID
 from traffic_manager.lane_manager import LaneMng
 from traffic_manager.cell_manager import CellMng
+from event_detection import defaultEventTypes, typeCharDict, typeIdDict
 
 '''This is to define the event class and event manager class.'''
 
@@ -37,10 +38,9 @@ class EventMng():
         初始化事件管理器
         '''
         # encode event types
-        num = len(eventTypes)
         self.eventTypes = eventTypes
-        self.typeIdDict = {eventTypes[i]: i for i in range(num)}
-        self.typeCharDict = ({eventTypes[i]: chr(i+65) for i in range(num)})
+        self.typeIdDict = typeIdDict
+        self.typeCharDict = typeCharDict
         # formulate event format
         self.eventsFormat = dict()
         for type in self.eventTypes:
@@ -50,13 +50,16 @@ class EventMng():
         # initialize event ID
         self.eventIdCount = {type: 0 for type in eventTypes}  # 每类最多百万
 
-    def run(self, type: str, time: str, *info: any):
+    def run(self, type: str, startTime: int, endTime:int,
+            # ifNewEventID: bool,
+            *info: any):
         '''function run
 
         input
         -----
         type: str, 事件类型
-        time: str, 事件发生时间
+        startTime: int, 事件发生unix时间戳, 单位ms
+        endTime: int, 事件结束unix时间戳, 单位ms
         info: any, 事件信息, 为可变数量的参数。
         - 当type为'spill'时, info为[cellMng]
         - 当type为'stop', 'lowSpeed', 'highSpeed', 'EmgcBrake',
@@ -68,12 +71,13 @@ class EventMng():
         '''
         # distribute event ID
         idLen = 7
+        # if ifNewEventID:
+        #     self.eventIdCount[type] += 1
+        #     self.eventIdCount[type] %= (10 ** (idLen - 1))
         eventID = self.typeCharDict[type] + \
             int2strID(self.eventIdCount[type], idLen)
-        self.eventIdCount[type] += 1
-        self.eventIdCount[type] %= (10 ** (idLen - 1))
         # formulate event info
-        event = self._generateEvent(type, eventID, time, info)
+        event = self._generateEvent(type, eventID, startTime, endTime, info)
         # add event to events
         self.events[type]['occured'] = True
         self.events[type]['items'][eventID] = vars(event)
@@ -85,20 +89,23 @@ class EventMng():
         '''
         self.events = deepcopy(self.eventsFormat)
 
-    def _generateEvent(self, type: str, eventID: str, time: str, info: any):
+    def _generateEvent(self, type: str, eventID: str, startTime: int, endTime:int, info: any):
         '''function _generateEvent
 
         生成事件实例, 用于添加到events中
         '''
+        # startTime和endTime转化为年月日时分秒格式
+
         if type == 'spill':
-            event = SpillEvent(type, eventID, time, info[0])
+            event = SpillEvent(type, eventID, startTime, endTime, info[0])
         elif type in ['stop', 'lowSpeed', 'highSpeed',
                       'emgcBrake', 'illegalOccupation']:
-            event = SingleCarEvent(type, eventID, time, info[0])
+            event = SingleCarEvent(type, eventID, startTime, endTime, info[0])
         elif type == 'incident':
-            event = IncidentEvent(type, eventID, time, info[0], info[1])
+            event = IncidentEvent(type, eventID, startTime, endTime,
+                                  info[0], info[1])
         elif type == 'crowd':
-            event = CrowdEvent(type, eventID, time, info[0])
+            event = CrowdEvent(type, eventID, startTime, endTime, info[0])
         else:
             raise ValueError(f"Invalid event type '{type}' is defined.")
         return event
@@ -113,20 +120,22 @@ class BaseEvent():
     ----------
     type: str, 事件类型
     eventID: str, 事件ID
-    time: str, 事件发生时间
+    startTime: str, 事件发生时间
+    endTime: str, 事件结束时间
 
     methods
     -------
     __init__: 初始化事件
     '''
-    def __init__(self, type: str, eventID: str, time: str):
+    def __init__(self, type: str, eventID: str, startTime: str, endTime:str):
         '''function __init__
 
         初始化事件
         '''
         self.type = type
         self.eventID = eventID
-        self.time = time
+        self.startTime = startTime
+        self.endTime = endTime
 
 
 class SpillEvent(BaseEvent):
@@ -138,24 +147,30 @@ class SpillEvent(BaseEvent):
     ----------
     type: str, 事件类型
     eventID: str, 事件ID
-    time: float, 事件发生时间
+    startTime: str, 事件发生时间
+    endTime: str, 事件结束时间
     laneID: str, 事件发生的laneID
     order: int, 事件发生的lane的顺序
     start: float, 事件发生的lane的起点
     end: float, 事件发生的lane的终点
     danger: float, 事件发生的lane的危险系数
+    lat: int, 事件发生的元胞的order
+    lon: int, 事件发生的元胞的start
     '''
-    def __init__(self, type: str, eventID: str, time: str, cell: CellMng):
+    def __init__(self, type: str, eventID: str,
+                 startTime: str, endTime:str,
+                 cell: CellMng):
         '''function __init__
 
         input
         -----
         type: str, 事件类型
         eventID: str, 事件ID
-        time: str, 事件发生时间
+        startTime: str, 事件发生时间
+        endTime: str, 事件结束时间
         cell: CellMng, 事件发生的cell
         '''
-        super().__init__(type, eventID, time)
+        super().__init__(type, eventID, startTime, endTime)
         self.laneID = cell.laneID
         self.order = cell.order
         start, end = cell.start, cell.end
@@ -164,6 +179,8 @@ class SpillEvent(BaseEvent):
         self.start = start
         self.end = end
         self.danger = cell.danger
+        self.lat = self.order      # for compatibility
+        self.lon = cell.start      # for compatibility
 
 
 class SingleCarEvent(BaseEvent):
@@ -175,31 +192,39 @@ class SingleCarEvent(BaseEvent):
     ----------
     type: str, 事件类型
     eventID: str, 事件ID
-    time: float, 事件发生时间
+    startTime: str, 事件发生时间
+    endTime: str, 事件结束时间
     carID: str, 事件发生的车辆ID
     laneID: str, 事件发生的车道ID
     x, y: float, 事件发生的车辆位置
     vx, vy: float, 事件发生的车辆速度
     speed: float, 事件发生的车辆速度
     a: float, 事件发生的车辆加速度
+    lat: float, 事件发生的车辆纬度
+    lon: float, 事件发生的车辆经度
     '''
-    def __init__(self, type: str, eventID: str, time: str, car: dict):
+    def __init__(self, type: str, eventID: str,
+                 startTime: str, endTime:str,
+                 car: dict):
         '''function __init__
 
         input
         -----
         type: str, 事件类型
         eventID: str, 事件ID
-        time: str, 事件发生时间
+        startTime: str, 事件发生时间
+        endTime: str, 事件结束时间
         car: dict, 事件发生的车辆信息
         '''
-        super().__init__(type, eventID, time)
+        super().__init__(type, eventID, startTime, endTime)
         self.carID = car['id']
         self.laneID = car['laneID']
         self.x, self.y = car['x'], car['y']
         self.vx, self.vy = car['vx'], car['vy']
         self.speed = car['speed']
         self.a = car['a']
+        self.lat = car['latitude']
+        self.lon = car['longitude']
 
 
 class IncidentEvent(BaseEvent):
@@ -209,15 +234,18 @@ class IncidentEvent(BaseEvent):
 
     properties
     ----------
-    time: float, 事件发生时间
+    startTime: str, 事件发生时间
+    endTime: str, 事件结束时间
     carID1, carID2: str, 事件发生的车辆ID
     laneID1, laneID2: str, 事件发生的车道ID
     x1, y1, x2, y2: float, 事件发生的车辆位置
     vx1, vy1, vx2, vy2: float, 事件发生的车辆速度
     speed1, speed2: float, 事件发生的车辆速度
     a1, a2: float, 事件发生的车辆加速度
+    lat, lon: float, 事件发生的车辆经纬度
     '''
-    def __init__(self, type: str, eventID: str, time: str,
+    def __init__(self, type: str, eventID: str,
+                 startTime: str, endTime:str,
                  car1: dict, car2: dict):
         '''function __init__
 
@@ -225,11 +253,12 @@ class IncidentEvent(BaseEvent):
         -----
         type: str, 事件类型
         eventID: str, 事件ID
-        time: str, 事件发生时间
+        startTime: str, 事件发生时间
+        endTime: str, 事件结束时间
         car1: dict, 事件发生的车辆信息
         car2: dict, 事件发生的车辆信息
         '''
-        super().__init__(type, eventID, time)
+        super().__init__(type, eventID, startTime, endTime)
         self.carID1 = car1['id']
         self.carID2 = car2['id']
         self.laneID1 = car1['laneID']
@@ -242,6 +271,8 @@ class IncidentEvent(BaseEvent):
         self.speed2 = car2['speed']
         self.a1 = car1['a']
         self.a2 = car2['a']
+        self.lat = car1['latitude']     # 撞车的两车位置应当一样
+        self.lon = car1['longitude']
 
 
 class CrowdEvent(BaseEvent):
@@ -253,24 +284,30 @@ class CrowdEvent(BaseEvent):
     ----------
     type: str, 事件类型
     eventID: str, 事件ID
-    time: float, 事件发生时间
+    startTime: str, 事件发生时间
+    endTime: str, 事件结束时间
     laneID: str, 事件发生的laneID
     q: float, 事件发生的lane的q
     k: float, 事件发生的lane的k
     v: float, 事件发生的lane的v
     '''
-    def __init__(self, type: str, eventID: str, time: str, lane: LaneMng):
+    def __init__(self, type: str, eventID: str,
+                 startTime: str, endTime:str,
+                 lane: LaneMng):
         '''function __init__
 
         input
         -----
         type: str, 事件类型
         eventID: str, 事件ID
-        time: str, 事件发生时间
+        startTime: str, 事件发生时间
+        endTime: str, 事件结束时间
         lane: LaneMng, 事件发生的lane
         '''
-        super().__init__(type, eventID, time)
+        super().__init__(type, eventID, startTime, endTime)
         self.laneID = lane.ID
         self.q = lane.q
         self.k = lane.k
         self.v = lane.v
+        self.lat = lane.ID  # for compatibility
+        self.lon = lane.q   # for compatibility
