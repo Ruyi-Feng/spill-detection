@@ -27,12 +27,12 @@ def main():
     controller = Controller(configPath, clbPath)
     # 生成kafka消费者
     cfg = loadConfig(configPath)
-    kc = MyKafkaConsumer(cfg['kafka']['ip'],
-                         cfg['kafka']['topic'],
-                         cfg['kafka']['groupid'],
-                         cfg['kafka']['key'])
+    kc = MyKafkaConsumer(cfg['ip'],
+                         cfg['topic'],
+                         cfg['groupid'],
+                         cfg['key'])
     # 生成http上报器
-    hp = HttpPoster(cfg['http']['url'])
+    hp = HttpPoster(cfg['http'])
 
     # 接收
     while True:
