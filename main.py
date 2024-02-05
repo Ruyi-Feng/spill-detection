@@ -30,6 +30,7 @@ def main():
     kc = MyKafkaConsumer(cfg['ip'],
                          cfg['topic'],
                          cfg['groupid'],
+                         cfg['producerversion'],
                          cfg['key'])
     # 生成http上报器
     hp = HttpPoster(cfg['http'])
