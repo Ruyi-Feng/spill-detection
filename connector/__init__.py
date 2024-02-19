@@ -16,7 +16,7 @@ class MyKafkaConsumer():
     message = consumer.run()
     从broker接收数据, 得到message
     '''
-    def __init__(self, ip, topic, groupid='kafka', key=None):
+    def __init__(self, ip, topic, groupid='kafka', producerVersion=(0, 11, 5), key=None):
         '''function __init__
 
         input
@@ -27,6 +27,7 @@ class MyKafkaConsumer():
         key: str, kafka接收数据的key
         '''
         self.consumer = KafkaConsumer(topic, bootstrap_servers=ip,
+                                      api_version=tuple(producerVersion),
                                       group_id=groupid)
 
     def run(self) -> dict:
