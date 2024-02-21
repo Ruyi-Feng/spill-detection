@@ -1,12 +1,13 @@
-import sys
+import sys, json
 from controller import Controller
-from connector import MyKafkaConsumer, HttpPoster
+from kafka import KafkaConsumer
+from connector import HttpPoster
 from rsu_simulator import Smltor
 from utils import loadConfig
 
 
 if sys.version_info > (3, 12, 0):       # for python version compatibility
-    sys.modules['kafka.vendor.six.moves'] = six.moves
+    sys.modules['kafka.vendor.six.moves'] = 'six.moves'
 
 
 def simulatedMain():
@@ -32,20 +33,21 @@ def main():
     controller = Controller(configPath, clbPath)
     # 生成kafka消费者
     cfg = loadConfig(configPath)
-    kc = MyKafkaConsumer(cfg['ip'],
-                         cfg['topic'],
-                         cfg['groupid'],
-                         cfg['producerversion'],
-                         cfg['key'])
+    kc = KafkaConsumer(cfg['topic'], bootstrap_servers=cfg['ip'],
+                       api_version=tuple(cfg['producerversion']),
+                       group_id=cfg['groupid'])
+
     # 生成http上报器
     hp = HttpPoster(cfg['http'])
 
-    # 接收
-    while True:
-        # 持续性运行接收
-        msg = kc.run()
+    # 持续性运行接收
+    for msgBytes in kc:
+        # 数据解码
+        msgStr = msgBytes.value.decode('utf-8')
+        msg = json.loads(msgStr)        # dict
+        # 非空数据判断
         if (msg is None) or (msg == '') or (not msg):
-            continue     # 接收到空数据
+            continue
         print('main: msg', type(msg), msg)
         # 算法检测
         msg, events = controller.run(msg)
