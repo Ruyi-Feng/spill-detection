@@ -1,7 +1,12 @@
+import sys
 from controller import Controller
 from connector import MyKafkaConsumer, HttpPoster
 from rsu_simulator import Smltor
 from utils import loadConfig
+
+
+if sys.version_info > (3, 12, 0):       # for python version compatibility
+    sys.modules['kafka.vendor.six.moves'] = six.moves
 
 
 def simulatedMain():
@@ -41,6 +46,7 @@ def main():
         msg = kc.run()
         if (msg is None) or (msg == '') or (not msg):
             continue     # 接收到空数据
+        print('main: msg', type(msg), msg)
         # 算法检测
         msg, events = controller.run(msg)
         if len(events) == 0:
