@@ -17,7 +17,7 @@ def test_calibrator():
         cfg = yaml.load(f, Loader=yaml.FullLoader)
 
     # 生成标定器
-    clbPath = './road_calibration/clb.yml'
+    clbPath = './road_calibration/clbymls/clb.yml'
     calibrator = Calibrator(clbPath,
                             fps=cfg['fps'],
                             laneWidth=cfg['laneWidth'],

@@ -14,7 +14,7 @@ if sys.version_info > (3, 12, 0):       # for python version compatibility
 
 def simulatedMain():
     configPath = './config.yml'
-    clbPath = './road_calibration/clb.yml'
+    clbPath = './road_calibration/clbymls/clb.yml'
     dataPath = './data/result.txt'
 
     controller = Controller(configPath, clbPath)
@@ -54,7 +54,7 @@ def main():
 
     # 根据设备信息生成clbPath, 为./road_calibration/clb_设备名_设备类型.yml
     # 生成主控制器
-    clbPath = './road_calibration/clb_' + deviceID + '_' + deviceType + '.yml'
+    clbPath = './road_calibration/clbymls/clb_' + deviceID + '_' + deviceType + '.yml'
     controller = Controller(configPath, clbPath)
     print('算法组件生成成功, 开始接收数据')
 
@@ -67,7 +67,6 @@ def main():
         # 非空数据判断
         if (msg is None) or (msg == '') or (not msg):
             continue
-        print('main: msg', type(msg), msg)
         # 算法检测
         msg, events = controller.run(msg)
         if (events is None) or (len(events) == 0):
