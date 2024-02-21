@@ -1,4 +1,6 @@
-import sys, json
+import sys
+import json
+from datetime import datetime
 from controller import Controller
 from kafka import KafkaConsumer
 from connector import HttpPoster
@@ -27,22 +29,38 @@ def simulatedMain():
 
 
 def main():
-    # 生成主控制器
+    # 读取配置文件
     configPath = './config.yml'
-    clbPath = './road_calibration/clb.yml'
-    controller = Controller(configPath, clbPath)
-    # 生成kafka消费者
     cfg = loadConfig(configPath)
+    # 生成kafka消费者
     kc = KafkaConsumer(cfg['topic'], bootstrap_servers=cfg['ip'],
                        api_version=tuple(cfg['producerversion']),
                        group_id=cfg['groupid'])
-
     # 生成http上报器
     hp = HttpPoster(cfg['http'])
+    print('数据通信组件生成成功')
+    
+    # 获取当前设备信息
+    print('waiting first message to obtain device information...')
+    for msgBytes in kc:     # 从kafka接收一帧数据以确定当前设备的信息
+        msgStr = msgBytes.value.decode('utf-8')
+        msg = json.loads(msgStr)        # dict
+        if (msg is None) or (msg == '') or (not msg):
+            continue
+        deviceID, deviceType = msg['deviceID'], msg['deviceType']
+        print('deviceID:', deviceID, 'deviceType:', deviceType)
+        break
+
+    # 根据设备信息生成clbPath, 为./road_calibration/clb_设备名_设备类型.yml
+    # 生成主控制器
+    clbPath = './road_calibration/clb_' + deviceID + '_' + deviceType + '.yml'
+    controller = Controller(configPath, clbPath)
+    print('算法组件生成成功, 开始接收数据')
 
     # 持续性运行接收
     for msgBytes in kc:
         # 数据解码
+        print('\rreceive time:', datetime.now(), end='')
         msgStr = msgBytes.value.decode('utf-8')
         msg = json.loads(msgStr)        # dict
         # 非空数据判断
