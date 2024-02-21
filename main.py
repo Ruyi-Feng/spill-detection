@@ -35,7 +35,8 @@ def main():
     # 生成kafka消费者
     kc = KafkaConsumer(cfg['topic'], bootstrap_servers=cfg['ip'],
                        api_version=tuple(cfg['producerversion']),
-                       group_id=cfg['groupid'])
+                       group_id=cfg['groupid'],
+                       auto_commit_interval_ms=cfg['kafkaAutoCommitIntervalMs'])
     # 生成http上报器
     hp = HttpPoster(cfg['http'])
     print('数据通信组件生成成功')
@@ -47,7 +48,7 @@ def main():
         msg = json.loads(msgStr)        # dict
         if (msg is None) or (msg == '') or (not msg):
             continue
-        deviceID, deviceType = msg['deviceID'], msg['deviceType']
+        deviceID, deviceType = msg['deviceID'], str(msg['deviceType'])
         print('deviceID:', deviceID, 'deviceType:', deviceType)
         break
 
@@ -60,7 +61,7 @@ def main():
     # 持续性运行接收
     for msgBytes in kc:
         # 数据解码
-        print('\rreceive time:', datetime.now(), end='')
+        print('receive time:', datetime.now())   # end='\r'
         msgStr = msgBytes.value.decode('utf-8')
         msg = json.loads(msgStr)        # dict
         # 非空数据判断
@@ -69,7 +70,7 @@ def main():
         print('main: msg', type(msg), msg)
         # 算法检测
         msg, events = controller.run(msg)
-        if len(events) == 0:
+        if (events is None) or (len(events) == 0):
             continue    # 未检测到事件
         # 上报事件
         hp.run(events)
