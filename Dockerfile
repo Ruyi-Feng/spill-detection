@@ -1,4 +1,4 @@
-from python:3.12-bullseye
+from python:3.8-bullseye
 
 WORKDIR /ws
 
