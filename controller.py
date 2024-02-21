@@ -29,7 +29,7 @@ class Controller:
 
     生成控制器, 用于控制整个算法流程。
     '''
-    def __init__(self, cfgPath: str, clbPath: str):
+    def __init__(self, cfgPath: str, clbPath: str, args):
         '''function __init__
 
         input
@@ -42,7 +42,7 @@ class Controller:
         cfg = loadConfig(cfgPath)
         self.cfg = cfg
         # 生成数据驱动器
-        self.drv = Driver(cfg['fps'])
+        self.drv = Driver(cfg['fps'], args)
         # 是否标定
         self.clbPath = clbPath
         self.needClb = False
