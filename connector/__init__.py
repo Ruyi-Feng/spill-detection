@@ -41,10 +41,12 @@ class MyKafkaConsumer():
             for message in self.consumer:
                 msgStr = message.value.decode('utf-8')
                 msgDict = json.loads(msgStr)
-                yield msgDict
+                # yield msgDict
+                return msgDict
         except Exception:
             # pass
-            yield None
+            return None
+            # yield None
 
 
 class HttpPoster():
