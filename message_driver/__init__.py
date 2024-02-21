@@ -21,7 +21,7 @@ class Driver():
         self.driverOnline = DriverOnline(fps)
         self.mode = 'offline'   # 'offline' | 'online', 默认为离线测试模式, receive时更新
 
-    def receive(self, msg: list | dict | str) -> (bool, list):
+    def receive(self, msg) -> (bool, list):
         '''function receive
 
         input
@@ -47,7 +47,7 @@ class Driver():
             self.mode = 'offline'
             return True, self.driverOffline.recieve(msg)
 
-    def _validMsg(self, msg: list | dict | str) -> bool:
+    def _validMsg(self, msg) -> bool:
         '''function _validMsg
 
         input
