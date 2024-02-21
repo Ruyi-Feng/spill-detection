@@ -4,6 +4,8 @@ import os
 from kafka import KafkaProducer
 from kafka import KafkaConsumer
 from kafka.errors import KafkaError
+
+
 KAFKA_HOST = "localhost"    # 服务器地址
 KAFKA_PORT = 9092       # 端口号
 KAFKA_TOPIC = "test"  # topic
