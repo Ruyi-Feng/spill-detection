@@ -292,11 +292,20 @@ class DriverOnline:
         '''
         deviceID = msg['deviceID']
         deviceType = msg['deviceType']
+        # for car in msg['targets']:
+        #     car['deviceID'] = deviceID
+        #     car['deviceType'] = deviceType
+        #     self._formatTransOuter2Inner(car)
+        # return msg['targets']
+        cars = []
         for car in msg['targets']:
             car['deviceID'] = deviceID
             car['deviceType'] = deviceType
             self._formatTransOuter2Inner(car)
-        return msg['targets']
+            if car['laneID'] == 0:
+                continue
+            cars.append(car)
+        return cars
 
     def send(self, cars: list, events: dict) -> (list, list):
         '''function send
@@ -446,7 +455,7 @@ class DriverOnline:
         newEvent['start_time'] = event['startTime']
         newEvent['end_time'] = event['endTime']
         newEvent['lane'] = event['laneID']
-        newEvent['raw_class'] = event['class']
+        newEvent['raw_class'] = event['rawClass']
         newEvent['point_wgs84'] = {
             'lat': event['lat'],
             'lon': event['lon']
