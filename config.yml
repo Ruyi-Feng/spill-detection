@@ -1,7 +1,7 @@
 ip: 'loacalhost:9092'
 topic: 'trafficTrajectory'
 groupid: 'group'
-producerversion: [0, 11, 5]
+producerversion: [2, 8, 1]
 key: None
 http: 'http://localhost:5000'
 
