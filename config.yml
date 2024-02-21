@@ -4,6 +4,13 @@ groupid: 'group'
 producerversion: [2, 8, 1]
 key: None
 http: 'http://localhost:5000'
+# 东揽版本
+# ip: 'loacalhost:9092'
+# topic: 'trafficTrajectory'
+# groupid: 'group'
+# producerversion: [2, 8, 1]
+# key: None
+# http: 'http://localhost:5000'
 
 fps: 20
 
