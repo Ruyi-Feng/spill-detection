@@ -2,7 +2,7 @@ import numpy as np
 import math
 
 
-def calQuartiles(points: list, range: float = 1) -> list:
+def calQuartiles(points: list, range: float = 3) -> list:
     '''func calQuartiles
 
     input
