@@ -159,6 +159,7 @@ class SpillEvent(BaseEvent):
     danger: float, 事件发生的lane的危险系数
     lat: int, 事件发生的元胞的order
     lon: int, 事件发生的元胞的start
+    rawClass: int, 事件车辆的种类, 无车为-1
     '''
     def __init__(self, type: str, eventID: str,
                  startTime: str, endTime: str,
@@ -189,6 +190,7 @@ class SpillEvent(BaseEvent):
         self.lon = cell.start      # for compatibility
         self.deviceID = deviceID
         self.deviceType = deviceType
+        self.rawClass = -1
 
 
 class SingleCarEvent(BaseEvent):
@@ -212,6 +214,7 @@ class SingleCarEvent(BaseEvent):
     lon: float, 事件发生的车辆经度
     deviceID: str, 事件发生的设备ID
     deviceType: str, 事件发生的设备类型
+    rawClass: int, 事件车辆的种类, 无车为-1
     '''
     def __init__(self, type: str, eventID: str,
                  startTime: str, endTime: str,
@@ -237,6 +240,7 @@ class SingleCarEvent(BaseEvent):
         self.lon = car['longitude']
         self.deviceID = car['deviceID']
         self.deviceType = car['deviceType']
+        self.rawClass = car['class']
 
 
 class IncidentEvent(BaseEvent):
@@ -257,6 +261,7 @@ class IncidentEvent(BaseEvent):
     lat, lon: float, 事件发生的车辆经纬度
     deviceID: str, 事件发生的设备ID
     deviceType: str, 事件发生的设备类型
+    rawClass: int, 事件车辆的种类, 无车为-1, 肇事为list
     '''
     def __init__(self, type: str, eventID: str,
                  startTime: str, endTime: str,
@@ -289,6 +294,7 @@ class IncidentEvent(BaseEvent):
         self.lon = car1['longitude']
         self.deviceID = car1['deviceID']
         self.deviceType = car1['deviceType']
+        self.rawClass = [car1['class'], car2['class']]
 
 
 class CrowdEvent(BaseEvent):
@@ -310,6 +316,7 @@ class CrowdEvent(BaseEvent):
     lon: float, 事件发生的lane的q
     deviceID: str, 事件发生的设备ID
     deviceType: str, 事件发生的设备类型
+    rawClass: int, 事件车辆的种类, 无车为-1
     '''
     def __init__(self, type: str, eventID: str,
                  startTime: str, endTime: str,
@@ -334,3 +341,4 @@ class CrowdEvent(BaseEvent):
         self.lon = lane.q   # for compatibility
         self.deviceID = deviceID
         self.deviceType = deviceType
+        self.rawClass = -1
