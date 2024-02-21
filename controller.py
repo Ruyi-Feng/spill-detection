@@ -49,7 +49,7 @@ class Controller:
         self.clbtor = None
         self.calibFrames = cfg['calibSeconds'] * cfg['fps']
         self.calibCount = 0
-        if not (os.path.exists(clbPath)) | self.cfg['ifRecalib']:
+        if (not (os.path.exists(clbPath))) | self.cfg['ifRecalib']:
             print('******开始标定过程******', end=' ')
             startTime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
             endTime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(
