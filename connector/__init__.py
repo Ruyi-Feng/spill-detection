@@ -1,52 +1,7 @@
-from kafka import KafkaConsumer
 import requests
-import json
 
 
 '''Connect the server and algorithms by Kafka.'''
-
-
-class MyKafkaConsumer():
-    '''class MyKafkaConsumer
-
-    properties
-    ----------
-    consumer: MyKafkaConsumer, kafka消费者
-    用法:
-    message = consumer.run()
-    从broker接收数据, 得到message
-    '''
-    def __init__(self, ip, topic, groupid='kafka', producerVersion=(0, 11, 5), key=None):
-        '''function __init__
-
-        input
-        -----
-        ip: str, kafka接收数据的ip地址
-        topic: str, kafka接收数据的topic
-        groupid: str, kafka接收数据的groupid
-        key: str, kafka接收数据的key
-        '''
-        self.consumer = KafkaConsumer(topic, bootstrap_servers=ip,
-                                      api_version=tuple(producerVersion),
-                                      group_id=groupid)
-
-    def run(self) -> dict:
-        '''function run
-
-        output
-        ------
-        message: dict, kafka接收到的数据
-        '''
-        try:
-            for message in self.consumer:
-                msgStr = message.value.decode('utf-8')
-                msgDict = json.loads(msgStr)
-                # yield msgDict
-                return msgDict
-        except Exception:
-            # pass
-            return None
-            # yield None
 
 
 class HttpPoster():
