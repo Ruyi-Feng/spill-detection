@@ -15,10 +15,10 @@ class Driver():
     数据格式转化驱动器, 将传感器数据转化为代码内部流通的数据格式,
     将代码内部流通的数据格式转化为输出数据。
     '''
-    def __init__(self, fps: float):
+    def __init__(self, fps: float, lanes: list):
         self.fps = fps
         self.driverOffline = DriverOffline(fps)
-        self.driverOnline = DriverOnline(fps)
+        self.driverOnline = DriverOnline(fps, lanes)
         self.mode = 'offline'   # 'offline' | 'online', 默认为离线测试模式, receive时更新
 
     def receive(self, msg) -> (bool, list):
@@ -242,7 +242,13 @@ class DriverOnline:
 
     在线部署驱动器, 用于在线部署时的数据接收与发送。
     '''
-    def __init__(self, fps) -> None:
+    def __init__(self, fps, lanes: list) -> None:
+        '''
+        input
+        -----
+        fps: float, 数据帧率。
+        lanes: list, 道路的车道号列表。
+        '''
         self.fps = fps
         # 数据格式接口, 从接收数据转化为内部处理数据
         interface = {
@@ -292,18 +298,19 @@ class DriverOnline:
         '''
         deviceID = msg['deviceID']
         deviceType = msg['deviceType']
-        # for car in msg['targets']:
-        #     car['deviceID'] = deviceID
-        #     car['deviceType'] = deviceType
-        #     self._formatTransOuter2Inner(car)
-        # return msg['targets']
         cars = []
         for car in msg['targets']:
+            self._formatTransOuter2Inner(car)
+            # if car['laneID'] == 0:
+            #     continue
+            if car['laneID'] not in self.lanes:
+                print('Warning: laneID ', car['laneID'],
+                      'not in lanes', self.lanes,
+                      'please recalibrate the section of ',
+                      'deviceID:', deviceID, 'deviceType:', deviceType)
+                continue
             car['deviceID'] = deviceID
             car['deviceType'] = deviceType
-            self._formatTransOuter2Inner(car)
-            if car['laneID'] == 0:
-                continue
             cars.append(car)
         return cars
 
