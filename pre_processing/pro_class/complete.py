@@ -31,11 +31,11 @@ class Interpolation:
         self._lagTime = lagTime   # 延误帧数
         self._speedCoefficient = 3.6
         # 若需补全的数据超过此时速, 则判为异常
-        self._speedDict = {
-            "motor": maxSpeedMotor / self._speedCoefficient,
-            "non-motor": maxSpeedNonMotor / self._speedCoefficient,
-            "pedestrian": maxSpeedPedestrian / self._speedCoefficient,
-        }
+        # self._speedDict = {
+        #     "motor": maxSpeedMotor / self._speedCoefficient,
+        #     "non-motor": maxSpeedNonMotor / self._speedCoefficient,
+        #     "pedestrian": maxSpeedPedestrian / self._speedCoefficient,
+        # }
 
     def run(
         self, contextFrames: dict, currentFrame: dict, lastTimestamp: int
@@ -75,6 +75,8 @@ class Interpolation:
     ) -> bool:
         if objInfo[index]["timestamp"] <= delaySecMark:
             return False
+        return True
+        """
         # 判断id下一次再出现时是否是位移过远, 是否是无效数据
         disX = objInfo[index]["x"] - objInfo[index - 1]["x"]
         disY = objInfo[index]["y"] - objInfo[index - 1]["y"]
@@ -85,6 +87,7 @@ class Interpolation:
         speed = math.hypot(disX, disY) / timeInterval
         speedMax = self._speedDict[objInfo[index]["ptcType"]]
         return speedMax > speed
+        """
 
     def _complete_obj(
         self, objsInfo: list, index: int, delaySecMark: int
