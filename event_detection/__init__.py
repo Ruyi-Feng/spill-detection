@@ -622,5 +622,7 @@ class EventDetector(TrafficMng):
             dictInfo = getattr(self, f'{type}Dict')[key]
             startTime, endTime, car = dictInfo[0], dictInfo[1], dictInfo[2]
             self.eventMng.run(type, startTime, endTime, car)
+            # print(f"事件: id={str(key)}车辆{type}事件结束, " + getCarBaseInfo(car) + \
+            #       f", 开始时间{str(startTime)}, 结束时间{str(endTime)}。 ")
             # 删除无效keys
             del getattr(self, f'{type}Dict')[key]
