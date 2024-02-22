@@ -250,6 +250,7 @@ class DriverOnline:
         lanes: list, 道路的车道号列表。
         '''
         self.fps = fps
+        self.lanes = lanes
         # 数据格式接口, 从接收数据转化为内部处理数据
         interface = {
                     'cls': 'class',
