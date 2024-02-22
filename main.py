@@ -6,7 +6,7 @@ from controller import Controller
 from kafka import KafkaConsumer
 from connector import HttpPoster
 from rsu_simulator import Smltor
-from utils import loadConfig
+from utils import loadConfig  # , swapQuotes
 
 if sys.version_info >=(3,12,0):
     sys.modules['kafka.vendor.six.moves'] = 'six.moves'
@@ -47,8 +47,10 @@ def main():
     kc = KafkaConsumer(cfg['topic'], bootstrap_servers=cfg['ip'],
                        api_version=tuple(cfg['producerversion']),
                     #    auto_offset_reset='smallest',
+                    #    auto_offset_reset='latest',  # TODO 注释掉
                        group_id=cfg['groupid'],
-                       auto_commit_interval_ms=cfg['kafkaAutoCommitIntervalMs'])
+                    #    auto_commit_interval_ms=cfg['kafkaAutoCommitIntervalMs']
+                       )
     # 生成http上报器
     hp = HttpPoster(cfg['http'])
     print('数据通信组件生成成功')
@@ -57,6 +59,10 @@ def main():
     print('waiting the first message to obtain device information...')
     for msgBytes in kc:     # 从kafka接收一帧数据以确定当前设备的信息
         msgStr = msgBytes.value.decode('utf-8')
+        # if len(msgStr) < 2:
+        #     continue
+        # if msgStr[1] == '\'':       # 避免传来的数据单引号不满足json格式
+        #     msgStr = swapQuotes(msgStr)
         msg = json.loads(msgStr)        # dict
         if (msg is None) or (msg == '') or (not msg) or isNotTargetDevice(msg, args):
             continue
