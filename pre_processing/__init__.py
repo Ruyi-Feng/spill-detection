@@ -1,6 +1,7 @@
 from pre_processing.pro_class.smooth import Exponential
 from pre_processing.pro_class.complete import Interpolation
 from utils.car_utils import carsList2Dict, carsDict2List
+from copy import deepcopy
 
 
 class PreProcessor():
@@ -33,7 +34,9 @@ class PreProcessor():
         if (self.lastTimestamp is None) & (len(curFrame) != 0):
             self.lastTimestamp = curFrame[0]['timestamp']
         # 处理0值speed数据
-        curFrame = self._fixSpeed0(curFrame)
+        # curFrame = self._fixSpeed0(curFrame)
+        # 给车辆timestamp属性做个备份
+        curFrame = self._copyTimestamp(curFrame)
         # dict组织方便索引
         curFrame = carsList2Dict(curFrame)
         # 补全
@@ -48,6 +51,8 @@ class PreProcessor():
         curFrame = self._calAcceleration(self.contextFrames, curFrame)
         # 返回为list形式车辆
         curFrame = carsDict2List(curFrame)
+        # 用time覆盖timestamp
+        curFrame = self._recoverTimestamp(curFrame)
         return curFrame
 
     def _calAcceleration(self, contextFrames: dict, curFrame: dict) -> dict:
@@ -103,3 +108,24 @@ class PreProcessor():
                 car['speed'] = (car['vx']**2 + car['vy']**2)**0.5
 
         return curFrame
+
+    def _copyTimestamp(self, cars: list):
+        '''
+        将车辆的timestamp属性备份出time
+        '''
+        newCars = []
+        for car in cars:
+            car['time'] = deepcopy(car['timestamp'])
+            newCars.append(car)
+
+        return newCars
+
+    def _recoverTimestamp(self, cars: list):
+        '''
+        把存储有car原始unix毫秒单位的时间戳time, 覆盖到timestamp
+        '''
+        newCars = []
+        for car in cars:
+            car['timestamp'] = deepcopy(car['time'])
+            newCars.append(car)
+        return newCars
