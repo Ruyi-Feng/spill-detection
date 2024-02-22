@@ -15,11 +15,23 @@ class Driver():
     数据格式转化驱动器, 将传感器数据转化为代码内部流通的数据格式,
     将代码内部流通的数据格式转化为输出数据。
     '''
-    def __init__(self, fps: float, lanes: list):
+    def __init__(self, fps: float):
         self.fps = fps
         self.driverOffline = DriverOffline(fps)
-        self.driverOnline = DriverOnline(fps, lanes)
+        self.driverOnline = DriverOnline(fps)
         self.mode = 'offline'   # 'offline' | 'online', 默认为离线测试模式, receive时更新
+
+    def setLanes(self, lanes: list) -> None:
+        '''function setLanes
+
+        input
+        -----
+        lanes: list, 道路的车道号列表。
+
+        更新车道号列表。将用于检查输入的目标车辆lane是否在标定的车道列表中,
+        若出现不在列表中的车道号, 则报警, 应当用更长的时间进行标定。
+        '''
+        self.driverOnline.lanes = lanes
 
     def receive(self, msg) -> (bool, list):
         '''function receive
@@ -242,7 +254,7 @@ class DriverOnline:
 
     在线部署驱动器, 用于在线部署时的数据接收与发送。
     '''
-    def __init__(self, fps, lanes: list) -> None:
+    def __init__(self, fps) -> None:
         '''
         input
         -----
@@ -250,7 +262,6 @@ class DriverOnline:
         lanes: list, 道路的车道号列表。
         '''
         self.fps = fps
-        self.lanes = lanes
         # 数据格式接口, 从接收数据转化为内部处理数据
         interface = {
                     'cls': 'class',
@@ -265,6 +276,7 @@ class DriverOnline:
         self.interface = interface
         self.interfaceBack = interfaceBack
         self.keys2delete = keys2delete
+        self.lanes = list(range(20))    # 预设值，在启动controller检测时会根据标定结果设值
 
     def recieve(self, msg: dict) -> list:
         '''function recieve
