@@ -475,7 +475,10 @@ class DriverOnline:
         # newEvent['start_time'] = event['startTime']
         # newEvent['end_time'] = event['endTime']
         newEvent['start_time'] = unix_milliseconds_to_datetime(event['startTime'])
-        newEvent['end_time'] = unix_milliseconds_to_datetime(event['endTime'])
+        if event['endTime'] == -1:
+            newEvent['end_time'] = -1
+        else:
+            newEvent['end_time'] = unix_milliseconds_to_datetime(event['endTime'])
         newEvent['lane'] = event['laneID']
         newEvent['raw_class'] = event['rawClass']
         newEvent['point_wgs84'] = {
