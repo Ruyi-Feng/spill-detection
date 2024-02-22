@@ -29,7 +29,7 @@ class Controller:
 
     生成控制器, 用于控制整个算法流程。
     '''
-    def __init__(self, cfgPath: str, clbPath: str, args):
+    def __init__(self, cfgPath: str, clbPath: str):
         '''function __init__
 
         input
@@ -42,7 +42,7 @@ class Controller:
         cfg = loadConfig(cfgPath)
         self.cfg = cfg
         # 生成数据驱动器
-        self.drv = Driver(cfg['fps'], args)
+        self.drv = Driver(cfg['fps'])
         # 是否标定
         self.clbPath = clbPath
         self.needClb = False
@@ -99,6 +99,8 @@ class Controller:
         print('******开始事件检测******', end=' ')
         print('开始时刻: {}'.format(
             time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+        # driver接收当前路段的lanes列表
+        self.drv.setLanes(list(self.clb.keys()))
         # 生成数据预处理器
         self.pp = PreProcessor(self.cfg['maxCompleteTime'],
                                self.cfg['smoothAlpha'])
