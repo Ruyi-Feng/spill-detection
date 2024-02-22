@@ -57,18 +57,21 @@ def main():
 
     # 获取当前设备信息
     print('waiting the first message to obtain device information...')
-    for msgBytes in kc:     # 从kafka接收一帧数据以确定当前设备的信息
-        msgStr = msgBytes.value.decode('utf-8')
-        # if len(msgStr) < 2:
-        #     continue
-        # if msgStr[1] == '\'':       # 避免传来的数据单引号不满足json格式
-        #     msgStr = swapQuotes(msgStr)
-        msg = json.loads(msgStr)        # dict
-        if (msg is None) or (msg == '') or (not msg) or isNotTargetDevice(msg, args):
-            continue
-        deviceID, deviceType = msg['deviceID'], str(msg['deviceType'])
-        print('deviceID:', deviceID, 'deviceType:', deviceType)
-        break
+    try:
+        for msgBytes in kc:     # 从kafka接收一帧数据以确定当前设备的信息
+            msgStr = msgBytes.value.decode('utf-8')
+            # if len(msgStr) < 2:
+            #     continue
+            # if msgStr[1] == '\'':       # 避免传来的数据单引号不满足json格式
+            #     msgStr = swapQuotes(msgStr)
+            msg = json.loads(msgStr)        # dict
+            if (msg is None) or (msg == '') or (not msg) or isNotTargetDevice(msg, args):
+                continue
+            deviceID, deviceType = msg['deviceID'], str(msg['deviceType'])
+            print('deviceID:', deviceID, 'deviceType:', deviceType)
+            break
+    except:
+        kc.close()
 
     # 根据设备信息生成clbPath, 为./road_calibration/clb_设备名_设备类型.yml
     # 生成主控制器
@@ -77,23 +80,26 @@ def main():
     print('算法组件生成成功, 开始接收数据')
 
     # 持续性运行接收
-    for msgBytes in kc:
-        # 数据解码
-        print('receive time:', datetime.now(), end='\r')  # end='\r'
-        msgStr = msgBytes.value.decode('utf-8')
-        msg = json.loads(msgStr)        # dict
-        # 非空数据判断
-        if (msg is None) or (msg == '') or (not msg):
-            continue
-        if isNotTargetDevice(msg, args):
-            continue
-        # 算法检测
-        msg, events = controller.run(msg)
-        if (events is None) or (len(events) == 0):
-            continue    # 未检测到事件
-        # 上报事件
-        hp.run(events)
-        print(events)
+    try:
+        for msgBytes in kc:
+            # 数据解码
+            print('receive time:', datetime.now(), end='\r')  # end='\r'
+            msgStr = msgBytes.value.decode('utf-8')
+            msg = json.loads(msgStr)        # dict
+            # 非空数据判断
+            if (msg is None) or (msg == '') or (not msg):
+                continue
+            if isNotTargetDevice(msg, args):
+                continue
+            # 算法检测
+            msg, events = controller.run(msg)
+            if (events is None) or (len(events) == 0):
+                continue    # 未检测到事件
+            # 上报事件
+            hp.run(events)
+            print(events)
+    except:
+        kc.close()
 
 
 if __name__ == "__main__":
