@@ -1,5 +1,5 @@
 from utils.default import typeIdDict
-
+from utils import unix_milliseconds_to_datetime
 
 '''Define the send and receive interface processor of message.'''
 
@@ -472,8 +472,10 @@ class DriverOnline:
         newEvent = dict()
         newEvent['type'] = typeIdDict[event['type']]
         newEvent['level'] = 1
-        newEvent['start_time'] = event['startTime']
-        newEvent['end_time'] = event['endTime']
+        # newEvent['start_time'] = event['startTime']
+        # newEvent['end_time'] = event['endTime']
+        newEvent['start_time'] = unix_milliseconds_to_datetime(event['startTime'])
+        newEvent['end_time'] = unix_milliseconds_to_datetime(event['endTime'])
         newEvent['lane'] = event['laneID']
         newEvent['raw_class'] = event['rawClass']
         newEvent['point_wgs84'] = {
