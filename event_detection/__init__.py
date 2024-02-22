@@ -1,3 +1,4 @@
+import math
 from traffic_manager import TrafficMng
 from event_detection.event import EventMng
 from utils import delDictKeys, strCapitalize
@@ -532,7 +533,9 @@ class EventDetector(TrafficMng):
 
         判断车辆是否静止
         '''
-        return abs(car['speed']) <= self.vStop
+        # return abs(car['speed']) <= self.vStop
+        # 用vx和vy计算速度判断静止
+        return math.sqrt(car['vx']**2 + car['vy']**2) <= self.vStop
 
     def _isCarLowSpeed(self, car: dict) -> bool:
         '''function _isCarLowSpeed
@@ -547,7 +550,11 @@ class EventDetector(TrafficMng):
 
         判断车辆是否低速
         '''
-        return self.vStop < abs(car['speed']) <= self.vLow
+        # return self.vStop < abs(car['speed']) <= self.vLow
+        # 用vx和vy计算速度判断低速
+        return (self.vStop < math.sqrt(car['vx']**2 + car['vy']**2) <=
+                self.vLow)
+    
 
     def _isCarHighSpeed(self, car: dict) -> bool:
         '''function _isCarHighSpeed
@@ -562,7 +569,9 @@ class EventDetector(TrafficMng):
 
         判断车辆是否高速
         '''
-        return abs(car['speed']) > self.vHigh
+        # return abs(car['speed']) > self.vHigh
+        # 用vx和vy计算速度判断高速
+        return math.sqrt(car['vx']**2 + car['vy']**2) > self.vHigh
 
     def _isCarEmgcBrake(self, car: dict) -> bool:
         '''function _isCarEmgcBrake
