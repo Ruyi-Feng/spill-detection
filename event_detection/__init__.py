@@ -220,7 +220,7 @@ class EventDetector(TrafficMng):
                             f"危险度: {self.lanes[id].cells[order].danger}, " + \
                             f"开始时间: {self.dangerDict[(id, order)][0]}, " + \
                             f"当前时间: {self.dangerDict[(id, order)][1]}"
-                        print(event)
+                        # print(event)
                         # 真正用生成事件
                         # ifNewEventID = True if deltaTs == 0 else False
                         self.eventMng.run('spill',
@@ -261,7 +261,7 @@ class EventDetector(TrafficMng):
                 car = getCarFromCars(cars, id)
                 event = f"事件: id={str(id)}车辆准静止, " + getCarBaseInfo(car) + \
                     f", 开始时间{str(self.stopDict[id][0])}。 "
-                print(event)
+                # print(event)
                 # 真正用生成事件
                 self.eventMng.run('stop', self.stopDict[id][0], -1, car)
 
@@ -286,7 +286,7 @@ class EventDetector(TrafficMng):
                 car = getCarFromCars(cars, id)
                 event = f"事件: id={str(id)}车辆低速行驶, " + getCarBaseInfo(car) + \
                     f", 开始时间{str(self.lowSpeedDict[id][0])}。 "
-                print(event)
+                # print(event)
                 # 真正用生成事件
                 self.eventMng.run('lowSpeed',
                                   self.lowSpeedDict[id][0], -1, car)
@@ -312,7 +312,7 @@ class EventDetector(TrafficMng):
                 car = getCarFromCars(cars, id)
                 event = f"事件: id={str(id)}车辆超速行驶, " + getCarBaseInfo(car) + \
                     f", 开始时间{str(self.highSpeedDict[id][0])}。 "
-                print(event)
+                # print(event)
                 # 真正用生成事件
                 self.eventMng.run('highSpeed',
                                   self.highSpeedDict[id][0], -1, car)
@@ -339,7 +339,7 @@ class EventDetector(TrafficMng):
                 event = f"事件: id={str(id)}车辆急刹车, " + getCarBaseInfo(car) + \
                     f"加速度: {car['a']}" + \
                     f", 开始时间{str(self.emgcBrakeDict[id][0])}。 "
-                print(event)
+                # print(event)
                 # 真正用生成事件
                 self.eventMng.run('emgcBrake',
                                   self.emgcBrakeDict[id][0], -1, car)
@@ -379,7 +379,7 @@ class EventDetector(TrafficMng):
                (abs(car2['vy']) <= self.vStop)):
                 event = f"事件: id={str(ids[0])},{str(ids[1])}车辆碰撞, " + \
                     getCarBaseInfo(car1) + getCarBaseInfo(car2)
-                print(event)
+                # print(event)
                 # 真正用生成事件
                 self.eventMng.run('incident',
                                   self.incidentDict[(car1['id'], car2['id'])],
@@ -476,7 +476,7 @@ class EventDetector(TrafficMng):
                 # 报警
                 if deltaTs % self.spillWarnFreq == 0:
                     event = f"事件: id={id}车道拥堵, 车道密度: {k}辆/km, 车道速度: {v}km/h。"
-                    print(event)
+                    # print(event)
                     # 真正用生成事件
                     # ifNewEventID = True if deltaTs == 0 else False
                     self.eventMng.run('crowd',
@@ -515,7 +515,7 @@ class EventDetector(TrafficMng):
                 car = getCarFromCars(cars, id)
                 event = f"事件: id={str(id)}车辆占用应急车道, " + getCarBaseInfo(car) +\
                     f", 开始时间{str(self.illegalOccupationDict[id][0])}。 "
-                print(event)
+                # print(event)
                 # 真正用生成事件
                 self.eventMng.run('illegalOccupation',
                                   self.illegalOccupationDict[id][0], -1, car)
