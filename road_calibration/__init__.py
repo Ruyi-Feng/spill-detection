@@ -309,10 +309,12 @@ class Calibrator():
         cellCount = dict()
         for id in self.laneIDs:
             count = [0] * cellNum
+            self.xyByLane.setdefault(id, [])
             for xy in self.xyByLane[id]:
-                # 根据y大于等于划分点的数量, 确定元胞编号
-                order = np.sum(xy[1] >= pts) - 1
-                count[order] += 1
+                if len(xy):
+                    # 根据y大于等于划分点的数量, 确定元胞编号
+                    order = np.sum(xy[1] >= pts) - 1
+                    count[order] += 1
             cellCount[id] = count
 
         for id in self.laneIDs:
