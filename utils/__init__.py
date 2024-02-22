@@ -1,5 +1,7 @@
 import yaml
 from utils.default import defaultEventTypes
+from datetime import datetime
+
 
 '''Contain commonly used functions.'''
 
@@ -122,8 +124,41 @@ def strCapitalize(str: str) -> str:
     return str[0].upper() + str[1:]
 
 
-def swapQuotes(input_string):
+def swapQuotes(input_string: str) -> str:
+    '''function swapQuotes
+
+    input
+    -----
+    input_string: str, 输入字符串
+
+    return
+    ------
+    str: str, 输出字符串
+
+    将字符串中的单引号和双引号互换。
+    '''
     input_string = input_string.replace("'", "temp")  # 将单引号替换为临时字符串
     input_string = input_string.replace('"', "'")  # 将双引号替换为单引号
     input_string = input_string.replace("temp", '"')  # 将临时字符串替换为双引号
     return input_string
+
+
+def unix_milliseconds_to_datetime(unix_milliseconds: int) -> str:
+    '''function unix_milliseconds_to_datetime
+    
+    input
+    -----
+    unix_milliseconds: int, Unix毫秒时间戳
+
+    return
+    ------
+    str: str, 年月日时分秒格式的字符串
+
+    将Unix毫秒时间戳转换为年月日时分秒格式的字符串。
+    '''
+    # 将Unix毫秒时间戳转换为秒
+    unix_seconds = unix_milliseconds / 1000.0
+    # 使用datetime.fromtimestamp()将Unix时间戳转换为datetime对象
+    dt_object = datetime.fromtimestamp(unix_seconds)
+    # 返回年月日时分秒格式的字符串
+    return dt_object.strftime('%Y-%m-%d %H:%M:%S')
