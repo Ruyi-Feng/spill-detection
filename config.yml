@@ -23,7 +23,7 @@ kafkaAutoCommitIntervalMs: 5000
 fps: 20
 
 ifRecalib: false
-calibSeconds: 600
+calibSeconds: 60
 laneWidth: 3.75
 emgcWidth: 3.5
 cellLen: 50
