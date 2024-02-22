@@ -86,6 +86,9 @@ class Controller:
             self.clbtor.run(cars)
         else:
             self.needClb = False
+            print('******标定完成******')
+            print('完成时刻: {}'.format(
+                time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
             self.clbtor.calibrate()
             self.clbtor.save()
             self.clb = loadYaml(self.clbPath)
