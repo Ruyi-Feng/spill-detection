@@ -1,16 +1,23 @@
 ip: 'localhost:9092'
-topic: 'trafficTrajectory'
-groupid: 'group'
+topic: 'test'
+groupid: None
 producerversion: [2, 8, 1]
 key: None
 http: 'http://localhost:20490'
-# 东揽版本
+# donglan test
 # ip: '192.168.1.31:9092'
 # topic: 'trafficTrajectory'
 # groupid: None
 # producerversion: [2, 8, 1]
 # key: None
 # http: 'http://192.168.1.31:20490'
+# local test
+# ip: 'localhost:9092'
+# topic: 'test'
+# groupid: None
+# producerversion: [2, 8, 1]
+# key: None
+# http: 'http://localhost:20490'
 
 kafkaAutoCommitIntervalMs: 5000
 fps: 20
