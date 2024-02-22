@@ -32,6 +32,8 @@ class PreProcessor():
         # 初次启动
         if (self.lastTimestamp is None) & (len(curFrame) != 0):
             self.lastTimestamp = curFrame[0]['timestamp']
+        # 处理0值speed数据
+        curFrame = self._fixSpeed0(curFrame)
         # dict组织方便索引
         curFrame = carsList2Dict(curFrame)
         # 补全
@@ -82,3 +84,22 @@ class PreProcessor():
                     newCurFrame[key]['a'] = (newCurFrame[key]['ax']**2 +
                                              newCurFrame[key]['ay']**2)**0.5
         return newCurFrame
+
+    def _fixSpeed0(self, curFrame: list) -> list:
+        '''function _fixSpeed0
+
+        input
+        -----
+        curFrame: list, 当前帧车辆目标信息
+
+        return
+        ------
+        curFrame: list, 修正后的当前帧车辆目标信息
+
+        修正速度为0的数据, 部分车辆速度值为0, 但vx和vy有数值
+        '''
+        for car in curFrame:
+            if (car['speed'] == 0) & ((car['vx'] > 1) or (car['vy'] > 1)):
+                car['speed'] = (car['vx']**2 + car['vy']**2)**0.5
+
+        return curFrame
