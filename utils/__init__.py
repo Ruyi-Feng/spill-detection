@@ -120,3 +120,10 @@ def strCapitalize(str: str) -> str:
     字符串首字母大写。
     '''
     return str[0].upper() + str[1:]
+
+
+def swapQuotes(input_string):
+    input_string = input_string.replace("'", "temp")  # 将单引号替换为临时字符串
+    input_string = input_string.replace('"', "'")  # 将双引号替换为单引号
+    input_string = input_string.replace("temp", '"')  # 将临时字符串替换为双引号
+    return input_string
