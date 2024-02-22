@@ -1,9 +1,9 @@
-ip: 'localhost:9092'
-topic: 'test'
+ip: '192.168.1.31:9092'
+topic: 'trafficTrajectory'
 groupid: None
 producerversion: [2, 8, 1]
 key: None
-http: 'http://localhost:20490'
+http: 'http://192.168.1.31:20490'
 # donglan test
 # ip: '192.168.1.31:9092'
 # topic: 'trafficTrajectory'
