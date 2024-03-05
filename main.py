@@ -53,10 +53,10 @@ def main():
                        )
     # 生成http上报器
     hp = HttpPoster(cfg['http'])
-    print('数据通信组件生成成功')
+    print('数据通信组件生成')
 
     # 获取当前设备信息
-    print('waiting the first message to obtain device information...')
+    print('waiting the first message to obtain device information...', end='  ')
     # try:
     for msgBytes in kc:     # 从kafka接收一帧数据以确定当前设备的信息
         msgStr = msgBytes.value.decode('utf-8')
