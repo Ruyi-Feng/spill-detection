@@ -3,7 +3,7 @@ from traffic_manager import TrafficMng
 from event_detection.event import EventMng
 from utils import delDictKeys, strCapitalize
 from utils.car_utils import getCarFromCars, getCarBaseInfo
-
+from utils.default import defaultEventTypes
 
 '''The module is to detect events. Params are defined in config.json.'''
 
@@ -98,6 +98,10 @@ class EventDetector(TrafficMng):
         self.dangerDict = dict()    # 以车道id+cell order为索引, 记录[开始时间, 结束时间, cell]
         self.crowdDict = dict()     # 以车道id为索引, 记录[开始时间, 结束时间, lane]
 
+        # 初始化事件告警记录变量
+        for type in defaultEventTypes:
+            self.__setattr__(type, [])
+
     def run(self, cars: list) -> dict:
         ''' function run
 
@@ -152,7 +156,7 @@ class EventDetector(TrafficMng):
         # 2. 遍历潜在事件记录字典
         # 删除无效dict键, 包括当前帧丢失目标, 或未消失但已脱离事件检测条件的目标
         for type in self.potentialEventTypes:
-            self._deleteNoUsePotentialDictKeys(type, cars)
+            self._deleteNoUsePotentialDictKeys(type+'Warn', cars)
 
     def detect(self, cars: list):
         '''function detect
@@ -257,7 +261,9 @@ class EventDetector(TrafficMng):
             # 检查事件
             deltaTms = self.stopDict[id][1] - self.stopDict[id][0]
             deltaTs = deltaTms / 1000
-            if abs(deltaTs - self.durationStop) < (1 / self.fps) * 0.99:
+            # if abs(deltaTs - self.durationStop) < (1 / self.fps) * 0.99:
+            if (deltaTs > self.durationStop) and (id not in self.__getattribute__('stop'+'Warn')):
+                self.__getattribute__('stop'+'Warn').append(id)
                 car = getCarFromCars(cars, id)
                 event = f"事件: id={str(id)}车辆准静止, " + getCarBaseInfo(car) + \
                     f", 开始时间{str(self.stopDict[id][0])}。 "
@@ -282,7 +288,9 @@ class EventDetector(TrafficMng):
             # 检查事件
             deltaTms = self.lowSpeedDict[id][1] - self.lowSpeedDict[id][0]
             deltaTs = deltaTms / 1000
-            if abs(deltaTs - self.durationLow) < (1 / self.fps) * 0.99:
+            # if abs(deltaTs - self.durationLow) < (1 / self.fps) * 0.99:
+            if (deltaTs > self.durationLow) and (id not in self.__getattribute__('lowSpeed'+'Warn')):
+                self.__getattribute__('lowSpeed'+'Warn').append(id)
                 car = getCarFromCars(cars, id)
                 event = f"事件: id={str(id)}车辆低速行驶, " + getCarBaseInfo(car) + \
                     f", 开始时间{str(self.lowSpeedDict[id][0])}。 "
@@ -308,7 +316,9 @@ class EventDetector(TrafficMng):
             # 检查事件
             deltaTms = self.highSpeedDict[id][1] - self.highSpeedDict[id][0]
             deltaTs = deltaTms / 1000
-            if abs(deltaTs - self.durationHigh) < (1 / self.fps) * 0.99:
+            # if abs(deltaTs - self.durationHigh) < (1 / self.fps) * 0.99:
+            if (deltaTs > self.durationHigh) and (id not in self.__getattribute__('highSpeed'+'Warn')):
+                self.__getattribute__('highSpeed'+'Warn').append(id)
                 car = getCarFromCars(cars, id)
                 event = f"事件: id={str(id)}车辆超速行驶, " + getCarBaseInfo(car) + \
                     f", 开始时间{str(self.highSpeedDict[id][0])}。 "
@@ -334,7 +344,9 @@ class EventDetector(TrafficMng):
             # 检查事件
             deltaTms = self.emgcBrakeDict[id][1] - self.emgcBrakeDict[id][0]
             deltaTs = deltaTms / 1000
-            if abs(deltaTs - self.durationEmgcBrake) < (1 / self.fps) * 0.99:
+            # if abs(deltaTs - self.durationEmgcBrake) < (1 / self.fps) * 0.99:
+            if (deltaTs > self.durationEmgcBrake) and (id not in self.__getattribute__('emgcBrake'+'Warn')):
+                self.__getattribute__('emgcBrake'+'Warn').append(id)
                 car = getCarFromCars(cars, id)
                 event = f"事件: id={str(id)}车辆急刹车, " + getCarBaseInfo(car) + \
                     f"加速度: {car['a']}" + \
@@ -511,7 +523,9 @@ class EventDetector(TrafficMng):
             deltaTms = self.illegalOccupationDict[id][1] - \
                 self.illegalOccupationDict[id][0]
             deltaTs = deltaTms / 1000
-            if abs(deltaTs - self.durationOccupation) < (1 / self.fps) * 0.99:
+            # if abs(deltaTs - self.durationOccupation) < (1 / self.fps) * 0.99:
+            if (deltaTs > self.durationOccupation) and (id not in self.__getattribute__('illegalOccupation'+'Warn')):
+                self.__getattribute__('illegalOccupation'+'Warn').append(id)
                 car = getCarFromCars(cars, id)
                 event = f"事件: id={str(id)}车辆占用应急车道, " + getCarBaseInfo(car) +\
                     f", 开始时间{str(self.illegalOccupationDict[id][0])}。 "
@@ -630,7 +644,9 @@ class EventDetector(TrafficMng):
             # 生成结束event
             dictInfo = getattr(self, f'{type}Dict')[key]
             startTime, endTime, car = dictInfo[0], dictInfo[1], dictInfo[2]
-            self.eventMng.run(type, startTime, endTime, car)
+            if car['id'] in self.__getattribute__(type + 'Warn'):
+                self.__getattribute__(type + 'Warn').remove(car['id'])
+                self.eventMng.run(type, startTime, endTime, car)
             # print(f"事件: id={str(key)}车辆{type}事件结束, " + getCarBaseInfo(car) + \
             #       f", 开始时间{str(startTime)}, 结束时间{str(endTime)}。 ")
             # 删除无效keys
