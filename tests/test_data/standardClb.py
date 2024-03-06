@@ -6,7 +6,7 @@ standardClb = {
         {
             'emgc': True, 'vDir': {'x': 1, 'y': -1},
             'start': 799.3, 'len': 799.3, 'end': 0,
-            'coef': [-0.907, -45.799, 180.391],
+            'coef': [-0.862, -45.739, 177.781],
             'cells': [False, False, False, False, False, False, False, False,
                       False, False, False, False, True, True, True, True]
         },
@@ -14,7 +14,7 @@ standardClb = {
         {
             'emgc': False, 'vDir': {'x': 1, 'y': -1},
             'start': 799.3, 'len': 799.3, 'end': 0,
-            'coef': [-0.907, -45.799, 197.175],
+            'coef': [-0.862, -45.739, 197.314],
             'cells': [False, False, False, False, True, True, True, True,
                       True, True, True, True, True, True, True, True]
         },
@@ -22,7 +22,7 @@ standardClb = {
         {
             'emgc': False, 'vDir': {'x': 1, 'y': -1},
             'start': 799.3, 'len': 799.3, 'end': 0,
-            'coef': [-0.907, -35.443, 340.721],
+            'coef': [-0.862, -35.639, 336.635],
             'cells': [False, False, False, True, True, True, True, True,
                       True, True, True, True, True, True, True, True]
         },
@@ -30,7 +30,7 @@ standardClb = {
         {
             'emgc': False, 'vDir': {'x': 1, 'y': -1},
             'start': 799.3, 'len': 799.3, 'end': 0,
-            'coef': [-0.907, -32.508, 469.615],
+            'coef': [-0.862, -32.909, 468.808],
             'cells': [False, False, False, False, False, True, True, True,
                       True, True, True, True, True, True, True, True]
         },
@@ -38,7 +38,7 @@ standardClb = {
         {
             'emgc': False, 'vDir': {'x': -1, 'y': 1},
             'start': 0, 'len': 799.3, 'end': 799.3,
-            'coef': [-0.907, -17.134, 715.163],
+            'coef': [-0.862, -17.658, 710.038],
             'cells': [False, True, True, True, True, True, True, True,
                       True, True, True, True, True, True, True, True]
         },
@@ -46,7 +46,7 @@ standardClb = {
         {
             'emgc': False, 'vDir': {'x': -1, 'y': 1},
             'start': 0, 'len': 799.3, 'end': 799.3,
-            'coef': [-0.907, -12.016, 762.724],
+            'coef': [-0.862, -12.435, 757.83],
             'cells': [False, True, True, True, True, True, True, True,
                       True, True, True, True, True, True, True, True]
         },
@@ -54,15 +54,17 @@ standardClb = {
         {
             'emgc': False, 'vDir': {'x': -1, 'y': 1},
             'start': 0, 'len': 799.3, 'end': 799.3,
-            'coef': [-0.907, -4.521, 786.292],
+            'coef': [-0.862, -5.295, 785.6],
             'cells': [False, True, True, True, True, True, True, True,
                       True, True, True, True, True, True, True, True]},
         8:
         {
             'emgc': True, 'vDir': {'x': -1, 'y': 1},
             'start': 0, 'len': 799.3, 'end': 799.3,
-            'coef': [-0.907, -4.521, 803.075],
+            'coef': [-0.862, -5.295, 805.134],
             'cells': [False, False, True, False, False, False, True, False,
                       True, True, True, False, True, True, True, True]
         }
     }
+
+
