@@ -145,7 +145,7 @@ def testComplementInterpolation():
 
     assert len(hisFrames["ab8756de"]) == 5
     assert len(hisFrames["ab8701de"]) == 5
-    assert len(hisFrames["ab8756an"]) == 4
+    assert len(hisFrames["ab8756an"]) == 5
     assert hisFrames["ab8756de"][2]["x"] == 99.0
     assert hisFrames["ab8756de"][2]["y"] == 100
     assert hisFrames["ab8756de"][2]["secMark"] == 200

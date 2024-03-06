@@ -5,21 +5,21 @@ dataIncident = [
     [
         {'id': 1, 'x': 2.36, 'y': 25, 'vx': 0.13, 'vy': 20,
          'laneID': 4, 'ax': 0, 'ay': 10, 'a': 10, 'timestamp': 0, 'speed': 20,
-         'latitude': 0, 'longitude': 0,
+         'latitude': 0, 'longitude': 0, 'class': 1,
          'deviceID': 'K68+366', 'deviceType': '1'},
         {'id': 2, 'x': 2.36, 'y': 26, 'vx': 0.13, 'vy': 20,
          'laneID': 4, 'ax': 0, 'ay': 10, 'a': 10, 'timestamp': 0, 'speed': 20,
-         'latitude': 0, 'longitude': 0,
+         'latitude': 0, 'longitude': 0, 'class': 1,
          'deviceID': 'K68+366', 'deviceType': '1'},
     ],
     [
         {'id': 1, 'x': 2.36, 'y': 26, 'vx': 0, 'vy': 0,
          'laneID': 4, 'ax': 0, 'ay': 10, 'a': 10, 'timestamp': 0, 'speed': 20,
-         'latitude': 0, 'longitude': 0,
+         'latitude': 0, 'longitude': 0, 'class': 1,
          'deviceID': 'K68+366', 'deviceType': '1'},
         {'id': 2, 'x': 2.36, 'y': 26.5, 'vx': 0, 'vy': 0,
          'laneID': 4, 'ax': 0, 'ay': 10, 'a': 10, 'timestamp': 0, 'speed': 20,
-         'latitude': 0, 'longitude': 0,
+         'latitude': 0, 'longitude': 0, 'class': 1,
          'deviceID': 'K68+366', 'deviceType': '1'},
     ]
 ]
@@ -54,7 +54,8 @@ dataIncidentEvent = {
             'lat': 0,
             'lon': 0,
             'deviceID': 'K68+366',
-            'deviceType': '1'
+            'deviceType': '1',
+            'rawClass': [1, 1]
         }
     }
 }

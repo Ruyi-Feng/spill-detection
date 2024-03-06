@@ -16,7 +16,8 @@ dataCrowdEvent = {
             'lat': 3,
             'lon': 0,
             'deviceID': 'K68+366',
-            'deviceType': '1'
+            'deviceType': '1',
+            'rawClass': -1
         }
     }
 }

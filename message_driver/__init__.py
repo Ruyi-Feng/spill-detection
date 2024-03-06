@@ -127,6 +127,7 @@ class DriverOffline:
                      'LineNum': 'laneID',
                      'Latitude': 'latitude',
                      'Longitude': 'longitude',
+                     'TargetType': 'class'
                      }
         # 返还数据格式接口, 从内部处理数据转化为输出数据
         interfaceBack = dict()
