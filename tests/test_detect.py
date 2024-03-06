@@ -191,12 +191,12 @@ def testCrowd():
 
 
 if __name__ == "__main__":
-    # testDetect()
+    testDetect()
     # testSpill()
     # testStop()
     # testLowSpeed()
     # testHighSpeed()
     # testIllegalOccupation()
     # testEmgcBrake()
-    testIncident()
-    testCrowd()
+    # testIncident()
+    # testCrowd()
