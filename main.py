@@ -6,7 +6,8 @@ from controller import Controller
 from kafka import KafkaConsumer
 from connector import HttpPoster
 from rsu_simulator import Smltor
-from utils import loadConfig  # , swapQuotes
+from utils import loadConfig, isNotTargetDevice
+from logger import MyLogger
 
 if sys.version_info >=(3,12,0):
     sys.modules['kafka.vendor.six.moves'] = 'six.moves'
@@ -33,10 +34,6 @@ def simulatedMain():
             break
         msg, events = controller.run(msg)  # msg为控制器返回的需要发送的数据
 
-def isNotTargetDevice(msg, args):
-    if msg['deviceID'] != args.deviceId:
-        return True
-    return False
 
 def main():
     # 读取配置文件
@@ -47,7 +44,7 @@ def main():
     kc = KafkaConsumer(cfg['topic'], bootstrap_servers=cfg['ip'],
                        api_version=tuple(cfg['producerversion']),
                     #    auto_offset_reset='smallest',
-                    #    auto_offset_reset='latest',  # TODO 注释掉
+                    #    auto_offset_reset='latest',
                        group_id=cfg['groupid'],
                     #    auto_commit_interval_ms=cfg['kafkaAutoCommitIntervalMs']
                        )
