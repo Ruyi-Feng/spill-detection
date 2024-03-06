@@ -53,7 +53,7 @@ class EventDetector(TrafficMng):
     durationOccupation: float, 非法占道持续时间阈值, 单位s
     '''
     def __init__(self, clb: dict, cfg: dict,
-                 logger: MyLogger):
+                 logger: MyLogger = None):
         ''' function __init__
 
         input
@@ -67,7 +67,7 @@ class EventDetector(TrafficMng):
         '''
         # 令TrafficMng方法初始化给自身
         super().__init__(clb, cfg)
-        self.logger = logger
+        self.logger = logger if logger else MyLogger('Driver', 20)
         # 生成事件管理器
         self.eventMng = EventMng(cfg['eventTypes'])
         # 初始化属性(其中秒为单位属性, 统一初次赋值后, 乘fps以帧为单位)
