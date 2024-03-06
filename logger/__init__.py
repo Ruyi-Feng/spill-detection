@@ -25,8 +25,8 @@ class MyLogger(logging.Logger):
         loggerName = deviceID + '_' + str(deviceType)
         super().__init__(loggerName, level)
         self.setLevel(level)
-        fmtStr = '%(asctime)s - %(name)s - %(levelname)s \
-            - %(filename)s - %(message)s'
+        fmtStrList = ['asctime', 'name', 'levelname', 'filename', 'message']
+        fmtStr = ' - '.join(['%('+i+')s' for i in fmtStrList])
         formatter = logging.Formatter(fmtStr)
         self.formatter = formatter
         # 控制台日志
