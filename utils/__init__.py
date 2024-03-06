@@ -162,3 +162,18 @@ def unix_milliseconds_to_datetime(unix_milliseconds: int) -> str:
     dt_object = datetime.fromtimestamp(unix_seconds)
     # 返回年月日时分秒格式的字符串
     return dt_object.strftime('%Y-%m-%d %H:%M:%S')
+
+
+def isNotTargetDevice(msg, args):
+    '''function isNotTargetDevice
+    
+    input
+    -----
+    msg: dict, 传来的消息
+    args: argparse.Namespace, 命令行参数
+    
+    return
+    ------
+    bool: bool, 是否不是目标设备
+    '''
+    return not (msg['deviceID'] == args.deviceId)
