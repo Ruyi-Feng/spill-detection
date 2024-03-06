@@ -104,7 +104,7 @@ class EventDetector(TrafficMng):
 
         # 初始化事件告警记录变量
         for type in defaultEventTypes:
-            self.__setattr__(type, [])
+            self.__setattr__(type + 'Warn', [])
 
     def run(self, cars: list) -> dict:
         ''' function run
@@ -160,7 +160,7 @@ class EventDetector(TrafficMng):
         # 2. 遍历潜在事件记录字典
         # 删除无效dict键, 包括当前帧丢失目标, 或未消失但已脱离事件检测条件的目标
         for type in self.potentialEventTypes:
-            self._deleteNoUsePotentialDictKeys(type+'Warn', cars)
+            self._deleteNoUsePotentialDictKeys(type, cars)
 
     def detect(self, cars: list):
         '''function detect
