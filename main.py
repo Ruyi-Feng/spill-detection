@@ -74,7 +74,7 @@ def main():
     # 根据设备信息生成clbPath, 为./road_calibration/clb_设备名_设备类型.yml
     # 生成主控制器
     clbPath = './road_calibration/clbymls/clb_' + deviceID + '_' + deviceType + '.yml'
-    controller = Controller(configPath, clbPath)
+    controller = Controller(configPath, clbPath, logger)
     logger.info('算法组件生成成功, 数据进入算法通道.')
 
     # 持续性运行接收
