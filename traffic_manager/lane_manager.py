@@ -257,5 +257,5 @@ class LaneMng:
         确定车辆所在元胞序号。
         '''
         order = self.vdir * (car['y'] - self.start) // self.cellLen
-        order = 0 if order <0 else order    # 防止雷达监测范围扩大，车辆先于标定区域的start出现而报错
+        order = 0 if order < 0 else order    # 防止雷达监测范围扩大
         return order

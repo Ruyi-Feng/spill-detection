@@ -1,6 +1,6 @@
 from logger import MyLogger
 from utils.default import typeIdDict
-from utils import unix_milliseconds_to_datetime
+from utils import unixMilliseconds2Datetime
 
 '''Define the send and receive interface processor of message.'''
 
@@ -16,9 +16,9 @@ class Driver():
     数据格式转化驱动器, 将传感器数据转化为代码内部流通的数据格式,
     将代码内部流通的数据格式转化为输出数据。
     '''
-    def __init__(self, fps: float, logger: MyLogger):
+    def __init__(self, fps: float, logger: MyLogger = None):
         self.fps = fps
-        self.logger = logger
+        self.logger = logger if logger else MyLogger('Driver', 20)
         self.driverOffline = DriverOffline(fps)
         self.driverOnline = DriverOnline(fps)
         self.mode = 'offline'   # 'offline' | 'online', 默认为离线测试模式, receive时更新
@@ -320,9 +320,10 @@ class DriverOnline:
             #     continue
             if car['laneID'] not in self.lanes:
                 self.logger.warning('laneID ', car['laneID'],
-                      'not in lanes', self.lanes,
-                      'please recalibrate the section: ',
-                      'deviceID:', deviceID, 'deviceType:', deviceType)
+                                    'not in lanes', self.lanes,
+                                    'please recalibrate the section: ',
+                                    'deviceID:', deviceID,
+                                    'deviceType:', deviceType)
                 continue
             car['deviceID'] = deviceID
             car['deviceType'] = deviceType
@@ -476,11 +477,11 @@ class DriverOnline:
         newEvent['level'] = 1
         # newEvent['start_time'] = event['startTime']
         # newEvent['end_time'] = event['endTime']
-        newEvent['start_time'] = unix_milliseconds_to_datetime(event['startTime'])
+        newEvent['start_time'] = unixMilliseconds2Datetime(event['startTime'])
         if event['endTime'] == -1:
             newEvent['end_time'] = -1
         else:
-            newEvent['end_time'] = unix_milliseconds_to_datetime(event['endTime'])
+            newEvent['end_time'] = unixMilliseconds2Datetime(event['endTime'])
         newEvent['lane'] = event['laneID']
         newEvent['raw_class'] = event['rawClass']
         newEvent['point_wgs84'] = {

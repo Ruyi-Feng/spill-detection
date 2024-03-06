@@ -266,7 +266,9 @@ class EventDetector(TrafficMng):
             deltaTms = self.stopDict[id][1] - self.stopDict[id][0]
             deltaTs = deltaTms / 1000
             # if abs(deltaTs - self.durationStop) < (1 / self.fps) * 0.99:
-            if (deltaTs > self.durationStop) and (id not in self.__getattribute__('stop'+'Warn')):
+            condition1 = (deltaTs > self.durationStop)
+            condition2 = (id not in self.__getattribute__('stop'+'Warn'))
+            if condition1 and condition2:
                 self.__getattribute__('stop'+'Warn').append(id)
                 car = getCarFromCars(cars, id)
                 event = f"事件: id={str(id)}车辆准静止, " + getCarBaseInfo(car) + \
@@ -293,7 +295,9 @@ class EventDetector(TrafficMng):
             deltaTms = self.lowSpeedDict[id][1] - self.lowSpeedDict[id][0]
             deltaTs = deltaTms / 1000
             # if abs(deltaTs - self.durationLow) < (1 / self.fps) * 0.99:
-            if (deltaTs > self.durationLow) and (id not in self.__getattribute__('lowSpeed'+'Warn')):
+            condition1 = (deltaTs > self.durationLow)
+            condition2 = (id not in self.__getattribute__('lowSpeed'+'Warn'))
+            if condition1 and condition2:
                 self.__getattribute__('lowSpeed'+'Warn').append(id)
                 car = getCarFromCars(cars, id)
                 event = f"事件: id={str(id)}车辆低速行驶, " + getCarBaseInfo(car) + \
@@ -321,7 +325,9 @@ class EventDetector(TrafficMng):
             deltaTms = self.highSpeedDict[id][1] - self.highSpeedDict[id][0]
             deltaTs = deltaTms / 1000
             # if abs(deltaTs - self.durationHigh) < (1 / self.fps) * 0.99:
-            if (deltaTs > self.durationHigh) and (id not in self.__getattribute__('highSpeed'+'Warn')):
+            condition1 = (deltaTs > self.durationHigh)
+            condition2 = (id not in self.__getattribute__('highSpeed'+'Warn'))
+            if condition1 and condition2:
                 self.__getattribute__('highSpeed'+'Warn').append(id)
                 car = getCarFromCars(cars, id)
                 event = f"事件: id={str(id)}车辆超速行驶, " + getCarBaseInfo(car) + \
@@ -349,7 +355,9 @@ class EventDetector(TrafficMng):
             deltaTms = self.emgcBrakeDict[id][1] - self.emgcBrakeDict[id][0]
             deltaTs = deltaTms / 1000
             # if abs(deltaTs - self.durationEmgcBrake) < (1 / self.fps) * 0.99:
-            if (deltaTs > self.durationEmgcBrake) and (id not in self.__getattribute__('emgcBrake'+'Warn')):
+            condition1 = (deltaTs > self.durationEmgcBrake)
+            condition2 = (id not in self.__getattribute__('emgcBrake'+'Warn'))
+            if condition1 and condition2:
                 self.__getattribute__('emgcBrake'+'Warn').append(id)
                 car = getCarFromCars(cars, id)
                 event = f"事件: id={str(id)}车辆急刹车, " + getCarBaseInfo(car) + \
@@ -527,8 +535,11 @@ class EventDetector(TrafficMng):
             deltaTms = self.illegalOccupationDict[id][1] - \
                 self.illegalOccupationDict[id][0]
             deltaTs = deltaTms / 1000
-            # if abs(deltaTs - self.durationOccupation) < (1 / self.fps) * 0.99:
-            if (deltaTs > self.durationOccupation) and (id not in self.__getattribute__('illegalOccupation'+'Warn')):
+            # if abs(deltaTs - self.durationOccupation) < (1 / self.fps)*0.99:
+            condition1 = (deltaTs > self.durationOccupation)
+            condition2 = (id not in self.__getattribute__(
+                'illegalOccupation'+'Warn'))
+            if condition1 and condition2:
                 self.__getattribute__('illegalOccupation'+'Warn').append(id)
                 car = getCarFromCars(cars, id)
                 event = f"事件: id={str(id)}车辆占用应急车道, " + getCarBaseInfo(car) +\
@@ -572,7 +583,6 @@ class EventDetector(TrafficMng):
         # 用vx和vy计算速度判断低速
         return (self.vStop < math.sqrt(car['vx']**2 + car['vy']**2) <=
                 self.vLow)
-    
 
     def _isCarHighSpeed(self, car: dict) -> bool:
         '''function _isCarHighSpeed
@@ -651,7 +661,8 @@ class EventDetector(TrafficMng):
             if car['id'] in self.__getattribute__(type + 'Warn'):
                 self.__getattribute__(type + 'Warn').remove(car['id'])
                 self.eventMng.run(type, startTime, endTime, car)
-            self.logger.warning(f"事件: id={str(key)}车辆{type}事件结束, " + getCarBaseInfo(car) + \
-                                f", 开始时间{str(startTime)}, 结束时间{str(endTime)}。 ")
+            self.logger.warning(
+                f"事件: id={str(key)}车辆{type}事件结束, " + getCarBaseInfo(car) +
+                f", 开始时间{str(startTime)}, 结束时间{str(endTime)}.")
             # 删除无效keys
             del getattr(self, f'{type}Dict')[key]

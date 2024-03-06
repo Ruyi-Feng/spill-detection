@@ -36,7 +36,8 @@ class MyLogger(logging.Logger):
         self.addHandler(ch)
         # 文件日志
         self._checkLogsDir()    # 判断两层文件夹是否存在
-        filePath = f'./logger/logs/{loggerName}/{datetime.now().strftime("%Y-%m-%d")}.log'
+        filePath = f'./logger/logs/{loggerName}/' + \
+            f'{datetime.now().strftime("%Y-%m-%d")}.log'
         fh = logging.FileHandler(filePath)
         fh.setFormatter(formatter)
         fh.setLevel(logging.WARNING)
@@ -48,7 +49,8 @@ class MyLogger(logging.Logger):
         每天12点, 更新一个文件保存当天的log'''
         # 判断当天的文件是否存在
         self._checkLogsDir()        # 判断两层文件夹是否存在
-        filePath = f'./logger/logs/{self.name}/{datetime.now().strftime("%Y-%m-%d")}.log'
+        filePath = f'./logger/logs/{self.name}/' +\
+            f'{datetime.now().strftime("%Y-%m-%d")}.log'
         if os.path.exists(filePath):    # 如果存在，则不需要更新
             return
         # 移除旧的 FileHandler

@@ -143,9 +143,9 @@ def swapQuotes(input_string: str) -> str:
     return input_string
 
 
-def unix_milliseconds_to_datetime(unix_milliseconds: int) -> str:
-    '''function unix_milliseconds_to_datetime
-    
+def unixMilliseconds2Datetime(unix_milliseconds: int) -> str:
+    '''function unixMilliseconds2Datetime
+
     input
     -----
     unix_milliseconds: int, Unix毫秒时间戳
@@ -166,14 +166,28 @@ def unix_milliseconds_to_datetime(unix_milliseconds: int) -> str:
 
 def isNotTargetDevice(msg, args):
     '''function isNotTargetDevice
-    
+
     input
     -----
     msg: dict, 传来的消息
     args: argparse.Namespace, 命令行参数
-    
+
     return
     ------
     bool: bool, 是否不是目标设备
     '''
     return not (msg['deviceID'] == args.deviceId)
+
+
+def isInvalidMsg(msg) -> bool:
+    '''function isInvalidMsg
+
+    input
+    -----
+    msg: 传来的消息
+
+    return
+    ------
+    bool: bool, 是否是无效消息
+    '''
+    return (msg is None) or (msg == '') or (not msg)
