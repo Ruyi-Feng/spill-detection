@@ -9,8 +9,10 @@ from rsu_simulator import Smltor
 from utils import loadConfig, isNotTargetDevice
 from logger import MyLogger
 
+
 if sys.version_info >=(3,12,0):
     sys.modules['kafka.vendor.six.moves'] = 'six.moves'
+
 
 def params():
     parser = argparse.ArgumentParser(description='spill-detection parameters')
@@ -18,6 +20,7 @@ def params():
     parser.add_argument('--deviceType', type=int, default=0, help="radar 1, camera 2")
     args = parser.parse_args()
     return args
+
 
 def simulatedMain():
     configPath = './config.yml'
@@ -36,10 +39,11 @@ def simulatedMain():
 
 
 def main():
+    args = params()
+    logger = MyLogger(args.deviceId, args.deviceType)
     # 读取配置文件
     configPath = './config.yml'
     cfg = loadConfig(configPath)
-    args = params()
     # 生成kafka消费者
     kc = KafkaConsumer(cfg['topic'], bootstrap_servers=cfg['ip'],
                        api_version=tuple(cfg['producerversion']),
@@ -50,11 +54,10 @@ def main():
                        )
     # 生成http上报器
     hp = HttpPoster(cfg['http'])
-    print('数据通信组件生成')
+    logger.info('kafka与http数据通信组件已生成.')
 
     # 获取当前设备信息
-    print('waiting the first message to obtain device information...', end='  ')
-    # try:
+    logger.info('waiting the first message to obtain device information...')
     for msgBytes in kc:     # 从kafka接收一帧数据以确定当前设备的信息
         msgStr = msgBytes.value.decode('utf-8')
         # if len(msgStr) < 2:
@@ -65,22 +68,19 @@ def main():
         if (msg is None) or (msg == '') or (not msg) or isNotTargetDevice(msg, args):
             continue
         deviceID, deviceType = msg['deviceID'], str(msg['deviceType'])
-        print('deviceID:', deviceID, 'deviceType:', deviceType)
+        logger.info('接收该设备数据: deviceID:', deviceID, 'deviceType:', deviceType)
         break
-    # except:
-    #     kc.close()
 
     # 根据设备信息生成clbPath, 为./road_calibration/clb_设备名_设备类型.yml
     # 生成主控制器
     clbPath = './road_calibration/clbymls/clb_' + deviceID + '_' + deviceType + '.yml'
     controller = Controller(configPath, clbPath)
-    print('算法组件生成成功, 开始接收数据')
+    logger.info('算法组件生成成功, 数据进入算法通道.')
 
     # 持续性运行接收
-    # try:
     for msgBytes in kc:
         # 数据解码
-        print('receive time:', datetime.now(), end='\r')  # end='\r'
+        print('latest receiving time:', datetime.now(), end='\r')   # 持续显示, 不用logger 
         msgStr = msgBytes.value.decode('utf-8')
         msg = json.loads(msgStr)        # dict
         # 非空数据判断
@@ -94,10 +94,7 @@ def main():
             continue    # 未检测到事件
         # 上报事件
         hp.run(events)
-        print(events)
-    # except:
-    #     print('kafka connection error!')
-    #     kc.close()
+        # logger.error(events)  # 在各个事件告警时计入日志
 
 
 if __name__ == "__main__":
