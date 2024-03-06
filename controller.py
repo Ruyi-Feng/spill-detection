@@ -48,7 +48,7 @@ class Controller:
         # 生成日志器
         self.logger = logger
         # 生成数据驱动器
-        self.drv = Driver(cfg['fps'])
+        self.drv = Driver(cfg['fps'], logger)
         # 是否标定
         self.clbPath = clbPath
         self.needClb = False
@@ -119,7 +119,7 @@ class Controller:
         # 生成事件检测器(内含交通参数管理器)
         self.edt = EventDetector(self.clb, self.cfg)
 
-    def run(self, msg: list) -> tuple[list, list]:
+    def run(self, msg: list) -> (list, list):
         '''function run
 
         input
