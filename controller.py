@@ -117,7 +117,7 @@ class Controller:
         self.pp = PreProcessor(self.cfg['maxCompleteTime'],
                                self.cfg['smoothAlpha'])
         # 生成事件检测器(内含交通参数管理器)
-        self.edt = EventDetector(self.clb, self.cfg)
+        self.edt = EventDetector(self.clb, self.cfg, self.logger)
 
     def run(self, msg: list) -> (list, list):
         '''function run
