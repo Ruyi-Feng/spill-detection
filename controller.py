@@ -1,10 +1,12 @@
 import os
+import time
+from logger import MyLogger
 from road_calibration import Calibrator
 from message_driver import Driver
 from pre_processing import PreProcessor
 from event_detection import EventDetector
 from utils import loadConfig, loadYaml
-import time
+
 
 '''Controller is to control the whole process of the project.'''
 
@@ -29,18 +31,22 @@ class Controller:
 
     生成控制器, 用于控制整个算法流程。
     '''
-    def __init__(self, cfgPath: str, clbPath: str):
+    def __init__(self, cfgPath: str, clbPath: str,
+                 logger: MyLogger):
         '''function __init__
 
         input
         -----
         cfgPath: str, 算法参数文件路径
         clbPath: str, 标定参数文件路径
+        logger: MyLogger, 日志器
         '''
         # 读取配置
         self.cfgPath = cfgPath
         cfg = loadConfig(cfgPath)
         self.cfg = cfg
+        # 生成日志器
+        self.logger = logger
         # 生成数据驱动器
         self.drv = Driver(cfg['fps'])
         # 是否标定
@@ -50,20 +56,21 @@ class Controller:
         self.calibFrames = cfg['calibSeconds'] * cfg['fps']
         self.calibCount = 0
         if (not (os.path.exists(clbPath))) | self.cfg['ifRecalib']:
-            print('******开始标定过程******', end=' ')
             startTime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
             endTime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(
                 time.time() + cfg['calibSeconds']))
-            print(f"开始时刻: {startTime}," +
-                  f"标定时长: {cfg['calibSeconds']}s," +
-                  f"预计结束时刻: {endTime}")
+            self.logger.info('******开始标定过程******' +
+                             f"开始时刻: {startTime}," +
+                             f"标定时长: {cfg['calibSeconds']}s," +
+                             f"预计结束时刻: {endTime}")
             # 没有cfg或者配置需要则标定
             self.needClb = True
             clbtor = Calibrator(clbPath=clbPath, fps=cfg['fps'],
                                 laneWidth=cfg['laneWidth'],
                                 emgcWidth=cfg['emgcWidth'],
                                 cellLen=cfg['cellLen'],
-                                qMerge=cfg['qMerge'])
+                                qMerge=cfg['qMerge'],
+                                logger=logger)
             self.clbtor = clbtor
         else:   # 有cfg则读取, 不需要标定
             self.clb = loadYaml(clbPath)
@@ -86,9 +93,10 @@ class Controller:
             self.clbtor.run(cars)
         else:
             self.needClb = False
-            print('******标定完成******')
-            print('完成时刻: {}'.format(
-                time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+            self.logger.info('******标定完成******' +
+                             '完成时刻: {}'.format(
+                                 time.strftime('%Y-%m-%d %H:%M:%S',
+                                               time.localtime())))
             self.clbtor.calibrate()
             self.clbtor.save()
             self.clb = loadYaml(self.clbPath)
@@ -99,9 +107,10 @@ class Controller:
 
         在完成标定或读取标定后正式启动事件检测。
         '''
-        print('******开始事件检测******', end=' ')
-        print('开始时刻: {}'.format(
-            time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+        self.logger.info('******开始事件检测******' +
+                         '开始时刻: {}'.format(
+                             time.strftime('%Y-%m-%d %H:%M:%S',
+                                           time.localtime())))
         # driver接收当前路段的lanes列表
         self.drv.setLanes(list(self.clb.keys()))
         # 生成数据预处理器
@@ -110,7 +119,7 @@ class Controller:
         # 生成事件检测器(内含交通参数管理器)
         self.edt = EventDetector(self.clb, self.cfg)
 
-    def run(self, msg: list) -> (list, list):
+    def run(self, msg: list) -> tuple[list, list]:
         '''function run
 
         input
