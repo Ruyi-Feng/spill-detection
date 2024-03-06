@@ -9,7 +9,10 @@ from datetime import datetime
 class MyLogger(logging.Logger):
     '''class MyLogger
     This class is a subclass of the logging.Logger class.
-    It is used to create a custom logger for the project'''
+    It is used to create a custom logger for the project
+    默认日志级别为logging.INFO, 控制台输出级别为logging.INFO
+    文件输出级别为logging.WARNING
+    '''
     def __init__(self, deviceID: str, deviceType: int, level=logging.INFO):
         '''function __init__
 
@@ -22,7 +25,9 @@ class MyLogger(logging.Logger):
         loggerName = deviceID + '_' + str(deviceType)
         super().__init__(loggerName, level)
         self.setLevel(level)
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(filename)s - %(message)s')
+        fmtStr = '%(asctime)s - %(name)s - %(levelname)s \
+            - %(filename)s - %(message)s'
+        formatter = logging.Formatter(fmtStr)
         self.formatter = formatter
         # 控制台日志
         ch = logging.StreamHandler()
