@@ -1,3 +1,4 @@
+from logger import MyLogger
 from utils.default import typeIdDict
 from utils import unix_milliseconds_to_datetime
 
@@ -15,8 +16,9 @@ class Driver():
     数据格式转化驱动器, 将传感器数据转化为代码内部流通的数据格式,
     将代码内部流通的数据格式转化为输出数据。
     '''
-    def __init__(self, fps: float):
+    def __init__(self, fps: float, logger: MyLogger):
         self.fps = fps
+        self.logger = logger
         self.driverOffline = DriverOffline(fps)
         self.driverOnline = DriverOnline(fps)
         self.mode = 'offline'   # 'offline' | 'online', 默认为离线测试模式, receive时更新
@@ -317,9 +319,9 @@ class DriverOnline:
             # if car['laneID'] == 0:
             #     continue
             if car['laneID'] not in self.lanes:
-                print('Warning: laneID ', car['laneID'],
+                self.logger.warning('laneID ', car['laneID'],
                       'not in lanes', self.lanes,
-                      'please recalibrate the section of ',
+                      'please recalibrate the section: ',
                       'deviceID:', deviceID, 'deviceType:', deviceType)
                 continue
             car['deviceID'] = deviceID
