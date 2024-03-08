@@ -161,6 +161,5 @@ cython_debug/
 #.idea/
 config.json
 config.yml
-docker.zip
-spill-detection-codes0305.zip
-spill-detection-codes0307.zip
+*.zip
+logger/eventsCache/*.txt
