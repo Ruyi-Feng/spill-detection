@@ -66,5 +66,3 @@ standardClb = {
                       True, True, True, False, True, True, True, True]
         }
     }
-
-

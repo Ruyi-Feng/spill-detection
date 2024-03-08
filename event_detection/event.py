@@ -79,8 +79,9 @@ class EventMng():
         # distribute event ID
         if (info[-1] == '') or (type == 'incident'):
             self.eventIdCount[type] += 1
-            eventID = self.currentDay + '-' + typeCharDict[type] +int2strID(self.eventIdCount[type], self.idLen)
-        else: # 从已经记录的id继承
+            eventID = self.currentDay + '-' + typeCharDict[type] +\
+                int2strID(self.eventIdCount[type], self.idLen)
+        else:  # 从已经记录的id继承
             eventID = info[-1]
 
         # formulate event

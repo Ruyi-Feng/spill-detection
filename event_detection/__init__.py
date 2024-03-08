@@ -51,7 +51,7 @@ class EventDetector(TrafficMng):
     vCrowd:       float, 拥堵速度阈值, 单位m/s
     非法占道类
     durationIllegalOccupation: float, 非法占道持续时间阈值, 单位s
-    
+
     TODO 非必要, 将各类别事件的dict, func都以字典形式存储, 更简洁且易于理解
     '''
     def __init__(self, clb: dict, cfg: dict,
@@ -91,11 +91,12 @@ class EventDetector(TrafficMng):
         self.highSpeedDict = dict()
         self.emgcBrakeDict = dict()
         self.illegalOccupationDict = dict()
-        # 高级记录器, 记录事故监测
-        self.incidentDict = dict()  # 以两辆车id为索引, 记录监测时间
-        # 高级记录器, 记录抛洒物监测
-        self.dangerDict = dict()    # 以车道id+cell order为索引, 记录[开始时间, 结束时间, cell, eventID]
-        self.crowdDict = dict()     # 以车道id为索引, 记录[开始时间, 结束时间, lane, eventID]
+        # 以两辆车id为索引, 记录监测时间
+        self.incidentDict = dict()
+        # 以车道id+cell order为索引, 记录[开始时间, 结束时间, cell, eventID]
+        self.dangerDict = dict()
+        # 以车道id为索引, 记录[开始时间, 结束时间, lane, eventID]
+        self.crowdDict = dict()
 
     def _initTimePropertiesUnitTrans2Frames(self):
         '''function _initTimePropertiesUnitTrans2Frames
@@ -245,10 +246,12 @@ class EventDetector(TrafficMng):
                     if (id, order) in self.dangerDict.keys():
                         # 生成结束事件告警
                         eventID = self.eventMng.run(
-                            'spill', self.dangerDict[(id, order)][0],
+                            'spill',
+                            self.dangerDict[(id, order)][0],
                             self.dangerDict[(id, order)][1],
                             self.dangerDict[(id, order)][2],
-                            deviceID, deviceType, self.dangerDict[(id, order)][3])
+                            deviceID, deviceType,
+                            self.dangerDict[(id, order)][3])
                         # 生成log信息
                         cellStart = self.lanes[id].cells[order].start
                         cellEnd = self.lanes[id].cells[order].end
@@ -295,14 +298,14 @@ class EventDetector(TrafficMng):
             if condition1 and condition2:
                 # 告警
                 car = getCarFromCars(cars, id)
-                eventID = self.eventMng.run(eventType,
-                                  eventRecordDict[id][0], -1, car,
-                                  eventRecordDict[id][3])
+                eventID = self.eventMng.run(
+                    eventType, eventRecordDict[id][0], -1,
+                    car, eventRecordDict[id][3])
                 eventRecordDict[id][3] = eventID
                 # 生成log信息
                 startTime = unixMilliseconds2Datetime(eventRecordDict[id][0])
                 logEvent = f"事件ID={eventID} - " +\
-                    f"id={str(id)}车辆事件{eventType}, " + getCarBaseInfo(car) + \
+                    f"id={str(id)}车辆发生{eventType}, " + getCarBaseInfo(car) + \
                     f", 开始时间{startTime}."
                 self.logger.warning(logEvent)
 
@@ -414,9 +417,9 @@ class EventDetector(TrafficMng):
             # 速度趋于0, 则报警
             if self._isCarStop(car1) & self._isCarStop(car2):
                 # 生成事件
-                eventID = self.eventMng.run('incident',
-                                  self.incidentDict[(car1['id'], car2['id'])],
-                                  car1['timestamp'], car1, car2)
+                eventID = self.eventMng.run(
+                    'incident', self.incidentDict[(car1['id'], car2['id'])],
+                    car1['timestamp'], car1, car2)
                 logEvent = f"事件ID={eventID} - " +\
                     f"id={str(ids[0])},{str(ids[1])}车辆碰撞, " + \
                     getCarBaseInfo(car1) + getCarBaseInfo(car2)
@@ -514,10 +517,9 @@ class EventDetector(TrafficMng):
                 if deltaTs % self.WarnFreq <= (1 / self.fps) * 0.9:
                     # 生成事件
                     eventID = self.eventMng.run(
-                        'crowd',
-                                      cars[0]['timestamp'], -1,
-                                      self.lanes[id],
-                                      deviceID, deviceType, self.crowdDict[id][3])
+                        'crowd', cars[0]['timestamp'], -1,
+                        self.lanes[id], deviceID, deviceType,
+                        self.crowdDict[id][3])
                     self.crowdDict[id][3] = eventID
                     logEvent = f"事件ID={eventID}:" +\
                         f": id={id}车道拥堵, 车道密度: {k}辆/km, 车道速度: {v}km/h."
@@ -526,11 +528,10 @@ class EventDetector(TrafficMng):
             else:   # 不满足拥堵条件, 检查是否在记录表内, 若在则删除
                 if id in self.crowdDict.keys():
                     # 生成结束event
-                    eventID = self.eventMng.run('crowd',
-                                      self.crowdDict[id][0],
-                                      self.crowdDict[id][1],
-                                      self.crowdDict[id][2],
-                                      deviceID, deviceType, self.crowdDict[id][3])
+                    eventID = self.eventMng.run(
+                        'crowd', self.crowdDict[id][0],
+                        self.crowdDict[id][1], self.crowdDict[id][2],
+                        deviceID, deviceType, self.crowdDict[id][3])
                     logEvent = f"事件ID={eventID} - " +\
                         f"id={id}车道拥堵已解除, 车道密度: {k}辆/km, 车道速度: {v}km/h."
                     self.logger.warning(logEvent)
@@ -639,11 +640,14 @@ class EventDetector(TrafficMng):
         for key in key2delete:
             # 生成结束event
             dictInfo = getattr(self, f'{type}Dict')[key]
-            startTime, endTime, car, eventID = dictInfo[0], dictInfo[1], dictInfo[2], dictInfo[3]
-            # 潜在事件表中可能有一些车辆并未发生事件, 只对已经触发事件报警的车辆生成结束event
+            startTime, endTime = dictInfo[2], dictInfo[3]
+            car, eventID = dictInfo[2], dictInfo[3]
+            # 潜在事件表中可能有一些车辆并未发生事件
+            # 只对已经触发事件报警的车辆生成结束event
             if eventID != '':
                 # 告警
-                eventID = self.eventMng.run(type, startTime, endTime, car, eventID)
+                eventID = self.eventMng.run(
+                    type, startTime, endTime, car, eventID)
                 # 生成log信息
                 startTime = unixMilliseconds2Datetime(startTime)
                 endTime = unixMilliseconds2Datetime(endTime)
