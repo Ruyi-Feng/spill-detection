@@ -199,55 +199,71 @@ class EventDetector(TrafficMng):
         # 检查是否存在抛洒物可能
         for id in self.lanes:
             for order in self.lanes[id].cells:
-                # 检查危险度达到1否, 若则报警
-                if self.lanes[id].cells[order].danger >= 1:
-                    # 记录到dict
-                    if (id, order) not in self.dangerDict.keys():
-                        # 若未曾记录, 添加记录
-                        self.dangerDict[(id, order)] = \
-                            [cars[0]['timestamp'], cars[0]['timestamp'],
-                             self.lanes[id].cells[order]]
-                    else:
-                        # 若已记录, 更新记录的当前时间和cell
-                        self.dangerDict[(id, order)][1] = cars[0]['timestamp']
-                        self.dangerDict[(id, order)][2] = \
-                            self.lanes[id].cells[order]
-                    deltaTms = self.dangerDict[(id, order)][1] - \
-                        self.dangerDict[(id, order)][0]
-                    deltaTs = deltaTms / 1000
-                    # 报警
-                    if deltaTs % self.spillWarnFreq == 0:
-                        # 获取报警基础信息
+                if self.lanes[id].cells[order].danger < 1:
+                    continue    # 危险度小于1, 跳过
+                # 记录
+                if (id, order) not in self.dangerDict.keys():
+                    self.dangerDict[(id, order)] = \
+                        [cars[0]['timestamp'], cars[0]['timestamp'],
+                            self.lanes[id].cells[order]]
+                else:       # 若已记录, 更新记录的当前时间和cell
+                    self.dangerDict[(id, order)][1] = cars[0]['timestamp']
+                    self.dangerDict[(id, order)][2] = \
+                        self.lanes[id].cells[order]
+                # 报警
+                deltaTms = self.dangerDict[(id, order)][1] - \
+                    self.dangerDict[(id, order)][0]
+                deltaTs = deltaTms / 1000
+                if (deltaTs % self.spillWarnFreq) <= (1 / self.fps) * 0.9:
+                    # 生成事件
+                    # ifNewEventID = True if deltaTs == 0 else False
+                    event = self.eventMng.run(
+                        'spill', self.dangerDict[(id, order)][0], -1,
+                        # ifNewEventID,
+                        self.dangerDict[(id, order)][2],
+                        deviceID, deviceType)
+                    # 生成log信息
+                    cellStart = self.lanes[id].cells[order].start
+                    cellEnd = self.lanes[id].cells[order].end
+                    if cellStart >= cellEnd:
+                        cellStart, cellEnd = cellEnd, cellStart
+                    startTime = unixMilliseconds2Datetime(
+                        self.dangerDict[(id, order)][0])
+                    endTime = unixMilliseconds2Datetime(
+                        self.dangerDict[(id, order)][1])
+                    logEvent = f"事件ID={event.eventID}:" +\
+                        f"id={id}车道可能有抛洒物, " + \
+                        f"元胞起点: {cellStart}, 元胞终点: {cellEnd}, " + \
+                        f"危险度: {self.lanes[id].cells[order].danger}, " + \
+                        f"开始时间: {startTime}, " + \
+                        f"当前时间: {endTime}"
+                    self.logger.warning(logEvent)
+
+                else:   # 未达到1, 检查是否在记录表内, 若在则删除
+                    if (id, order) in self.dangerDict.keys():
+                        # 生成结束事件告警
+                        event = self.eventMng.run(
+                            'spill', self.dangerDict[(id, order)][0],
+                            self.dangerDict[(id, order)][1],
+                            self.dangerDict[(id, order)][2],
+                            deviceID, deviceType)
+                        # 生成log信息
                         cellStart = self.lanes[id].cells[order].start
                         cellEnd = self.lanes[id].cells[order].end
                         if cellStart >= cellEnd:
                             cellStart, cellEnd = cellEnd, cellStart
-                        # 调试用输出
                         startTime = unixMilliseconds2Datetime(
                             self.dangerDict[(id, order)][0])
                         endTime = unixMilliseconds2Datetime(
                             self.dangerDict[(id, order)][1])
-                        event = f"事件: id={id}车道可能有抛洒物, " + \
+                        logEvent = f"事件ID={event.eventID}:" +\
+                            f"id={id}车道抛洒物已处理, " + \
                             f"元胞起点: {cellStart}, 元胞终点: {cellEnd}, " + \
                             f"危险度: {self.lanes[id].cells[order].danger}, " + \
                             f"开始时间: {startTime}, " + \
-                            f"当前时间: {endTime}"
-                        self.logger.warning(event)
-                        # 真正用生成事件
-                        # ifNewEventID = True if deltaTs == 0 else False
-                        self.eventMng.run('spill',
-                                          self.dangerDict[(id, order)][0],
-                                          -1,  # ifNewEventID,
-                                          self.dangerDict[(id, order)][2],
-                                          deviceID, deviceType)
-                else:   # 未达到1, 检查是否在记录表内, 若在则删除
-                    if (id, order) in self.dangerDict.keys():
-                        # 生成结束事件告警
-                        self.eventMng.run('spill',
-                                          self.dangerDict[(id, order)][0],
-                                          self.dangerDict[(id, order)][1],
-                                          self.dangerDict[(id, order)][2],
-                                          deviceID, deviceType)
+                            f"结束时间: {endTime}"
+                        self.logger.warning(logEvent)
+
                         del self.dangerDict[(id, order)]
 
         self.resetCellDetermineStatus()
