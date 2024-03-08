@@ -178,8 +178,9 @@ class DriverOffline:
         将事件信息转化为输出需要的格式。
         '''
         # 若需输出目标数据, 在这里重新组织, 调用_formatTransInner2Outer()修改属性
-        for car in cars:
-            self._formatTransInner2Outer(car)
+        # 目前若重新组织目标数据，会导致在预处理的补全阶段因数据引用出现报错
+        # for car in cars:
+        #     self._formatTransInner2Outer(car)
         # 事件格式转化
         outEvents = self._eventsInner2Outer(events)
         return cars, outEvents
