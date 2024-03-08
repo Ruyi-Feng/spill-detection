@@ -55,3 +55,4 @@ tSupervise: 20
 densityCrowd: 18
 vCrowd: 5.555
 durationOccupation: 3
+caCheSeconds: 60
