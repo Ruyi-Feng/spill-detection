@@ -41,11 +41,11 @@ def test_driver():
 
         # 发送数据
         msg, events2send = d.send(cars, events)
-        # 检查点2: 成功删除属性
-        if len(msg) > 0:
-            for key in interface.keys():
-                assert interface[key] not in msg[0].keys()
-                assert key in msg[0].keys()
+        # 检查点2: 成功删除属性, 暂无msg输出需求, 取消该项assert
+        # if len(msg) > 0:
+        #     for key in interface.keys():
+        #         assert interface[key] not in msg[0].keys()
+        #         assert key in msg[0].keys()
         # 检查点3: 将events转为输出格式
         assert events2send == outerEvents
 

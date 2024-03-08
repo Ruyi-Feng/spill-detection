@@ -18,7 +18,7 @@ from tests.test_data.eventData import (dataSpill, dataSpillEvent,
 configPath = './config.yml'
 cfg = loadConfig(configPath)
 # 读取标定文件
-calibPath = './road_calibration/clb.yml'
+calibPath = './road_calibration/clbymls/clb.yml'
 clb = loadYaml(calibPath)
 
 

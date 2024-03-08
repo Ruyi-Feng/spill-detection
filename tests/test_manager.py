@@ -7,7 +7,7 @@ from message_driver import Driver
 # 通过
 def testManager():
     configPath = './config.yml'
-    clbPath = './road_calibration/clb.yml'
+    clbPath = './road_calibration/clbymls/clb.yml'
     dataPath = './data/result.txt'
     # standardQ = [923, 937, 1121, 1153, 1147, 1137, 1101, 1058, 1103, 1094,
     #              1101, 1155, 1158, 1192, 1227, 1193, 1250, 1297, 1241, 1241,
