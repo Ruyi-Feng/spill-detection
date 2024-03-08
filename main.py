@@ -16,7 +16,7 @@ if sys.version_info >= (3, 12, 0):
 
 def params():
     parser = argparse.ArgumentParser(description='spill-detection parameters')
-    parser.add_argument('--deviceId', type=str, help="K73+516")
+    parser.add_argument('--deviceId', default='', type=str, help="K73+516")
     parser.add_argument('--deviceType', type=int, default=0,
                         help="radar 1, camera 2")
     args = parser.parse_args()
@@ -25,10 +25,11 @@ def params():
 
 def simulatedMain():
     configPath = './config.yml'
-    clbPath = './road_calibration/clb.yml'
+    clbPath = './road_calibration/clbymls/clb.yml'
     dataPath = './data/result.txt'
-
-    controller = Controller(configPath, clbPath)
+    args = params()
+    logger = MyLogger(args.deviceId, args.deviceType)
+    controller = Controller(configPath, clbPath, logger)
     smltor = Smltor(dataPath)
 
     # 模拟接受数据
@@ -62,10 +63,6 @@ def main():
     logger.info('waiting the first message to obtain device information...')
     for msgBytes in kc:     # 从kafka接收一帧数据以确定当前设备的信息
         msgStr = msgBytes.value.decode('utf-8')
-        # if len(msgStr) < 2:
-        #     continue
-        # if msgStr[1] == '\'':       # 避免传来的数据单引号不满足json格式
-        #     msgStr = swapQuotes(msgStr)
         msg = json.loads(msgStr)        # dict
         if isInvalidMsg(msg) or isNotTargetDevice(msg, args):
             continue
@@ -95,7 +92,6 @@ def main():
             continue    # 未检测到事件
         # 上报事件
         hp.run(events)
-        # logger.error(events)  # 在各个事件告警时计入日志
 
 
 if __name__ == "__main__":
