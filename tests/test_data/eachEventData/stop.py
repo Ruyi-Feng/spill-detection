@@ -1,3 +1,6 @@
+from datetime import datetime
+
+
 dataStop = [
     [{'id': 9934, 'x': 2.36, 'y': 405.65, 'vx': 0.13, 'vy': 0.5,
       'laneID': 4, 'ax': 0, 'ay': 0, 'a': 0, 'timestamp': 0, 'speed': 1,
@@ -865,15 +868,16 @@ dataStop = [
       'deviceID': 'K68+366', 'deviceType': '1'}],
 ]
 
+eventID = datetime.now().strftime('%Y%m%d') + '-B00001'
 dataStopEvent = {
     'name': 'stop',
     'occured': True,
     'items':
     {
-        'B0000000':
+        eventID:
         {
             'type': 'stop',
-            'eventID': 'B0000000',
+            'eventID': eventID,
             'startTime': 0,
             'endTime': -1,
             'carID': 9934,

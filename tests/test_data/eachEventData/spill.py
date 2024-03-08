@@ -1,4 +1,5 @@
 from copy import deepcopy
+from datetime import datetime
 
 
 elementData = [
@@ -82,9 +83,10 @@ for i in range(frameNum):
 #     }
 # }
 
+eventID = datetime.now().strftime('%Y%m%d') + '-A00001'
 dataSpillEvent = {
     'type': 'spill',
-    'eventID': 'A0000000',
+    'eventID': eventID,
     'startTime': 29400,
     'endTime': -1,
     'laneID': 4,

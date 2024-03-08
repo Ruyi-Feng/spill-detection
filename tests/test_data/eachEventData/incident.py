@@ -1,4 +1,4 @@
-'''Simulate 2 cars touches.'''
+from datetime import datetime
 
 
 dataIncident = [
@@ -24,15 +24,16 @@ dataIncident = [
     ]
 ]
 
+eventID = datetime.now().strftime('%Y%m%d') + '-F00001'
 dataIncidentEvent = {
     'name': 'incident',
     'occured': True,
     'items':
     {
-        'F0000000':
+        eventID:
         {
             'type': 'incident',
-            'eventID': 'F0000000',
+            'eventID': eventID,
             'startTime': 0,
             'endTime': 0,
             'carID1': 1,

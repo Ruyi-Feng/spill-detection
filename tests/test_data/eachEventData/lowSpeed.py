@@ -1,3 +1,6 @@
+from datetime import datetime
+
+
 dataLowSpeed = [
     [{'id': 9934, 'x': 2.36, 'y': 405.65, 'vx': 0.13, 'vy': 1.38,
       'laneID': 4, 'ax': 0, 'ay': 0, 'a': 0, 'timestamp': 0, 'speed': 2,
@@ -865,15 +868,16 @@ dataLowSpeed = [
       'deviceID': 'K68+366', 'deviceType': '1'}],
 ]
 
+eventID = datetime.now().strftime('%Y%m%d') + '-C00001'
 dataLowSpeedEvent = {
     'name': 'lowSpeed',
     'occured': True,
     'items':
     {
-        'C0000000':
+        eventID:
         {
             'type': 'lowSpeed',
-            'eventID': 'C0000000',
+            'eventID': eventID,
             'startTime': 0,
             'endTime': -1,
             'carID': 9934,

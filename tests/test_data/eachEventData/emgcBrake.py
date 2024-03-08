@@ -1,3 +1,6 @@
+from datetime import datetime
+
+
 dataEmgcBrake = [
     [{'id': 9934, 'x': 2.36, 'y': 405.65, 'vx': 0, 'vy': -37.43,
       'laneID': 4, 'ax': 0.13, 'ay': 4, 'a': 4,
@@ -795,15 +798,16 @@ dataEmgcBrake = [
       'deviceID': 'K68+366', 'deviceType': '1'}],
 ]
 
+eventID = datetime.now().strftime('%Y%m%d') + '-E00001'
 dataEmgcBrakeEvent = {
     'name': 'emgcBrake',
     'occured': True,
     'items':
     {
-        'E0000000':
+        eventID:
         {
             'type': 'emgcBrake',
-            'eventID': 'E0000000',
+            'eventID': eventID,
             'startTime': 0,
             'endTime': -1,
             'carID': 9934,

@@ -1,12 +1,16 @@
+from datetime import datetime
+
+
+eventID = datetime.now().strftime('%Y%m%d') + '-G00001'
 dataCrowdEvent = {
     'name': 'crowd',
     'occured': True,
     'items':
     {
-        'G0000000':
+        eventID:
         {
             'type': 'crowd',
-            'eventID': 'G0000000',
+            'eventID': eventID,
             'startTime': 200,
             'endTime': -1,
             'laneID': 3,

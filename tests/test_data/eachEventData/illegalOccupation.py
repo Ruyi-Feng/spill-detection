@@ -1,3 +1,6 @@
+from datetime import datetime
+
+
 dataIllegalOccupation = [
     [{'id': 5819, 'x': 21.7, 'y': 410.5, 'vx': -0.01, 'vy': 19.39,
       'laneID': 8, 'ax': 0, 'ay': 0, 'a': 0,
@@ -436,15 +439,16 @@ dataIllegalOccupation = [
       'deviceID': 'K68+366', 'deviceType': '1'}],
 ]
 
+eventID = datetime.now().strftime('%Y%m%d') + '-H00001'
 dataIllegalOccupationEvent = {
     'name': 'illegalOccupation',
     'occured': True,
     'items':
     {
-        'H0000000':
+        eventID:
         {
             'type': 'illegalOccupation',
-            'eventID': 'H0000000',
+            'eventID': eventID,
             'startTime': 0,
             'endTime': -1,
             'carID': 5819,
