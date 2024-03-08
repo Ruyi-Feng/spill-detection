@@ -45,14 +45,14 @@ WarnFreq: 300
 vStop: 1
 durationStop: 3
 vLow: 2.778
-durationLow: 3
+durationLowSpeed: 3
 vHigh: 33.33
-durationHigh: 3
+durationHighSpeed: 3
 aEmgcBrake: 3
 durationEmgcBrake: 1
 dTouch: 5
 tSupervise: 20
 densityCrowd: 18
 vCrowd: 5.555
-durationOccupation: 3
+durationIllegalOccupation: 3
 cacheSeconds: 60
