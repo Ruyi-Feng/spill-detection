@@ -35,8 +35,8 @@ smoothAlpha: 0.1
 qDuration: 300
 calInterval: 30
 
-eventTypes: ["spill", "stop", "lowSpeed", "highSpeed", "emgcBrake", "incident", "crowd", "illegalOccupation"]
-# eventTypes: ["spill", "stop", "emgcBrake", "incident", "crowd", "illegalOccupation"]
+# eventTypes: ["spill", "stop", "lowSpeed", "highSpeed", "emgcBrake", "incident", "crowd", "illegalOccupation"]
+eventTypes: ["spill", "stop", "emgcBrake", "incident", "crowd", "illegalOccupation"]
 tTolerance: 300
 qStandard: 10000
 vLateral: 3
