@@ -17,12 +17,12 @@ defaultConfig = {"fps": 20,
                  "tTolerance": 300, "qStandard": 10000,
                  "vLateral": 0.56, "rate2": 0.1, "WarnFreq": 300,
                  "vStop": 2.778, "durationStop": 5,
-                 "vLow": 11.11, "durationLow": 5,
-                 "vHigh": 33.33, "durationHigh": 5,
+                 "vLow": 11.11, "durationLowSpeed": 5,
+                 "vHigh": 33.33, "durationHighSpeed": 5,
                  "aEmgcBrake": 3, "durationEmgcBrake": 1,
                  "dTouch": 5, "tSupervise": 20,
                  "densityCrowd": 18, "vCrowd": 16.667,
-                 "durationOccupation": 5}
+                 "durationIllegalOccupation": 5}
 
 
 def loadConfig(path: str) -> dict:
