@@ -75,10 +75,10 @@ def getCarBaseInfo(car: dict) -> str:
     获取单车基本信息字符串, 用于事件信息输出。
     基本信息包括x,y,laneID,vx,vy。
     '''
-    info = f"位置(x,y): {round(car['x'], 0)}m, {round(car['y'], 0)}m, " + \
-        f"车道号: {car['laneID']}, " + \
-        "速度(vx,vy,speed): " + \
+    info = f"(x,y)=[{round(car['x'], 0)}, {round(car['y'], 0)}]m, " + \
+        f"lane={car['laneID']}, " + \
+        "(vx,vy,speed)=[" + \
         str(round(car['vx'] * 3.6, 0)) + ", " + \
         str(round(car['vy'] * 3.6, 0)) + ", " + \
-        str(round(car['speed'] * 3.6, 0)) + "km/h "
+        str(round(car['speed'] * 3.6, 0)) + "]km/h "
     return info
