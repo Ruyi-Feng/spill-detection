@@ -69,7 +69,7 @@ class EventDetector(TrafficMng):
         super().__init__(clb, cfg)
         self.logger = logger if logger else MyLogger('Driver', 20)
         # 生成事件管理器
-        self.eventMng = EventMng(cfg['eventTypes'])
+        self.eventMng = EventMng()
         # 初始化属性(其中秒为单位属性, 统一初次赋值后, 乘fps以帧为单位)
         self.clb = clb
         self.fps = cfg['fps']
@@ -292,9 +292,9 @@ class EventDetector(TrafficMng):
             if condition1 and condition2:
                 self.__getattribute__('stop'+'Warn').append(id)
                 # 告警
+                car = getCarFromCars(cars, id)
                 event = self.eventMng.run('stop', self.stopDict[id][0], -1, car)
                 # 生成log信息
-                car = getCarFromCars(cars, id)
                 startTime = unixMilliseconds2Datetime(self.stopDict[id][0])
                 logEvent = f"事件ID={event.eventID}:" +\
                     f": id={str(id)}停车, " + getCarBaseInfo(car) + \
@@ -324,10 +324,10 @@ class EventDetector(TrafficMng):
             if condition1 and condition2:
                 self.__getattribute__('lowSpeed'+'Warn').append(id)
                 # 告警
+                car = getCarFromCars(cars, id)
                 event = self.eventMng.run('lowSpeed',
                                           self.lowSpeedDict[id][0], -1, car)
                 # 生成log信息
-                car = getCarFromCars(cars, id)
                 startTime = unixMilliseconds2Datetime(self.lowSpeedDict[id][0])
                 logEvent = f"事件ID={event.eventID}" +\
                     f": id={str(id)}车辆低速行驶, " + getCarBaseInfo(car) + \
@@ -357,10 +357,10 @@ class EventDetector(TrafficMng):
             if condition1 and condition2:
                 self.__getattribute__('highSpeed'+'Warn').append(id)
                 # 告警
+                car = getCarFromCars(cars, id)
                 event = self.eventMng.run('highSpeed',
                                           self.highSpeedDict[id][0], -1, car)
                 # 生成log信息
-                car = getCarFromCars(cars, id)
                 startTime = unixMilliseconds2Datetime(self.highSpeedDict[id][0])
                 logEvent = f"事件ID={event.eventID}" +\
                     f": id={str(id)}车辆超速行驶, " + getCarBaseInfo(car) + \
@@ -390,10 +390,10 @@ class EventDetector(TrafficMng):
             if condition1 and condition2:
                 self.__getattribute__('emgcBrake'+'Warn').append(id)
                 # 告警
+                car = getCarFromCars(cars, id)
                 event = self.eventMng.run('emgcBrake',
                                   self.emgcBrakeDict[id][0], -1, car)
                 # 生成log信息
-                car = getCarFromCars(cars, id)
                 startTime = unixMilliseconds2Datetime(self.emgcBrakeDict[id][0])
                 logEvent = f"事件ID={event.eventID}" +\
                     f": id={str(id)}车辆急刹车, " + getCarBaseInfo(car) + \
@@ -579,9 +579,9 @@ class EventDetector(TrafficMng):
             if condition1 and condition2:
                 self.__getattribute__('illegalOccupation'+'Warn').append(id)
                 # 告警
+                car = getCarFromCars(cars, id)
                 event = self.eventMng.run('illegalOccupation',
                                   self.illegalOccupationDict[id][0], -1, car)
-                car = getCarFromCars(cars, id)
                 startTime = unixMilliseconds2Datetime(
                     self.illegalOccupationDict[id][0])
                 logEvent = f"事件ID={event.eventID}:" +\
