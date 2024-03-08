@@ -41,7 +41,7 @@ tTolerance: 300
 qStandard: 10000
 vLateral: 3
 rate2: 0.0017
-spillWarnFreq: 300
+WarnFreq: 300
 vStop: 1
 durationStop: 3
 vLow: 2.778
