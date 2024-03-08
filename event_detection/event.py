@@ -4,6 +4,7 @@ from traffic_manager.lane_manager import LaneMng
 from traffic_manager.cell_manager import CellMng
 from utils.default import typeCharDict, typeIdDict
 
+
 '''This is to define the event class and event manager class.'''
 
 
@@ -70,7 +71,7 @@ class EventMng():
         执行事件管理, 将事件信息添加到events中。在检测到event时调用。
         '''
         # distribute event ID
-        idLen = 7
+        idLen = 10
         # if ifNewEventID:
         #     self.eventIdCount[type] += 1
         #     self.eventIdCount[type] %= (10 ** (idLen - 1))
@@ -81,6 +82,7 @@ class EventMng():
         # add event to events
         self.events[type]['occured'] = True
         self.events[type]['items'][eventID] = vars(event)
+        return event
 
     def clear(self):
         '''function clear
