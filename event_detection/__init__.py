@@ -4,9 +4,9 @@ from traffic_manager import TrafficMng
 from event_detection.event import EventMng
 from utils import delDictKeys, strCapitalize, unixMilliseconds2Datetime
 from utils.car_utils import getCarFromCars, getCarBaseInfo
-from utils.default import defaultEventTypes
 
-'''The module is to detect events. Params are defined in config.json.'''
+
+'''The module is to detect events. Params are defined in config.yml.'''
 
 
 class EventDetector(TrafficMng):
@@ -38,9 +38,9 @@ class EventDetector(TrafficMng):
     vStop:        float, 准静止判定速度阈值, 单位m/s
     durationStop: float, 准静止持续时间阈值, 单位s
     vLow:           float, 低速阈值, 单位m/s
-    durationLow:    float, 低速持续时间阈值, 单位s
+    durationLowSpeed:    float, 低速持续时间阈值, 单位s
     vHigh:          float, 高速阈值, 单位m/s
-    durationHigh:   float, 高速持续时间阈值, 单位s
+    durationHighSpeed:   float, 高速持续时间阈值, 单位s
     aEmgcBrake:       float, 急刹车加速度阈值(绝对值), 单位m/s^2
     durationEmgcBrake: float, 急刹车持续时间阈值, 单位s
     车辆碰撞检测类
@@ -50,7 +50,7 @@ class EventDetector(TrafficMng):
     densityCrowd: float, 拥堵密度阈值, 单位辆/km
     vCrowd:       float, 拥堵速度阈值, 单位m/s
     非法占道类
-    durationOccupation: float, 非法占道持续时间阈值, 单位s
+    durationIllegalOccupation: float, 非法占道持续时间阈值, 单位s
     '''
     def __init__(self, clb: dict, cfg: dict,
                  logger: MyLogger = None):
@@ -77,14 +77,12 @@ class EventDetector(TrafficMng):
             self.__setattr__(param, cfg[param])
 
         # # 更新参数单位从秒到帧（因采用timestamp而弃用）
-        # self.tTolerance *= self.fps             # 抛洒物存在持续时间容忍度
-        # self.WarnFreq *= self.fps          # 抛洒物报警频率
-        # self.durationStop *= self.fps         # 准静止持续时间阈值
-        # self.durationLow *= self.fps            # 低速持续时间阈值
-        # self.durationHigh *= self.fps           # 高速持续时间阈值
-        # self.durationEmgcBrake *= self.fps        # 急刹车持续时间阈值
-        # self.tSupervise *= self.fps             # 车辆碰撞监控时间
-        # self.durationOccupation *= self.fps     # 非法占道持续时间阈值
+        # timeProperties = [
+        #     'tTolerance', 'WarnFreq', 'durationStop', 'durationLowSpeed',
+        #     'durationHighSpeed', 'durationEmgcBrake', 'tSupervise',
+        #     'durationIllegalOccupation']
+        # for param in timeProperties:
+        #     self.__setattr__(param, self.__getattribute__(param) * self.fps)
 
         # 初始化潜在事件记录变量
         self.currentIDs = []    # 当前帧车辆id列表
@@ -262,6 +260,43 @@ class EventDetector(TrafficMng):
 
         self.resetCellDetermineStatus()
 
+    def _singleCarEventDetect(self, cars: list, eventType: str):
+        '''function singleCarEventDetect
+
+        input
+        ------
+        cars: list, 传感器数据
+        eventType: str, 事件类型
+
+        output
+        ------
+        events: list, 事件列表, 元素为event的衍生类
+
+        检测单车事件, 输出并返回事件列表
+        '''
+        eventRecordDict = getattr(self, eventType+'Dict')
+        threshold = getattr(self, 'duration'+strCapitalize(eventType))
+        for id in eventRecordDict:
+            # 检查事件
+            deltaTms = eventRecordDict[id][1] - eventRecordDict[id][0]
+            deltaTs = deltaTms / 1000
+            condition1 = deltaTs > threshold
+            condition2 = eventRecordDict[id][3] == ''
+            # 生成事件
+            if condition1 and condition2:
+                # 告警
+                car = getCarFromCars(cars, id)
+                eventID = self.eventMng.run(eventType,
+                                  eventRecordDict[id][0], -1, car,
+                                  eventRecordDict[id][3])
+                eventRecordDict[id][3] = eventID
+                # 生成log信息
+                startTime = unixMilliseconds2Datetime(eventRecordDict[id][0])
+                logEvent = f"事件ID={eventID}:" +\
+                    f": id={str(id)}车辆事件{eventType}, " + getCarBaseInfo(car) + \
+                    f", 开始时间{startTime}."
+                self.logger.warning(logEvent)
+
     def _stopDetect(self, cars: list):
         '''function stopDetect
 
@@ -275,26 +310,7 @@ class EventDetector(TrafficMng):
 
         检测低速事件, 输出并返回事件列表
         '''
-        for id in self.stopDict.keys():
-            # 检查事件
-            deltaTms = self.stopDict[id][1] - self.stopDict[id][0]
-            deltaTs = deltaTms / 1000
-            # if abs(deltaTs - self.durationStop) < (1 / self.fps) * 0.99:
-            condition1 = (deltaTs > self.durationStop)
-            condition2 = getattr(self, 'stop'+'Dict')[id][3] == ''
-            # 生成事件
-            if condition1 and condition2:
-                # 告警
-                car = getCarFromCars(cars, id)
-                eventID = self.eventMng.run('stop', self.stopDict[id][0], -1, car,
-                                            self.stopDict[id][3])
-                self.stopDict[id][3] = eventID
-                # 生成log信息
-                startTime = unixMilliseconds2Datetime(self.stopDict[id][0])
-                logEvent = f"事件ID={eventID}:" +\
-                    f": id={str(id)}停车, " + getCarBaseInfo(car) + \
-                    f", 开始时间{startTime}."
-                self.logger.warning(logEvent)
+        self._singleCarEventDetect(cars, 'stop')
 
     def _lowSpeedDetect(self, cars: list):
         '''function lowSpeedDetect
@@ -309,26 +325,7 @@ class EventDetector(TrafficMng):
 
         检测低速事件, 输出并返回事件列表
         '''
-        for id in self.lowSpeedDict.keys():
-            # 检查事件
-            deltaTms = self.lowSpeedDict[id][1] - self.lowSpeedDict[id][0]
-            deltaTs = deltaTms / 1000
-            condition1 = (deltaTs > self.durationLow)
-            condition2 = getattr(self, 'lowSpeed'+'Dict')[id][3] == ''
-            # 生成事件
-            if condition1 and condition2:
-                # 告警
-                car = getCarFromCars(cars, id)
-                eventID = self.eventMng.run('lowSpeed',
-                                          self.lowSpeedDict[id][0], -1, car,
-                                          self.lowSpeedDict[id][3])
-                self.lowSpeedDict[id][3] = eventID
-                # 生成log信息
-                startTime = unixMilliseconds2Datetime(self.lowSpeedDict[id][0])
-                logEvent = f"事件ID={eventID}" +\
-                    f": id={str(id)}车辆低速行驶, " + getCarBaseInfo(car) + \
-                    f", 开始时间{startTime}."
-                self.logger.warning(logEvent)
+        self._singleCarEventDetect(cars, 'lowSpeed')
 
     def _highSpeedDetect(self, cars: list):
         '''function highSpeedDetect
@@ -343,26 +340,7 @@ class EventDetector(TrafficMng):
 
         检测超速事件, 输出并返回事件列表
         '''
-        for id in self.highSpeedDict.keys():
-            # 检查事件
-            deltaTms = self.highSpeedDict[id][1] - self.highSpeedDict[id][0]
-            deltaTs = deltaTms / 1000
-            condition1 = (deltaTs > self.durationHigh)
-            condition2 = getattr(self, 'highSpeed'+'Dict')[id][3] == ''
-            # 生成事件
-            if condition1 and condition2:
-                # 告警
-                car = getCarFromCars(cars, id)
-                eventID = self.eventMng.run('highSpeed',
-                                          self.highSpeedDict[id][0], -1, car,
-                                          self.highSpeedDict[id][3])
-                self.highSpeedDict[id][3] = eventID
-                # 生成log信息
-                startTime = unixMilliseconds2Datetime(self.highSpeedDict[id][0])
-                logEvent = f"事件ID={eventID}" +\
-                    f": id={str(id)}车辆超速行驶, " + getCarBaseInfo(car) + \
-                    f", 开始时间{startTime}."
-                self.logger.warning(logEvent)
+        self._singleCarEventDetect(cars, 'highSpeed')
 
     def _emgcBrakeDetect(self, cars: list):
         '''function intensiveSpeedReductionDetect
@@ -377,26 +355,22 @@ class EventDetector(TrafficMng):
 
         检测急刹车事件, 输出并返回事件列表。减速判断也需要考虑加速度a方向需要跟v方向相反。
         '''
-        for id in self.emgcBrakeDict.keys():
-            # 检查事件
-            deltaTms = self.emgcBrakeDict[id][1] - self.emgcBrakeDict[id][0]
-            deltaTs = deltaTms / 1000
-            condition1 = (deltaTs > self.durationEmgcBrake)
-            condition2 = getattr(self, 'emgcBrake'+'Dict')[id][3] == ''
-            # 生成事件
-            if condition1 and condition2:
-                # 告警
-                car = getCarFromCars(cars, id)
-                eventID = self.eventMng.run('emgcBrake',
-                                  self.emgcBrakeDict[id][0], -1, car,
-                                  self.emgcBrakeDict[id][3])
-                self.emgcBrakeDict[id][3] = eventID
-                # 生成log信息
-                startTime = unixMilliseconds2Datetime(self.emgcBrakeDict[id][0])
-                logEvent = f"事件ID={eventID}" +\
-                    f": id={str(id)}车辆急刹车, " + getCarBaseInfo(car) + \
-                    f"加速度: {car['a']}" + f", 开始时间{startTime}."
-                self.logger.warning(logEvent)                
+        self._singleCarEventDetect(cars, 'emgcBrake')
+
+    def _illegalOccupationDetect(self, cars: list):
+        '''function illegalOccupationDetect
+
+        input
+        ------
+        cars: list, 传感器数据
+
+        output
+        ------
+        events: list, 事件列表, 元素为event的衍生类
+
+        检测非法占道事件, 输出并返回事件列表
+        '''
+        self._singleCarEventDetect(cars, 'illegalOccupation')
 
     def _incidentDetect(self, cars: list):
         '''function incidentDetect
@@ -552,41 +526,6 @@ class EventDetector(TrafficMng):
                         f": id={id}车道拥堵已解除, 车道密度: {k}辆/km, 车道速度: {v}km/h."
                     self.logger.warning(logEvent)
                     del self.crowdDict[id]
-
-    def _illegalOccupationDetect(self, cars: list):
-        '''function illegalOccupationDetect
-
-        input
-        ------
-        cars: list, 传感器数据
-
-        output
-        ------
-        events: list, 事件列表, 元素为event的衍生类
-
-        检测非法占用应急车道事件, 输出并返回事件列表
-        '''
-        for id in self.illegalOccupationDict.keys():
-            # 检查事件
-            deltaTms = self.illegalOccupationDict[id][1] - \
-                self.illegalOccupationDict[id][0]
-            deltaTs = deltaTms / 1000
-            condition1 = (deltaTs > self.durationOccupation)
-            condition2 = getattr(self, 'illegalOccupation'+'Dict')[id][3] == ''
-            # 生成事件
-            if condition1 and condition2:
-                # 告警
-                car = getCarFromCars(cars, id)
-                eventID = self.eventMng.run('illegalOccupation',
-                                  self.illegalOccupationDict[id][0], -1, car,
-                                  self.illegalOccupationDict[id][3])
-                self.illegalOccupationDict[id][3] = eventID
-                startTime = unixMilliseconds2Datetime(
-                    self.illegalOccupationDict[id][0])
-                logEvent = f"事件ID={eventID}:" +\
-                    f": id={str(id)}车辆占用应急车道, " + getCarBaseInfo(car) +\
-                    f", 开始时间{startTime}."
-                self.logger.warning(logEvent)
 
     def _isCarStop(self, car: dict) -> bool:
         '''function _isCarStop
