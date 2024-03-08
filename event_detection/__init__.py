@@ -102,10 +102,6 @@ class EventDetector(TrafficMng):
         self.dangerDict = dict()    # 以车道id+cell order为索引, 记录[开始时间, 结束时间, cell, eventID]
         self.crowdDict = dict()     # 以车道id为索引, 记录[开始时间, 结束时间, lane, eventID]
 
-        # 初始化事件告警记录变量
-        for type in defaultEventTypes:
-            self.__setattr__(type + 'Warn', [])
-
     def run(self, cars: list) -> dict:
         ''' function run
 
@@ -285,10 +281,9 @@ class EventDetector(TrafficMng):
             deltaTs = deltaTms / 1000
             # if abs(deltaTs - self.durationStop) < (1 / self.fps) * 0.99:
             condition1 = (deltaTs > self.durationStop)
-            condition2 = (id not in self.__getattribute__('stop'+'Warn'))
+            condition2 = getattr(self, 'stop'+'Dict')[id][3] == ''
             # 生成事件
             if condition1 and condition2:
-                self.__getattribute__('stop'+'Warn').append(id)
                 # 告警
                 car = getCarFromCars(cars, id)
                 eventID = self.eventMng.run('stop', self.stopDict[id][0], -1, car,
@@ -319,10 +314,9 @@ class EventDetector(TrafficMng):
             deltaTms = self.lowSpeedDict[id][1] - self.lowSpeedDict[id][0]
             deltaTs = deltaTms / 1000
             condition1 = (deltaTs > self.durationLow)
-            condition2 = (id not in self.__getattribute__('lowSpeed'+'Warn'))
+            condition2 = getattr(self, 'lowSpeed'+'Dict')[id][3] == ''
             # 生成事件
             if condition1 and condition2:
-                self.__getattribute__('lowSpeed'+'Warn').append(id)
                 # 告警
                 car = getCarFromCars(cars, id)
                 eventID = self.eventMng.run('lowSpeed',
@@ -354,10 +348,9 @@ class EventDetector(TrafficMng):
             deltaTms = self.highSpeedDict[id][1] - self.highSpeedDict[id][0]
             deltaTs = deltaTms / 1000
             condition1 = (deltaTs > self.durationHigh)
-            condition2 = (id not in self.__getattribute__('highSpeed'+'Warn'))
+            condition2 = getattr(self, 'highSpeed'+'Dict')[id][3] == ''
             # 生成事件
             if condition1 and condition2:
-                self.__getattribute__('highSpeed'+'Warn').append(id)
                 # 告警
                 car = getCarFromCars(cars, id)
                 eventID = self.eventMng.run('highSpeed',
@@ -389,10 +382,9 @@ class EventDetector(TrafficMng):
             deltaTms = self.emgcBrakeDict[id][1] - self.emgcBrakeDict[id][0]
             deltaTs = deltaTms / 1000
             condition1 = (deltaTs > self.durationEmgcBrake)
-            condition2 = (id not in self.__getattribute__('emgcBrake'+'Warn'))
+            condition2 = getattr(self, 'emgcBrake'+'Dict')[id][3] == ''
             # 生成事件
             if condition1 and condition2:
-                self.__getattribute__('emgcBrake'+'Warn').append(id)
                 # 告警
                 car = getCarFromCars(cars, id)
                 eventID = self.eventMng.run('emgcBrake',
@@ -580,11 +572,9 @@ class EventDetector(TrafficMng):
                 self.illegalOccupationDict[id][0]
             deltaTs = deltaTms / 1000
             condition1 = (deltaTs > self.durationOccupation)
-            condition2 = (id not in self.__getattribute__(
-                'illegalOccupation'+'Warn'))
+            condition2 = getattr(self, 'illegalOccupation'+'Dict')[id][3] == ''
             # 生成事件
             if condition1 and condition2:
-                self.__getattribute__('illegalOccupation'+'Warn').append(id)
                 # 告警
                 car = getCarFromCars(cars, id)
                 eventID = self.eventMng.run('illegalOccupation',
@@ -684,6 +674,7 @@ class EventDetector(TrafficMng):
         cars: list, 传感器数据
 
         删除无效dict键, 包括当前帧丢失目标, 或未消失但已脱离事件检测条件的目标。
+        注意: dict键记录的只是潜在事件, 可能有些id车辆并未发生该事件。
         '''
         key2delete = []
         # 遍历该类type的dict记录表
@@ -701,10 +692,10 @@ class EventDetector(TrafficMng):
             # 生成结束event
             dictInfo = getattr(self, f'{type}Dict')[key]
             startTime, endTime, car, eventID = dictInfo[0], dictInfo[1], dictInfo[2], dictInfo[3]
-            if car['id'] in self.__getattribute__(type + 'Warn'):
-                self.__getattribute__(type + 'Warn').remove(car['id'])
+            # 潜在事件表中可能有一些车辆并未发生事件, 只对已经触发事件报警的车辆生成结束event
+            if eventID != '':
                 # 告警
-                event = self.eventMng.run(type, startTime, endTime, car, eventID)
+                eventID = self.eventMng.run(type, startTime, endTime, car, eventID)
                 # 生成log信息
                 startTime = unixMilliseconds2Datetime(startTime)
                 endTime = unixMilliseconds2Datetime(endTime)
@@ -712,5 +703,5 @@ class EventDetector(TrafficMng):
                     f": id={str(key)}车辆{type}事件结束, " + getCarBaseInfo(car) +\
                     f", 开始时间{startTime}, 结束时间{endTime}."
                 self.logger.warning(logEvent)
-            # 删除无效keys
+            # 删除所有无效keys
             del getattr(self, f'{type}Dict')[key]
