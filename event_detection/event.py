@@ -1,3 +1,4 @@
+from datetime import datetime
 from copy import deepcopy
 from utils import int2strID
 from traffic_manager.lane_manager import LaneMng
@@ -50,9 +51,10 @@ class EventMng():
         self.events = self.eventsFormat.copy()
         # initialize event ID, 规则: 日期+五位计数器
         self.eventIdCount = {type: 0 for type in defaultEventTypes}
+        self.currentDay = datetime.now().strftime('%Y%m%d')
+        self.idLen = 5
 
     def run(self, type: str, startTime: int, endTime: int,
-            # ifNewEventID: bool,
             *info: any):
         '''function run
 
@@ -62,27 +64,31 @@ class EventMng():
         startTime: int, 事件发生unix时间戳, 单位ms
         endTime: int, 事件结束unix时间戳, 单位ms
         info: any, 事件信息, 为可变数量的参数。
-        - 当type为'spill'时, info为[cellMng]
+        - 当type为'spill'时, info为[cellMng, deviceID, deviceType, eventID]
         - 当type为'stop', 'lowSpeed', 'highSpeed', 'EmgcBrake',
-          'illegalOccupation'时, info为[car]
+          'illegalOccupation'时, info为[car, eventID]
         - 当type为'incident'时, info为[car1, car2]
-        - 当type为'crowd'时, info为[laneMng]
+        - 当type为'crowd'时, info为[laneMng, deviceID, deviceType, eventID]
 
         执行事件管理, 将事件信息添加到events中。在检测到event时调用。
         '''
+        # 重置计数
+        if self.currentDay != datetime.now().strftime('%Y%m%d'):
+            self.eventIdCount = {type: 0 for type in defaultEventTypes}
+            self.currentDay = datetime.now().strftime('%Y%m%d')
         # distribute event ID
-        idLen = 10
-        # if ifNewEventID:
-        #     self.eventIdCount[type] += 1
-        #     self.eventIdCount[type] %= (10 ** (idLen - 1))
-        eventID = self.typeCharDict[type] + \
-            int2strID(self.eventIdCount[type], idLen)
-        # formulate event info
+        if (info[-1] == '') or (type == 'incident'):
+            self.eventIdCount[type] += 1
+            eventID = self.currentDay + '-' + int2strID(self.eventIdCount[type], self.idLen)
+        else: # 从已经记录的id继承
+            eventID = info[-1]
+
+        # formulate event
         event = self._generateEvent(type, eventID, startTime, endTime, info)
         # add event to events
         self.events[type]['occured'] = True
         self.events[type]['items'][eventID] = vars(event)
-        return event
+        return eventID
 
     def clear(self):
         '''function clear
