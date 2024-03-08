@@ -38,7 +38,7 @@ class MyLogger(logging.Logger):
         self._checkLogsDir()    # 判断两层文件夹是否存在
         filePath = f'./logger/logs/{loggerName}/' + \
             f'{datetime.now().strftime("%Y-%m-%d")}.log'
-        fh = logging.FileHandler(filePath)
+        fh = logging.FileHandler(filePath, encoding='utf-8')
         fh.setFormatter(formatter)
         fh.setLevel(logging.WARNING)
         self.addHandler(fh)
@@ -58,7 +58,7 @@ class MyLogger(logging.Logger):
             if isinstance(handler, logging.FileHandler):
                 self.removeHandler(handler)
         # 文件日志
-        fh = logging.FileHandler(filePath)
+        fh = logging.FileHandler(filePath, encoding='utf-8')
         fh.setFormatter(self.formatter)
         fh.setLevel(logging.WARNING)
         self.addHandler(fh)
