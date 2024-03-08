@@ -640,7 +640,7 @@ class EventDetector(TrafficMng):
         for key in key2delete:
             # 生成结束event
             dictInfo = getattr(self, f'{type}Dict')[key]
-            startTime, endTime = dictInfo[2], dictInfo[3]
+            startTime, endTime = dictInfo[0], dictInfo[1]
             car, eventID = dictInfo[2], dictInfo[3]
             # 潜在事件表中可能有一些车辆并未发生事件
             # 只对已经触发事件报警的车辆生成结束event
