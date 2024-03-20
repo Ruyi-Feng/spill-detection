@@ -162,4 +162,4 @@ cython_debug/
 config.json
 config.yml
 *.zip
-logger/eventsCache/*.txt
+logger/eventsCache/*/*.txt
