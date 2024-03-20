@@ -42,7 +42,7 @@ class Controller:
     生成控制器, 用于控制整个算法流程。
     '''
     def __init__(self, cfgPath: str, clbPath: str,
-                 logger: MyLogger):
+                 logger: MyLogger, args):
         '''function __init__
 
         input
@@ -50,6 +50,7 @@ class Controller:
         cfgPath: str, 算法参数文件路径
         clbPath: str, 标定参数文件路径
         logger: MyLogger, 日志器
+        args: dict, 参数
         '''
         # 读取配置
         self.cfgPath = cfgPath
@@ -57,6 +58,8 @@ class Controller:
         self.cfg = cfg
         # 生成日志器
         self.logger = logger
+        self.deviceID = args.deviceId
+        self.deviceType = args.deviceType
         # 生成数据驱动器
         self.drv = Driver(cfg['fps'], logger)
         # 是否标定
@@ -200,7 +203,11 @@ class Controller:
         dir = './logger/eventsCache'
         if not os.path.exists(dir):
             os.makedirs(dir)
-        path = f'{dir}/{eventID}.txt'
+        sonDir = f'{dir}/{self.deviceID}_{self.deviceType}'
+        if not os.path.exists(sonDir):
+            os.makedirs(sonDir)
+
+        path = f'{sonDir}/{eventID}.txt'
         with open(path, 'w') as f:
             for msg in self.cache:
                 f.write(str(msg) + '\n')
