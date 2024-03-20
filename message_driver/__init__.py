@@ -475,22 +475,34 @@ class DriverOnline:
         }
         '''
         newEvent = dict()
-        newEvent['type'] = typeIdDict[event['type']]
-        newEvent['level'] = 1
-        # newEvent['start_time'] = event['startTime']
-        # newEvent['end_time'] = event['endTime']
-        newEvent['start_time'] = unixMilliseconds2Datetime(event['startTime'])
-        if event['endTime'] == -1:
-            newEvent['end_time'] = -1
-        else:
-            newEvent['end_time'] = unixMilliseconds2Datetime(event['endTime'])
-        newEvent['lane'] = event['laneID']
-        newEvent['raw_class'] = event['rawClass']
-        newEvent['point_wgs84'] = {
-            'lat': event['lat'],
-            'lon': event['lon']
-        }
-        newEvent['device_type'] = event['deviceType']
-        newEvent['device_id'] = event['deviceID']
+        # newEvent['type'] = typeIdDict[event['type']]
+        # newEvent['level'] = 1
+        # newEvent['start_time'] = unixMilliseconds2Datetime(event['startTime'])
+        # if event['endTime'] == -1:
+        #     newEvent['end_time'] = -1
+        # else:
+        #     newEvent['end_time'] = unixMilliseconds2Datetime(event['endTime'])
+        # newEvent['lane'] = event['laneID']
+        # newEvent['raw_class'] = event['rawClass']
+        # newEvent['point_wgs84'] = {
+        #     'lat': event['lat'],
+        #     'lon': event['lon']
+        # }
+        # newEvent['device_type'] = event['deviceType']
+        # newEvent['device_id'] = event['deviceID']
+        # 上述用dict.update()的方式更新newEvent
+        newEvent.update(
+            {
+                'type': typeIdDict[event['type']],
+                'level': 1,
+                'start_time': unixMilliseconds2Datetime(event['startTime']),
+                'end_time': unixMilliseconds2Datetime(event['endTime']) \
+                    if event['endTime'] != -1 else -1,
+                'lane': event['laneID'],
+                'raw_class': event['rawClass'],
+                'point_wgs84': {'lat': event['lat'], 'lon': event['lon']},
+                'device_type': event['deviceType'],
+                'device_id': event['deviceID']
+            })
 
         return newEvent
