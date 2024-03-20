@@ -16,7 +16,8 @@ if sys.version_info >= (3, 12, 0):
 
 def params():
     parser = argparse.ArgumentParser(description='spill-detection parameters')
-    parser.add_argument('--deviceId', default='', type=str, help="K73+516")
+    parser.add_argument('--deviceId', default='K00+000',
+                        type=str, help="K73+516")
     parser.add_argument('--deviceType', type=int, default=0,
                         help="radar 1, camera 2")
     args = parser.parse_args()
@@ -29,7 +30,7 @@ def simulatedMain():
     dataPath = './data/result.txt'
     args = params()
     logger = MyLogger(args.deviceId, args.deviceType)
-    controller = Controller(configPath, clbPath, logger)
+    controller = Controller(configPath, clbPath, logger, args)
     smltor = Smltor(dataPath)
 
     # 模拟接受数据
@@ -74,7 +75,7 @@ def main():
     # 生成主控制器
     clbPath = './road_calibration/clbymls/clb_' + \
         deviceID + '_' + deviceType + '.yml'
-    controller = Controller(configPath, clbPath, logger)
+    controller = Controller(configPath, clbPath, logger, args)
     logger.info('算法组件生成成功, 数据进入算法通道.')
 
     # 持续性运行接收
@@ -95,5 +96,5 @@ def main():
 
 
 if __name__ == "__main__":
-    # simulatedMain()
-    main()
+    simulatedMain()
+    # main()
