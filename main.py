@@ -68,7 +68,8 @@ def main():
         if isInvalidMsg(msg) or isNotTargetDevice(msg, args):
             continue
         deviceID, deviceType = msg['deviceID'], str(msg['deviceType'])
-        logger.info('接收该设备数据: deviceID:', deviceID, 'deviceType:', deviceType)
+        logger.info('接收该设备数据: deviceID:' + deviceID +\
+                    'deviceType:' + deviceType)
         break
 
     # 根据设备信息生成clbPath, 为./road_calibration/clb_设备名_设备类型.yml
@@ -98,5 +99,5 @@ def main():
 
 
 if __name__ == "__main__":
-    simulatedMain()
-    # main()
+    # simulatedMain()
+    main()
