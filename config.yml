@@ -1,9 +1,9 @@
-ip: '192.168.1.31:9092'
+ip: '10.121.25.234:9092'
 topic: 'trafficTrajectory'
 groupid: None
 producerversion: [2, 8, 1]
 key: None
-http: 'http://192.168.1.31:20490'
+http: 'http://10.121.25.234:19025'
 # donglan test
 # ip: '192.168.1.31:9092'
 # topic: 'trafficTrajectory'
@@ -23,7 +23,7 @@ kafkaAutoCommitIntervalMs: 5000
 fps: 20
 
 ifRecalib: false
-calibSeconds: 300
+calibSeconds: 120
 laneWidth: 3.75
 emgcWidth: 3.5
 cellLen: 50
