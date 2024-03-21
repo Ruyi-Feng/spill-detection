@@ -72,6 +72,11 @@ class Controller:
             startTime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
             endTime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(
                 time.time() + cfg['calibSeconds']))
+            txt1 = f'{clbPath}文件已存在, ' if os.path.exists(clbPath) \
+                else f'{clbPath}文件不存在, '
+            txt2 = f'配置设置需要进行标定, ' if self.cfg['ifRecalib'] \
+                else f'配置设置不需重复标定（若文件已存在）'
+            self.logger.info(txt1 + txt2)
             self.logger.info('******开始标定过程******' +
                              f"开始时刻: {startTime}," +
                              f"标定时长: {cfg['calibSeconds']}s," +
@@ -86,6 +91,8 @@ class Controller:
                                 logger=logger)
             self.clbtor = clbtor
         else:   # 有cfg则读取, 不需要标定
+            txt = f'{clbPath}文件已存在, 且配置设置不需重复标定'
+            self.logger.info(txt)
             self.clb = loadYaml(clbPath)
             self.startDetect()
 
