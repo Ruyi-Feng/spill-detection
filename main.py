@@ -87,6 +87,8 @@ def main():
         # 非空数据判断
         if isInvalidMsg(msg) or isNotTargetDevice(msg, args):
             continue
+        # log文件保存更新
+        logger.updateDayLogFile()
         # 算法检测
         msg, events = controller.run(msg)
         if (events is None) or (len(events) == 0):
