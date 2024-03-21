@@ -87,8 +87,7 @@ class Controller:
                                 laneWidth=cfg['laneWidth'],
                                 emgcWidth=cfg['emgcWidth'],
                                 cellLen=cfg['cellLen'],
-                                qMerge=cfg['qMerge'],
-                                logger=logger)
+                                qMerge=cfg['qMerge'])
             self.clbtor = clbtor
         else:   # 有cfg则读取, 不需要标定
             txt = f'{clbPath}文件已存在, 且配置设置不需重复标定'
