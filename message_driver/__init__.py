@@ -18,9 +18,9 @@ class Driver():
     '''
     def __init__(self, fps: float, logger: MyLogger = None):
         self.fps = fps
-        self.logger = logger if logger else MyLogger('Driver', 20)
-        self.driverOffline = DriverOffline(fps)
-        self.driverOnline = DriverOnline(fps)
+        self.logger = logger if logger else MyLogger('Driver', 'notDefined')
+        self.driverOffline = DriverOffline(fps, logger)
+        self.driverOnline = DriverOnline(fps, logger)
         self.mode = 'offline'   # 'offline' | 'online', 默认为离线测试模式, receive时更新
 
     def setLanes(self, lanes: list) -> None:
@@ -111,8 +111,9 @@ class DriverOffline:
 
     离线测试驱动器, 用于离线测试时的数据接收与发送。
     '''
-    def __init__(self, fps) -> None:
+    def __init__(self, fps, logger) -> None:
         self.fps = fps
+        self.logger = logger
         self.count = 0                          # 用于开发阶段测试, 不用于实际部署
         self.timeIntervalMs = int(1000 / fps)   # 用于开发阶段测试, 不用于实际部署
         # 数据格式接口, 从接收数据转化为内部处理数据
@@ -258,7 +259,7 @@ class DriverOnline:
 
     在线部署驱动器, 用于在线部署时的数据接收与发送。
     '''
-    def __init__(self, fps) -> None:
+    def __init__(self, fps, logger) -> None:
         '''
         input
         -----
@@ -266,6 +267,7 @@ class DriverOnline:
         lanes: list, 道路的车道号列表。
         '''
         self.fps = fps
+        self.logger = logger
         # 数据格式接口, 从接收数据转化为内部处理数据
         interface = {
                     'cls': 'class',
