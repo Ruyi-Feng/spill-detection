@@ -323,11 +323,11 @@ class DriverOnline:
             # if car['laneID'] == 0:
             #     continue
             if car['laneID'] not in self.lanes:
-                self.logger.warning('laneID ', car['laneID'],
-                                    'not in lanes', self.lanes,
-                                    'please recalibrate the section: ',
-                                    'deviceID:', deviceID,
-                                    'deviceType:', deviceType)
+                self.logger.warning('laneID '+ str(car['laneID'])+
+                                    'not in lanes'+ str(self.lanes)+
+                                    'please recalibrate the section: '+
+                                    'deviceID:'+ deviceID+
+                                    'deviceType:'+ str(deviceType))
                 continue
             car['deviceID'] = deviceID
             car['deviceType'] = deviceType
