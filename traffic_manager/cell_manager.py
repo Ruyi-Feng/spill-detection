@@ -93,7 +93,10 @@ class CellMng:
         self.r1 = 0
         self.r2 = r2
         self.vLat = vLat
-        self.danger = 0.0
+        self.dangerTime = 0.0       # 时间增长积累的danger
+        self.dangerChange = 0.0     # 车辆换道积累的danger
+        self.danger = self.dangerTime + self.dangerChange   # 外部调用
+        self.dangerTimeTop = 0.5    # 时间增长积累的danger上限
         # 缓存
         self.cache = []    # list内按顺序索引, 用dict反而会有遍历的消耗
         self.cacheRet = cacheRet
@@ -167,6 +170,8 @@ class CellMng:
         PossibleFrontSpill = False
         # 若最后一帧有车, 更新danger为0
         if len(self.cache[-1]) != 0:
+            self.dangerTime = 0.0
+            self.dangerChange = 0.0
             self.danger = 0.0
             # 判断是否有车辆速度超限
             for car in self.cache[-1]:
@@ -175,7 +180,12 @@ class CellMng:
                     return PossibleFrontSpill, self.order
         else:
             # 增加默认时间增长率
-            self.danger += self.r1
+            self.dangerTime += self.r1
+            # 但设置上限不可超出
+            if self.dangerTime > self.dangerTimeTop:
+                self.dangerTime = self.dangerTimeTop
+            # 更新danger
+            self.danger = self.dangerTime + self.dangerChange
         return PossibleFrontSpill, self.order
 
     def updateDangerPassive(self):
@@ -187,8 +197,11 @@ class CellMng:
         在event detect 时发现该元胞前一些元胞有车辆横向速度过大时调用。
         '''
         if not self.r2added:    # 已经被加过就不加了
-            self.danger += self.r2
+            # 更新换道danger
+            self.dangerChange += self.r2
             self.r2added = True
+            # 更新对外danger数值
+            self.danger = self.dangerTime + self.dangerChange
 
     def resetCellDetermineStatus(self):
         '''function resetCellDetermineStatus
