@@ -1,7 +1,7 @@
 import json
-from utils import swapQuotes
+from utils import swapQuotes, BigFileReader
 
-class Smltor():
+class Smltor(BigFileReader):
     '''class Smltor
 
     仿真器, 用于仿真传感器数据的传输。每运行一次, 读取一行数据, 返回该行数据, 并再下次运行时读取下一行数据。
@@ -18,6 +18,8 @@ class Smltor():
         '''
         self.dataPath = dataPath
         self.f = open(self.dataPath, 'r')
+        # super().__init__(dataPath)
+        # self.runIndex = -1
 
     def run(self):
         '''
@@ -26,6 +28,8 @@ class Smltor():
         函数会返回list类型的数据, 或者str类型的消息。
         '''
         msg = self.f.readline()
+        # self.runIndex += 1
+        # msg = self.getRow(self.runIndex)
         msg = swapQuotes(msg)
         # 接受数据
         try:
