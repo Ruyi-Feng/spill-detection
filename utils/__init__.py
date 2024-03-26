@@ -62,6 +62,22 @@ def loadYaml(path: str) -> dict:
     return dic
 
 
+def checkConfigDevices(cfg: dict) -> bool:
+    '''function checkConfigDevices
+
+    input
+    -----
+    cfg: dict, 配置参数
+
+    return
+    ------
+    bool: bool, 是否设置的设备ID和类别的数量相同
+    '''
+    condition = len(cfg['deviceIDs']) == len(cfg['deviceTypes'])
+    hint = '设备ID与设备类型数量不匹配. 请检查config.yml'
+    return condition, hint
+
+
 def updateDictCount(dic: dict, key: any):
     '''function updateDictCount
 
