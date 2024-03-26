@@ -1,5 +1,6 @@
 import json
-from utils import swapQuotes, BigFileReader
+from utils import swapQuotes
+from utils.file_read import BigFileReader
 
 
 class Smltor(BigFileReader):
@@ -31,7 +32,7 @@ class Smltor(BigFileReader):
         msg = self.f.readline()
         # self.runIndex += 1
         # msg = self.getRow(self.runIndex)
-        msg = swapQuotes(msg)
+        # msg = swapQuotes(msg)
         # 接受数据
         try:
             msg = json.loads(msg)  # 接收到list数据

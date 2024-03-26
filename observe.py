@@ -1,6 +1,7 @@
 import os
 import json
-from utils import swapQuotes, unixMilliseconds2Datetime, BigFileReader
+from utils import swapQuotes, unixMilliseconds2Datetime
+from utils.file_read import BigFileReader
 
 
 if __name__ == '__main__':
