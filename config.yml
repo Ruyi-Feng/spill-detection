@@ -4,6 +4,8 @@ groupid: None
 producerversion: [2, 8, 1]
 key: None
 http: 'http://10.121.25.234:19025'
+deviceIDs: ["K68+366", "K68+400", "K69+000", "K69+800", "K71+616", "K73+516", "K75+001", "K76+781", "K78+760", "K79+886", "K80+850", "K80+880", "K81+320", "K81+866"]
+deviceTypes: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 # donglan test
 # ip: '192.168.1.31:9092'
 # topic: 'trafficTrajectory'
