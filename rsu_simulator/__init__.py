@@ -1,6 +1,7 @@
 import json
 from utils import swapQuotes, BigFileReader
 
+
 class Smltor(BigFileReader):
     '''class Smltor
 

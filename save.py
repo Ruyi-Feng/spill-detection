@@ -26,6 +26,7 @@ def updateFilePathPerHour():
     hour = now.hour
     return f'./data/{year}-{month}-{day}-{hour}.txt'
 
+
 def save():
     cfgPath = './config.yml'
     cfg = loadConfig(cfgPath)

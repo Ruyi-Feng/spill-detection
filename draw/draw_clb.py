@@ -2,7 +2,6 @@
 
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-from matplotlib.patheffects import Stroke
 import yaml
 import os
 
@@ -68,7 +67,7 @@ def drawClb(clbPath: str):
             rect = patches.Rectangle(xy=(id - 0.5, i * cellLen),
                                      width=1, height=50, color=color)
             ax.add_patch(rect)
-        
+
     # 在各个cell标注出所在车道的运动正方向
     plt.xlabel('lane')
     plt.xlim(0, len(lanes) + 1)

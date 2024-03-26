@@ -10,7 +10,6 @@ from rsu_simulator import Smltor
 from logger import MyLogger
 from utils import loadConfig, isNotTargetDevice, isInvalidMsg
 from utils import checkConfigDevices, argsFromDeviceID
-from utils import unixMilliseconds2Datetime
 
 
 if sys.version_info >= (3, 12, 0):
@@ -71,7 +70,7 @@ def main():
         if isInvalidMsg(msg) or isNotTargetDevice(msg, args):
             continue
         deviceID, deviceType = msg['deviceID'], str(msg['deviceType'])
-        logger.info('接收该设备数据: deviceID:' + deviceID +\
+        logger.info('接收该设备数据: deviceID:' + deviceID +
                     'deviceType:' + deviceType)
         break
 
@@ -99,6 +98,7 @@ def main():
             continue    # 未检测到事件
         # 上报事件
         hp.run(events)
+
 
 def simulatedMainGrouped(dataPath: str):
     '''多设备组合的主函数, 用于从离线数据读取进行测试'''
@@ -135,7 +135,7 @@ def simulatedMainGrouped(dataPath: str):
             continue
         deviceID, deviceType = msg['deviceID'], str(msg['deviceType'])
         name = deviceID + '_' + deviceType
-        dataTime = unixMilliseconds2Datetime(msg['targets'][0]['timestamp'])
+        # dataTime = unixMilliseconds2Datetime(msg['targets'][0]['timestamp'])
         # print('latest receiving time:', datetime.now(),
         #       ' dataTime: ', dataTime, name, end='\r')   # 持续显示
 
@@ -151,8 +151,8 @@ def simulatedMainGrouped(dataPath: str):
 
 def evaluateDeployedModel():
     '''function evaluateDeployedModel
-    
-    读取从部署地点的实时保存数据文件, 
+
+    读取从部署地点的实时保存数据文件,
     模拟实时接收数据, 检验事件结果,
     评估部署模型的性能。
     '''
@@ -208,7 +208,7 @@ def mainGrouped():
             continue
         deviceID, deviceType = msg['deviceID'], str(msg['deviceType'])
         name = deviceID + '_' + deviceType
-        print('latest receiving time:', datetime.now(), name, end='\r')   # 持续显示
+        print('latest receiving time:', datetime.now(), name, end='\r')
         # 当前消息的设备
         if name not in controllerGroup:
             logger.error('该设备未在config中设置, 请添加.' + name)

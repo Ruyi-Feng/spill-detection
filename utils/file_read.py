@@ -29,7 +29,7 @@ def txtRead(path: str, sep: str = ',', type: str = 'tuple',
     result = []
     with open(path, 'r') as file:
         if skip_header:
-            file.readline() # 跳过首行的表头
+            file.readline()  # 跳过首行的表头
         for line in file:
             line = line.strip().split(sep)
             # 处理元素类型
@@ -38,7 +38,7 @@ def txtRead(path: str, sep: str = ',', type: str = 'tuple',
             elif element_type == 'float':
                 line = [float(x) for x in line]
             else:
-                print('element_type error in txtReadList, should be int or float')
+                print('element_type error in txtReadList, should be int/float')
                 sys.exit()
             # 处理行类型
             if row_type == 'tuple':
@@ -46,7 +46,7 @@ def txtRead(path: str, sep: str = ',', type: str = 'tuple',
             elif row_type == 'list':
                 pass
             else:
-                print('row_type error in txtReadList, should be tuple or list')
+                print('row_type error in txtReadList, should be tuple/list')
                 sys.exit()
             result.append(line)
     # 处理返回类型
@@ -158,11 +158,11 @@ class BigFileReader:
     '''
     def __init__(self, path: str):
         '''function __init__
-        
+
         input
         -----
         path: str, 文件路径
-        
+
         初始化BigFileReader类
         0. 检查文件后缀, 若为csv则会在后续跳过首行的处理
         1. 检查是否有文件的.index文件, 若没有则生成。将index保存为类的属性
@@ -187,11 +187,11 @@ class BigFileReader:
 
     def getRow(self, row_index: int) -> str:
         '''function getRow
-        
+
         input
         -----
         row_index: int, 行号
-        
+
         根据index文件, 从对应的文件中读取指定行的数据
         '''
         bytes_start, bytes_end = self.rowsBytesIndex[row_index]

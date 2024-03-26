@@ -74,8 +74,8 @@ class Controller:
                 time.time() + cfg['calibSeconds']))
             txt1 = f'{clbPath}文件已存在, ' if os.path.exists(clbPath) \
                 else f'{clbPath}文件不存在, '
-            txt2 = f'配置设置需要进行标定, ' if self.cfg['ifRecalib'] \
-                else f'配置设置不需重复标定（若文件已存在）'
+            txt2 = '配置设置需要进行标定, ' if self.cfg['ifRecalib'] \
+                else '配置设置不需重复标定（若文件已存在）'
             self.logger.info(txt1 + txt2)
             self.logger.info('******开始标定过程******' +
                              f"开始时刻: {startTime}," +

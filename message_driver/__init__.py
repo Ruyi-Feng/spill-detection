@@ -323,11 +323,13 @@ class DriverOnline:
             # if car['laneID'] == 0:
             #     continue
             if car['laneID'] not in self.lanes:
-                self.logger.info('laneID '+ str(car['laneID'])+
-                                 'not in lanes'+ str(self.lanes)+
-                                 'please recalibrate the section: '+
-                                 'deviceID:'+ deviceID+
-                                 ' deviceType:'+ str(deviceType))
+                dataTime = unixMilliseconds2Datetime(car['timestamp'])
+                self.logger.info('laneID ' + str(car['laneID']) +
+                                 'not in lanes' + str(self.lanes) +
+                                 'please recalibrate the section: ' +
+                                 'deviceID:' + deviceID +
+                                 ' deviceType:' + str(deviceType) +
+                                 'dataTime: ' + str(dataTime))
                 continue
             car['deviceID'] = deviceID
             car['deviceType'] = deviceType
@@ -477,30 +479,14 @@ class DriverOnline:
         }
         '''
         newEvent = dict()
-        # newEvent['type'] = typeIdDict[event['type']]
-        # newEvent['level'] = 1
-        # newEvent['start_time'] = unixMilliseconds2Datetime(event['startTime'])
-        # if event['endTime'] == -1:
-        #     newEvent['end_time'] = -1
-        # else:
-        #     newEvent['end_time'] = unixMilliseconds2Datetime(event['endTime'])
-        # newEvent['lane'] = event['laneID']
-        # newEvent['raw_class'] = event['rawClass']
-        # newEvent['point_wgs84'] = {
-        #     'lat': event['lat'],
-        #     'lon': event['lon']
-        # }
-        # newEvent['device_type'] = event['deviceType']
-        # newEvent['device_id'] = event['deviceID']
-        # 上述用dict.update()的方式更新newEvent
         newEvent.update(
             {
                 'eventID': event['eventID'],
                 'type': typeIdDict[event['type']],
                 'level': 1,
                 'start_time': unixMilliseconds2Datetime(event['startTime']),
-                'end_time': unixMilliseconds2Datetime(event['endTime']) \
-                    if event['endTime'] != -1 else -1,
+                'end_time': unixMilliseconds2Datetime(event['endTime'])
+                if event['endTime'] != -1 else -1,
                 'lane': event['laneID'],
                 'raw_class': event['rawClass'],
                 'point_wgs84': {'lat': event['lat'], 'lon': event['lon']},
