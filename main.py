@@ -10,6 +10,7 @@ from rsu_simulator import Smltor
 from logger import MyLogger
 from utils import loadConfig, isNotTargetDevice, isInvalidMsg
 from utils import checkConfigDevices, argsFromDeviceID
+from utils import unixMilliseconds2Datetime
 
 
 if sys.version_info >= (3, 12, 0):
@@ -134,7 +135,9 @@ def simulatedMainGrouped(dataPath: str):
             continue
         deviceID, deviceType = msg['deviceID'], str(msg['deviceType'])
         name = deviceID + '_' + deviceType
-        print('latest receiving time:', datetime.now(), name, end='\r')   # 持续显示
+        dataTime = unixMilliseconds2Datetime(msg['targets'][0]['timestamp'])
+        # print('latest receiving time:', datetime.now(),
+        #       ' dataTime: ', dataTime, name, end='\r')   # 持续显示
 
         # 当前消息的设备
         if name not in controllerGroup:
@@ -153,12 +156,15 @@ def evaluateDeployedModel():
     模拟实时接收数据, 检验事件结果,
     评估部署模型的性能。
     '''
-    dataDir = './data/'
+    # dataDir = './data/'
+    dataDir = r'D:\东南大学\科研\金科\data'
+    # 2024-3-26-0.txt, 568914行
+    # 2024-3-26-1.txt, 863957行
     for file in os.listdir(dataDir):
         if ('dump' in file) or ('result' in file) or ('heartbeat' in file):
             continue
         print(file, 'is running.')
-        simulatedMainGrouped(dataDir + file)
+        simulatedMainGrouped(dataDir + '/' + file)
 
 
 def mainGrouped():
