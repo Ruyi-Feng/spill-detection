@@ -1,0 +1,192 @@
+1:
+  cells:
+  - false
+  - true
+  - true
+  - true
+  - false
+  - false
+  - false
+  - false
+  - true
+  - true
+  - true
+  coef:
+  - 0.255
+  - 9.718
+  - 36.208
+  emgc: true
+  end: 500.95
+  len: 500.95
+  start: 0
+  vDir:
+    x: -1
+    y: 1
+2:
+  cells:
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  coef:
+  - 0.255
+  - 9.718
+  - 71.621
+  emgc: false
+  end: 500.95
+  len: 500.95
+  start: 0
+  vDir:
+    x: -1
+    y: 1
+3:
+  cells:
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  coef:
+  - 0.255
+  - 11.944
+  - 139.45
+  emgc: false
+  end: 500.95
+  len: 500.95
+  start: 0
+  vDir:
+    x: -1
+    y: 1
+4:
+  cells:
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  coef:
+  - 0.255
+  - 13.01
+  - 150.637
+  emgc: false
+  end: 500.95
+  len: 500.95
+  start: 0
+  vDir:
+    x: -1
+    y: 1
+5:
+  cells:
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  coef:
+  - 0.255
+  - -16.879
+  - 263.234
+  emgc: false
+  end: 0
+  len: 500.95
+  start: 500.95
+  vDir:
+    x: 1
+    y: -1
+6:
+  cells:
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  coef:
+  - 0.255
+  - -28.729
+  - 271.152
+  emgc: false
+  end: 0
+  len: 500.95
+  start: 500.95
+  vDir:
+    x: 1
+    y: -1
+7:
+  cells:
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  coef:
+  - 0.255
+  - -46.013
+  - 223.996
+  emgc: false
+  end: 500.95
+  len: 500.95
+  start: 0
+  vDir:
+    x: 1
+    y: 1
+8:
+  cells:
+  - false
+  - false
+  - false
+  - false
+  - false
+  - false
+  - false
+  - false
+  - false
+  - false
+  - false
+  coef:
+  - 0.255
+  - -46.013
+  - 259.409
+  emgc: true
+  end: 500.95
+  len: 500.95
+  start: 0
+  vDir:
+    x: 1
+    y: 1

@@ -1,0 +1,264 @@
+1:
+  cells:
+  - false
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - false
+  - true
+  - true
+  - true
+  - true
+  - false
+  - false
+  - false
+  - false
+  coef:
+  - -56.511
+  - 2078.573
+  - -19361.55
+  emgc: true
+  end: 986.8
+  len: 986.8
+  start: 0
+  vDir:
+    x: 1
+    y: 1
+2:
+  cells:
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - false
+  - false
+  coef:
+  - -56.511
+  - 2078.573
+  - -14523.237
+  emgc: false
+  end: 986.8
+  len: 986.8
+  start: 0
+  vDir:
+    x: 1
+    y: 1
+3:
+  cells:
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - false
+  coef:
+  - -56.511
+  - 1882.649
+  - -8410.934
+  emgc: false
+  end: 986.8
+  len: 986.8
+  start: 0
+  vDir:
+    x: -1
+    y: 1
+4:
+  cells:
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  coef:
+  - -56.511
+  - 1655.943
+  - -3022.787
+  emgc: false
+  end: 986.8
+  len: 986.8
+  start: 0
+  vDir:
+    x: -1
+    y: 1
+5:
+  cells:
+  - false
+  - false
+  - false
+  - false
+  - false
+  - false
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  coef:
+  - -56.511
+  - -441.537
+  - -35.423
+  emgc: false
+  end: 0
+  len: 986.8
+  start: 986.8
+  vDir:
+    x: 1
+    y: -1
+6:
+  cells:
+  - false
+  - false
+  - false
+  - false
+  - true
+  - false
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  coef:
+  - -56.511
+  - -632.728
+  - -295.35
+  emgc: false
+  end: 0
+  len: 986.8
+  start: 986.8
+  vDir:
+    x: 1
+    y: -1
+7:
+  cells:
+  - false
+  - false
+  - false
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  coef:
+  - -56.511
+  - -1334.707
+  - -7112.708
+  emgc: false
+  end: 0
+  len: 986.8
+  start: 986.8
+  vDir:
+    x: -1
+    y: -1
+8:
+  cells:
+  - false
+  - false
+  - false
+  - false
+  - false
+  - false
+  - false
+  - false
+  - false
+  - false
+  - false
+  - false
+  - false
+  - false
+  - false
+  - true
+  - true
+  - true
+  - false
+  - false
+  coef:
+  - -56.511
+  - -1334.707
+  - -2274.395
+  emgc: true
+  end: 0
+  len: 986.8
+  start: 986.8
+  vDir:
+    x: -1
+    y: -1
