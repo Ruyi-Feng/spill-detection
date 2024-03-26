@@ -1,10 +1,9 @@
 import yaml
-from utils.default import defaultEventTypes
-from utils import BigFileReader
+import os
 from datetime import datetime
+import pandas as pd
+from utils.default import defaultEventTypes
 
-
-BigFileReader = BigFileReader
 '''Contain commonly used functions.'''
 
 
@@ -230,3 +229,34 @@ def argsFromDeviceID(deviceID: str, deviceType) -> tuple:
     deviceType: str/int, 设备类型
     '''
     return Args(deviceID, deviceType)
+
+
+def fixDfSpeed0(dataPath: str, vxColId: int, vyColId: int, speedColId: int):
+    '''function fixDfSpeed0
+
+    input
+    -----
+    dataPath: str, 数据文件路径
+    vxColId: int, vx列索引
+    vyColId: int, vy列索引
+    speedColId: int, 速度列索引
+
+    return
+    ------
+    None
+
+    修复df中速度为0的情况。
+    '''
+    # 直接将speed列数据换为vxvy的模
+    df = pd.read_csv(dataPath)
+    df.iloc[:, speedColId] = (df.iloc[:, vxColId] ** 2 + df.iloc[:, vyColId] ** 2) ** 0.5
+    df.to_csv(dataPath, index=False)
+
+
+if __name__ == '__main__':
+    csvDir = './data/extractedData'
+    for file in os.listdir(csvDir):
+        if file.endswith('.csv'):
+            dataPath = os.path.join(csvDir, file)
+            fixDfSpeed0(dataPath, 9, 10, 8)
+            print(f'fixed {dataPath} speed 0')
