@@ -9,7 +9,7 @@ from connector import HttpPoster
 from rsu_simulator import Smltor
 from logger import MyLogger
 from utils import loadConfig, isNotTargetDevice, isInvalidMsg
-from utils import argsFromDeviceID
+from utils import checkConfigDevices, argsFromDeviceID
 
 
 if sys.version_info >= (3, 12, 0):
@@ -104,9 +104,9 @@ def simulatedMainGrouped(dataPath: str):
     # 读取配置文件
     configPath = './config.yml'
     cfg = loadConfig(configPath)
-    deviceNum1, deviceNum2 = len(cfg['deviceIDs']), len(cfg['deviceTypes'])
-    if deviceNum1 != deviceNum2:
-        print('设备ID与设备类型数量不匹配. 请检查config.yml')
+    condition, hint = checkConfigDevices(cfg)
+    if not condition:
+        print(hint)
         return
 
     # 数据地址
@@ -163,12 +163,13 @@ def evaluateDeployedModel():
 
 def mainGrouped():
     '''多设备组合的主函数'''
+    logger = MyLogger('main', 'noDeivce')
     # 读取配置文件
     configPath = './config.yml'
     cfg = loadConfig(configPath)
-    deviceNum1, deviceNum2 = len(cfg['deviceIDs']), len(cfg['deviceTypes'])
-    if deviceNum1 != deviceNum2:
-        logger.error('设备ID与设备类型数量不匹配. 请检查config.yml')
+    condition, hint = checkConfigDevices(cfg)
+    if not condition:
+        logger.error(hint)
         return
     # 生成kafka消费者
     kc = KafkaConsumer(
@@ -177,7 +178,6 @@ def mainGrouped():
         group_id=cfg['groupid'])
     # 生成http上报器
     hp = HttpPoster(cfg['http'])
-    logger = MyLogger('main', 'noDeivce')
     logger.info('kafka与http数据通信组件已生成.')
 
     # 根据设备信息生成clbPath, 为./road_calibration/clb_设备名_设备类型.yml
