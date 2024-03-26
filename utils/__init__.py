@@ -191,3 +191,24 @@ def isInvalidMsg(msg) -> bool:
     bool: bool, 是否是无效消息
     '''
     return (msg is None) or (msg == '') or (not msg)
+
+
+class Args:
+    '''class Args
+
+    用于模拟argparse.Namespace的类。
+    '''
+    def __init__(self, deviceId, deviceType):
+        self.deviceId = deviceId
+        self.deviceType = deviceType
+
+
+def argsFromDeviceID(deviceID: str, deviceType) -> tuple:
+    '''function argsFromDeviceID
+
+    input
+    -----
+    deviceID: str, 设备ID
+    deviceType: str/int, 设备类型
+    '''
+    return Args(deviceID, deviceType)
