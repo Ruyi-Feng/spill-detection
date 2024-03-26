@@ -163,3 +163,6 @@ config.json
 config.yml
 *.zip
 logger/eventsCache/*/*.txt
+*/*/*.txt
+*/*/*/*.txt
+*/*/*/*/*.txt
