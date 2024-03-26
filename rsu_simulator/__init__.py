@@ -1,5 +1,5 @@
 import json
-
+from utils import swapQuotes
 
 class Smltor():
     '''class Smltor
@@ -26,6 +26,7 @@ class Smltor():
         函数会返回list类型的数据, 或者str类型的消息。
         '''
         msg = self.f.readline()
+        msg = swapQuotes(msg)
         # 接受数据
         try:
             msg = json.loads(msg)  # 接收到list数据
