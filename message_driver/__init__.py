@@ -323,11 +323,11 @@ class DriverOnline:
             # if car['laneID'] == 0:
             #     continue
             if car['laneID'] not in self.lanes:
-                self.logger.warning('laneID '+ str(car['laneID'])+
-                                    'not in lanes'+ str(self.lanes)+
-                                    'please recalibrate the section: '+
-                                    'deviceID:'+ deviceID+
-                                    'deviceType:'+ str(deviceType))
+                self.logger.info('laneID '+ str(car['laneID'])+
+                                 'not in lanes'+ str(self.lanes)+
+                                 'please recalibrate the section: '+
+                                 'deviceID:'+ deviceID+
+                                 ' deviceType:'+ str(deviceType))
                 continue
             car['deviceID'] = deviceID
             car['deviceType'] = deviceType
@@ -495,6 +495,7 @@ class DriverOnline:
         # 上述用dict.update()的方式更新newEvent
         newEvent.update(
             {
+                'eventID': event['eventID'],
                 'type': typeIdDict[event['type']],
                 'level': 1,
                 'start_time': unixMilliseconds2Datetime(event['startTime']),
