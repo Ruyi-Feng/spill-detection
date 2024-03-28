@@ -44,8 +44,8 @@ qStandard: 10000
 vLateral: 3
 rate2: 0.0017
 WarnFreq: 300
-vStop: 1
-durationStop: 3
+vStop: 2.78
+durationStop: 0.5
 vLow: 2.778
 durationLowSpeed: 3
 vHigh: 33.33
