@@ -1,5 +1,5 @@
 import json
-import pandas as pd
+# import pandas as pd
 from utils import swapQuotes
 from utils.file_read import BigFileReader
 
@@ -33,7 +33,8 @@ class Smltor(BigFileReader):
         msg = self.f.readline()
         # self.runIndex += 1
         # msg = self.getRow(self.runIndex)
-        # msg = swapQuotes(msg)
+        if msg[1] == '\'':      # 防止json.loads()报错, load要求字符串中为双引号
+            msg = swapQuotes(msg)
         # 接受数据
         try:
             msg = json.loads(msg)  # 接收到list数据
