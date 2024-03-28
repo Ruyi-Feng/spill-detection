@@ -13,8 +13,8 @@ class MyLogger(logging.Logger):
     默认日志级别为logging.INFO, 控制台输出级别为logging.INFO
     文件输出级别为logging.WARNING
     '''
-    def __init__(self, deviceID: str, deviceType: int, level=logging.INFO,
-                 fileLevel=logging.INFO, consoleLevel=logging.INFO):
+    def __init__(self, deviceID: str, deviceType: int, level=logging.DEBUG,
+                 fileLevel=logging.INFO, consoleLevel=logging.DEBUG):
         '''function __init__
 
         input
