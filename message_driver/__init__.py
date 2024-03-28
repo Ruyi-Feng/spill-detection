@@ -327,13 +327,13 @@ class DriverOnline:
             # if car['laneID'] == 0:
             #     continue
             if car['laneID'] not in self.lanes:
-                dataTime = unixMilliseconds2Datetime(car['timestamp'])
-                self.logger.debug('laneID ' + str(car['laneID']) +
-                                  ' not in lanes' + str(self.lanes) +
-                                  ' please recalibrate the section:' +
-                                  ' deviceID:' + deviceID +
-                                  ' deviceType:' + str(deviceType) +
-                                  ' dataTime: ' + str(dataTime))
+                # dataTime = unixMilliseconds2Datetime(car['timestamp'])
+                # self.logger.debug('laneID ' + str(car['laneID']) +
+                #                   ' not in lanes' + str(self.lanes) +
+                #                   ' please recalibrate the section:' +
+                #                   ' deviceID:' + deviceID +
+                #                   ' deviceType:' + str(deviceType) +
+                #                   ' dataTime: ' + str(dataTime))
                 continue
             car['deviceID'] = deviceID
             car['deviceType'] = deviceType
