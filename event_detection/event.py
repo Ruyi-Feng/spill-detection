@@ -4,6 +4,7 @@ from utils import int2strID
 from traffic_manager.lane_manager import LaneMng
 from traffic_manager.cell_manager import CellMng
 from utils.default import defaultEventTypes, typeCharDict, typeIdDict
+from .event_filter import EventFilter
 
 
 '''This is to define the event class and event manager class.'''
@@ -53,6 +54,8 @@ class EventMng():
         self.eventIdCount = {type: 0 for type in defaultEventTypes}
         self.currentDay = datetime.now().strftime('%Y%m%d')
         self.idLen = 5
+        # 事件过滤器, 用于防止同id长期多次报警
+        self.ef = EventFilter()
 
     def run(self, type: str, startTime: int, endTime: int,
             *info: any):
@@ -76,6 +79,10 @@ class EventMng():
         if self.currentDay != datetime.now().strftime('%Y%m%d'):
             self.eventIdCount = {type: 0 for type in defaultEventTypes}
             self.currentDay = datetime.now().strftime('%Y%m%d')
+        # 过滤已经报警的数据(3分钟缓存内记录的id和type不会再报警)
+        ifFilter = self.ef.run(type, startTime, endTime, info)
+        if ifFilter:    # 如果过滤, 将不会分配eventID, 不会生成事件
+            return None
         # distribute event ID
         if (info[-1] == '') or (type == 'incident'):
             self.eventIdCount[type] += 1
@@ -289,6 +296,7 @@ class IncidentEvent(BaseEvent):
         super().__init__(type, eventID, startTime, endTime)
         self.carID1 = car1['id']
         self.carID2 = car2['id']
+        self.laneID = car1['laneID']  # 撞车的两车位置应当一样
         self.laneID1 = car1['laneID']
         self.laneID2 = car2['laneID']
         self.x1, self.y1 = car1['x'], car1['y']
