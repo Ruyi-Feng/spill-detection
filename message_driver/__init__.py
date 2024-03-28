@@ -126,9 +126,11 @@ class DriverOffline:
                      'Ysize': 'length',
                      'TargetType': 'class',
                      'LineNum': 'laneID',
+                     'lane': 'laneID',
                      'Latitude': 'latitude',
                      'Longitude': 'longitude',
-                     'TargetType': 'class'
+                     'TargetType': 'class',
+                     'cls': 'class'
                      }
         # 返还数据格式接口, 从内部处理数据转化为输出数据
         interfaceBack = dict()
@@ -198,12 +200,14 @@ class DriverOffline:
         '''
         # 调整属性名称
         for key in self.interface.keys():
+            if key not in car.keys():
+                continue
             car[self.interface[key]] = car[key]
             del car[key]
         # 处理特殊属性
         car['speed'] = (car['vx']**2 + car['vy']**2)**0.5
         car['laneNeedAdd'] = False
-        if car['laneID'] > 100:
+        if ('laneID' in car.keys()) and (car['laneID'] > 100):
             car['laneID'] -= 100
             car['laneNeedAdd'] = True
         # 调整时间戳格式
@@ -324,12 +328,12 @@ class DriverOnline:
             #     continue
             if car['laneID'] not in self.lanes:
                 dataTime = unixMilliseconds2Datetime(car['timestamp'])
-                self.logger.info('laneID ' + str(car['laneID']) +
-                                 'not in lanes' + str(self.lanes) +
-                                 'please recalibrate the section: ' +
-                                 'deviceID:' + deviceID +
-                                 ' deviceType:' + str(deviceType) +
-                                 'dataTime: ' + str(dataTime))
+                self.logger.debug('laneID ' + str(car['laneID']) +
+                                  ' not in lanes' + str(self.lanes) +
+                                  ' please recalibrate the section:' +
+                                  ' deviceID:' + deviceID +
+                                  ' deviceType:' + str(deviceType) +
+                                  ' dataTime: ' + str(dataTime))
                 continue
             car['deviceID'] = deviceID
             car['deviceType'] = deviceType
