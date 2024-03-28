@@ -10,6 +10,7 @@ from rsu_simulator import Smltor, DfSimulator
 from logger import MyLogger
 from utils import loadConfig, isNotTargetDevice, isInvalidMsg
 from utils import checkConfigDevices, argsFromDeviceID
+from utils import unixMilliseconds2Datetime
 
 
 if sys.version_info >= (3, 12, 0):
@@ -88,12 +89,15 @@ def main():
     # 持续性运行接收
     for msgBytes in kc:
         # 数据解码
-        print('latest receiving time:', datetime.now(), end='\r')   # 持续显示
         msgStr = msgBytes.value.decode('utf-8')
         msg = json.loads(msgStr)        # dict
         # 非空数据判断
         if isInvalidMsg(msg) or isNotTargetDevice(msg, args):
             continue
+        dataTime = unixMilliseconds2Datetime(msg['targets'][0]['timestamp'])
+        print('latest receiving time:', datetime.now(),
+              ' dataTime: ', dataTime,
+              f'{args.deviceId}_{args.deviceType}', end='\r')
         # log文件保存更新
         logger.updateDayLogFile()
         # 算法检测
@@ -217,7 +221,9 @@ def mainGrouped():
             continue
         deviceID, deviceType = msg['deviceID'], str(msg['deviceType'])
         name = deviceID + '_' + deviceType
-        print('latest receiving time:', datetime.now(), name, end='\r')
+        # dataTime = unixMilliseconds2Datetime(msg['targets'][0]['timestamp'])
+        # print('latest receiving time:', datetime.now(),
+        #       ' dataTime: ', dataTime, name, end='\r')   # 持续显示
         # 当前消息的设备
         if name not in controllerGroup:
             logger.error('该设备未在config中设置, 请添加.' + name)
@@ -234,6 +240,8 @@ def mainGrouped():
 
 if __name__ == "__main__":
     # simulatedMain()
-    main()
+    # main()
     # evaluateDeployedModel()
     # mainGrouped()
+    dataPath = r'D:\东南大学\科研\金科\data\dataRy\data\2024-3-27-17.txt'
+    simulatedMainGrouped(dataPath)
