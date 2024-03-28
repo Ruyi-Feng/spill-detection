@@ -131,6 +131,10 @@ class EventDetector(TrafficMng):
         # 检测交通事件
         self.updatePotentialDict(cars)
         self.detect(cars)
+        # print(self.stopDict, unixMilliseconds2Datetime(cars[0]['timestamp']))
+        # 更新事件过滤器的记录
+        if len(cars) > 0:
+            self.eventMng.ef.clearEventCache(cars[0]['timestamp'])
         return self.eventMng.events
 
     def updatePotentialDict(self, cars: list) -> None:
@@ -224,6 +228,9 @@ class EventDetector(TrafficMng):
                         'spill', self.dangerDict[(id, order)][0], -1,
                         self.dangerDict[(id, order)][2],
                         deviceID, deviceType, self.dangerDict[(id, order)][3])
+                    # 若eventID返回None, 说明该事件应当过滤, 并且未生成新事件, 不输出报警
+                    if eventID is None:
+                        continue
                     self.dangerDict[(id, order)][3] = eventID
                     # 生成log信息
                     cellStart = self.lanes[id].cells[order].start
@@ -252,6 +259,9 @@ class EventDetector(TrafficMng):
                             self.dangerDict[(id, order)][2],
                             deviceID, deviceType,
                             self.dangerDict[(id, order)][3])
+                        # 若eventID返回None, 说明该事件应当过滤, 并且未生成新事件, 不输出报警
+                        if eventID is None:
+                            continue
                         # 生成log信息
                         cellStart = self.lanes[id].cells[order].start
                         cellEnd = self.lanes[id].cells[order].end
@@ -302,6 +312,9 @@ class EventDetector(TrafficMng):
                     eventType, eventRecordDict[id][0], -1,
                     car, eventRecordDict[id][3])
                 eventRecordDict[id][3] = eventID
+                # 若eventID返回None, 说明该事件应当过滤, 并且未生成新事件, 不输出报警
+                if eventID is None:
+                    continue
                 # 生成log信息
                 startTime = unixMilliseconds2Datetime(eventRecordDict[id][0])
                 logEvent = f"事件ID={eventID} - " +\
@@ -420,6 +433,9 @@ class EventDetector(TrafficMng):
                 eventID = self.eventMng.run(
                     'incident', self.incidentDict[(car1['id'], car2['id'])],
                     car1['timestamp'], car1, car2)
+                # 若eventID返回None, 说明该事件应当过滤, 并且未生成新事件, 不输出报警
+                if eventID is None:
+                    continue
                 logEvent = f"事件ID={eventID} - " +\
                     f"id={str(ids[0])},{str(ids[1])}车辆碰撞, " + \
                     getCarBaseInfo(car1) + getCarBaseInfo(car2)
@@ -520,6 +536,9 @@ class EventDetector(TrafficMng):
                         'crowd', cars[0]['timestamp'], -1,
                         self.lanes[id], deviceID, deviceType,
                         self.crowdDict[id][3])
+                    # 若eventID返回None, 说明该事件应当过滤, 并且未生成新事件, 不输出报警
+                    if eventID is None:
+                        continue
                     self.crowdDict[id][3] = eventID
                     logEvent = f"事件ID={eventID}:" +\
                         f": id={id}车道拥堵, 车道密度: {k}辆/km, 车道速度: {v}km/h."
@@ -532,6 +551,9 @@ class EventDetector(TrafficMng):
                         'crowd', self.crowdDict[id][0],
                         self.crowdDict[id][1], self.crowdDict[id][2],
                         deviceID, deviceType, self.crowdDict[id][3])
+                    # 若eventID返回None, 说明该事件应当过滤, 并且未生成新事件, 不输出报警
+                    if eventID is None:
+                        continue
                     logEvent = f"事件ID={eventID} - " +\
                         f"id={id}车道拥堵已解除, 车道密度: {k}辆/km, 车道速度: {v}km/h."
                     self.logger.warning(logEvent)
@@ -648,6 +670,9 @@ class EventDetector(TrafficMng):
                 # 告警
                 eventID = self.eventMng.run(
                     type, startTime, endTime, car, eventID)
+                # 若eventID返回None, 说明该事件应当过滤, 并且未生成新事件, 不输出报警
+                if eventID is None:
+                    continue
                 # 生成log信息
                 startTime = unixMilliseconds2Datetime(startTime)
                 endTime = unixMilliseconds2Datetime(endTime)
