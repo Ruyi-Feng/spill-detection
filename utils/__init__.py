@@ -1,7 +1,7 @@
 import yaml
 import os
 from datetime import datetime
-import pandas as pd
+# import pandas as pd
 from utils.default import defaultEventTypes
 
 '''Contain commonly used functions.'''
