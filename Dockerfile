@@ -11,4 +11,4 @@ RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
 
 RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 
-RUN pip install --no-cache-dir numpy PyYAML tqdm requests kafka-python
+RUN pip install --no-cache-dir numpy PyYAML tqdm requests kafka-python pandas
