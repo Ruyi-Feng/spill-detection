@@ -166,3 +166,4 @@ logger/eventsCache/*/*.txt
 */*/*.txt
 */*/*/*.txt
 */*/*/*/*.txt
+*/*/*/*/*/*.txt
