@@ -47,6 +47,7 @@ def simulatedMain():
 
 
 def main():
+    '''单进程, 单设备, 可在外部起多进程'''
     args = params()
     logger = MyLogger(args.deviceId, args.deviceType)
     # 读取配置文件
@@ -56,7 +57,7 @@ def main():
     kc = KafkaConsumer(
         cfg['topic'], bootstrap_servers=cfg['ip'],
         api_version=tuple(cfg['producerversion']),
-        group_id=cfg['groupid'],
+        group_id=args.deviceId,
         # auto_offset_reset='smallest',
         # auto_offset_reset='latest',
         # auto_commit_interval_ms=cfg['kafkaAutoCommitIntervalMs']
@@ -176,7 +177,7 @@ def evaluateDeployedModel():
 
 
 def mainGrouped():
-    '''多设备组合的主函数'''
+    '''单进程, 多设备组合的主函数'''
     logger = MyLogger('main', 'noDeivce')
     # 读取配置文件
     configPath = './config.yml'
@@ -233,6 +234,6 @@ def mainGrouped():
 
 if __name__ == "__main__":
     # simulatedMain()
-    # main()
-    evaluateDeployedModel()
+    main()
+    # evaluateDeployedModel()
     # mainGrouped()
