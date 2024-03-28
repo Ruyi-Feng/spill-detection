@@ -6,7 +6,7 @@ from datetime import datetime
 from controller import Controller
 from kafka import KafkaConsumer
 from connector import HttpPoster
-from rsu_simulator import Smltor
+from rsu_simulator import Smltor, DfSimulator
 from logger import MyLogger
 from utils import loadConfig, isNotTargetDevice, isInvalidMsg
 from utils import checkConfigDevices, argsFromDeviceID
@@ -28,16 +28,19 @@ def params():
 
 def simulatedMain():
     configPath = './config.yml'
-    clbPath = './road_calibration/clbymls/clb.yml'
-    dataPath = './data/result.txt'
+    # clbPath = './road_calibration/clbymls/clb.yml'
+    # dataPath = './data/result.txt'
+    clbPath = './road_calibration/clbymls/clb_K81+866_1.yml'
+    dataPath = r'D:\myscripts\spill-detection\data\sample\stop20240326-K81+866.csv'
     args = params()
     logger = MyLogger(args.deviceId, args.deviceType)
     controller = Controller(configPath, clbPath, logger, args)
-    smltor = Smltor(dataPath)
+    smltor = Smltor(dataPath) if dataPath.endswith('.txt') else DfSimulator(dataPath)
 
     # 模拟接受数据
     while True:
         msg = smltor.run()
+        # print(msg)
         if msg == '':   # 读取到文件末尾
             break
         msg, events = controller.run(msg)  # msg为控制器返回的需要发送的数据
@@ -157,11 +160,16 @@ def evaluateDeployedModel():
     评估部署模型的性能。
     '''
     # dataDir = './data/'
-    dataDir = r'D:\东南大学\科研\金科\data'
+    # dataDir = r'D:\东南大学\科研\金科\data'
+    dataDir = r'D:\myscripts\spill-detection\data\extractedData'
     # 2024-3-26-0.txt, 568914行
     # 2024-3-26-1.txt, 863957行
     for file in os.listdir(dataDir):
         if ('dump' in file) or ('result' in file) or ('heartbeat' in file):
+            continue
+        if not file.endswith('.txt'):
+            continue
+        if '2024-03-26' in file:
             continue
         print(file, 'is running.')
         simulatedMainGrouped(dataDir + '/' + file)
@@ -219,7 +227,7 @@ def mainGrouped():
         msg, events = controllerGroup[name].run(msg)
         if (events is None) or (len(events) == 0):
             continue    # 未检测到事件
-        # 上报事件
+        # 上报事件        
         hp.run(events)
 
 
