@@ -6,7 +6,7 @@ from utils import unixMilliseconds2Datetime
 
 
 # count记录最大值(达到后重置)ss
-maxCount = 60000            # 1min对应的最大ms时长
+maxCount = 600000         # 10min对应的最大ms时长
 # maxCount = 172800000    # fps=20时, 10天重置1次
 
 
