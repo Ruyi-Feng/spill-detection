@@ -9,7 +9,7 @@ __pycache__/
 # Distribution / packaging
 .Python
 build/
-data/
+# data/
 develop-eggs/
 dist/
 downloads/
@@ -163,7 +163,28 @@ config.json
 config.yml
 *.zip
 logger/eventsCache/*/*.txt
+*/*.txt
 */*/*.txt
 */*/*/*.txt
 */*/*/*/*.txt
 */*/*/*/*/*.txt
+*/*/*.csv
+*/*/*/*.csv
+*/*/*/*/*.csv
+*/*/*/*/*/*.csv
+*/*/*.xlsx
+*/*/*/*.xlsx
+*/*/*/*/*.xlsx
+*/*/*/*/*/*.xlsx
+*/*/*.jpg
+*/*/*/*.jpg
+*/*/*/*/*.jpg
+*/*/*/*/*/*.jpg
+*/*/*.png
+*/*/*/*.png
+*/*/*/*/*.png
+*/*/*/*/*/*.png
+*/*/*.index
+*/*/*/*.index
+*/*/*/*/*.index
+*/*/*/*/*/*.index
