@@ -1,6 +1,8 @@
 from pre_processing.pro_class.smooth import Exponential
 from pre_processing.pro_class.complete import Interpolation
 from utils.car_utils import carsList2Dict, carsDict2List
+from pre_processing.utils import framesCombination, getCurrentFrame
+
 from copy import deepcopy
 
 
@@ -39,6 +41,12 @@ class PreProcessor():
         curFrame = self._copyTimestamp(curFrame)
         # dict组织方便索引
         curFrame = carsList2Dict(curFrame)
+        # 如果不开补全平滑
+        # _, self.lastTimestamp = framesCombination(self.contextFrames,
+        #                                                 curFrame,
+        #                                                 self.lastTimestamp)
+        # curFrame = getCurrentFrame(self.contextFrames, self.lastTimestamp)
+
         # 补全
         curFrame, self.lastTimestamp = self.cmp.run(self.contextFrames,
                                                     curFrame,
