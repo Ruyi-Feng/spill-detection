@@ -41,7 +41,7 @@ def framesCombination(
 
     input
     -----
-    contextFrames: dict, 历史帧数据
+    contextFrames: dict, 历史帧数据, 以id为索引, 值为list
     currentFrame: dict, 当前帧数据
     lastTimestamp: int, 上一帧的时间戳
 

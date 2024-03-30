@@ -10,7 +10,7 @@ class PreProcessor():
     def __init__(self, comMaxFrm: int, smthA: float) -> None:
         self.cmp = Interpolation(comMaxFrm * 1000)  # 补全器(输入ms)
         self.smth = Exponential(smthA)              # 平滑器
-        self.contextFrames = dict()                 # 按id索引的历史数据
+        self.contextFrames = dict()   # 按id索引的历史数据, 值为历史数据list
         self.lastTimestamp = None                   # 上一帧时间戳
 
     def run(self, curFrame: list) -> list:
