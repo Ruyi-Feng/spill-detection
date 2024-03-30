@@ -42,7 +42,7 @@ class Controller:
     生成控制器, 用于控制整个算法流程。
     '''
     def __init__(self, cfgPath: str, clbPath: str,
-                 logger: MyLogger, args):
+                 logger: MyLogger, args, ifReportRunTime: bool = False):
         '''function __init__
 
         input
@@ -51,7 +51,11 @@ class Controller:
         clbPath: str, 标定参数文件路径
         logger: MyLogger, 日志器
         args: dict, 参数
+        ifReportRunTime: bool, 是否报告各阶段运行时间
         '''
+        self.ifReportRunTime = ifReportRunTime
+        self.timeTmp = [[] for _ in range(7)]
+
         # 读取配置
         self.cfgPath = cfgPath
         cfg = loadConfig(cfgPath)
@@ -154,6 +158,7 @@ class Controller:
         接受传感器数据, 返回发送数据、事件检测结果。
         '''
         # 接受数据
+        time1 = time.time()
         valid, cars = self.drv.receive(msg)
         if not valid:
             return None, None
@@ -161,19 +166,40 @@ class Controller:
         if self.needClb:
             self.calibration(cars)
             return None, None
+        time2 = time.time()
         # 更新缓存
         self._updateCache(cars)
+        time3 = time.time()
         # 预处理
         cars = self.pp.run(cars)
+        time4 = time.time()
         # 事件检测(内含交通流参数计算+事件检测)
         events = self.edt.run(cars)
+        time5 = time.time()
         # 发送数据
         msg, events = self.drv.send(cars.copy(), events)
+        time6 = time.time()
         # 保存缓存
         if len(events) > 0:
             for event in events:
                 self._saveCache(event['eventID'])
-
+        time7 = time.time()
+        # 计算各阶段时长
+        if self.ifReportRunTime:
+            timeDriver = time2 - time1
+            timeTraffic = time3 - time2
+            timePre = time4 - time3
+            timeDetect = time5 - time4
+            timeSend = time6 - time5
+            timeSave = time7 - time6
+            timeTotal = time7 - time1
+            self.timeTmp[0].append(timeDriver)
+            self.timeTmp[1].append(timeTraffic)
+            self.timeTmp[2].append(timePre)
+            self.timeTmp[3].append(timeDetect)
+            self.timeTmp[4].append(timeSend)
+            self.timeTmp[5].append(timeSave)
+            self.timeTmp[6].append(timeTotal)
         return msg, events
 
     def _initCache(self):
@@ -217,3 +243,40 @@ class Controller:
         with open(path, 'w') as f:
             for msg in self.cache:
                 f.write(str(msg) + '\n')
+
+    def reportRunTime(self, seconds: float):
+        '''计算各阶段总耗用和平均耗用时长, 以及各阶段的时长占比，并输出'''
+        # 总耗
+        timeDriver = sum(self.timeTmp[0])
+        timeTraffic = sum(self.timeTmp[1])
+        timePre = sum(self.timeTmp[2])
+        timeDetect = sum(self.timeTmp[3])
+        timeSend = sum(self.timeTmp[4])
+        timeSave = sum(self.timeTmp[5])
+        timeTotal = sum(self.timeTmp[6])
+        if timeTotal == 0:
+            return   # 说明该设备数据为空, controller未接收数据
+        # 平均耗
+        avgDriver = timeDriver / seconds
+        avgTraffic = timeTraffic / seconds
+        avgPre = timePre / seconds
+        avgDetect = timeDetect / seconds
+        avgSend = timeSend / seconds
+        avgSave = timeSave / seconds
+        avgTotal = timeTotal / seconds
+        # 占比
+        percentDriver = timeDriver / timeTotal
+        percentTraffic = timeTraffic / timeTotal
+        percentPre = timePre / timeTotal
+        percentDetect = timeDetect / timeTotal
+        percentSend = timeSend / timeTotal
+        percentSave = timeSave / timeTotal
+        # print输出, ms单位
+        print('驱动器平均耗时: {:.2f}ms, 占比: {:.2%}'.format(avgDriver * 1000, percentDriver))
+        print('交通参数计算平均耗时: {:.2f}ms, 占比: {:.2%}'.format(avgTraffic * 1000, percentTraffic))
+        print('预处理平均耗时: {:.2f}ms, 占比: {:.2%}'.format(avgPre * 1000, percentPre))
+        print('事件检测平均耗时: {:.2f}ms, 占比: {:.2%}'.format(avgDetect * 1000, percentDetect))
+        print('发送平均耗时: {:.2f}ms, 占比: {:.2%}'.format(avgSend * 1000, percentSend))
+        print('保存平均耗时: {:.2f}ms, 占比: {:.2%}'.format(avgSave * 1000, percentSave))
+        print('平均总耗时: {:.2f}ms'.format(avgTotal * 1000))
+        print('总耗时: {:.2f}ms'.format(timeTotal * 1000))
