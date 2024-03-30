@@ -33,12 +33,14 @@ class Smltor(BigFileReader):
         msg = self.f.readline()
         # self.runIndex += 1
         # msg = self.getRow(self.runIndex)
-        if msg[1] == '\'':      # 防止json.loads()报错, load要求字符串中为双引号
+        if (len(msg) > 1) and (msg[1] == '\''):      # 防止json.loads()报错, load要求字符串中为双引号
             msg = swapQuotes(msg)
         # 接受数据
         try:
             msg = json.loads(msg)  # 接收到list数据
         except Exception:
+            # msg = swapQuotes(msg)
+            # msg = json.loads(msg)  # 接收到list数据
             pass    # 非检测信息则会接收到str数据
         return msg
 
