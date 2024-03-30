@@ -44,10 +44,10 @@ class Interpolation:
         self, contextFrames: dict, currentFrame: dict, lastTimestamp: int
     ) -> tuple:
         """外部调用函数
-        # TODO 将contextFrames每个id保存都改写为以timestamp为索引的dict, 提高效率
         input
         -----
-        contextFrames: 算法的历史帧数据, 从上一次调用的结果中获得
+        contextFrames: 算法的历史帧数据, 从上一次调用的结果中获得,
+                       以id为索引, 值为以时间戳为索引的dict
         currentFrame: 最新的帧数据
         lastTimestamp: 上次调用算法函数时的当前帧数据时间戳
 
@@ -151,10 +151,16 @@ class Interpolation:
             if index != 0:
                 if self._isFrameValid(objsInfo, index, delaySecMark):
                     self._complete_obj(objsInfo, index, delaySecMark)
-                for i in range(len(objsInfo) - 1, -1, -1):
-                    if objsInfo[i]["timestamp"] == delaySecMark:
-                        obj_id = objsInfo[i]["id"]
-                        updatedLatestFrame[obj_id] = objsInfo[i]
+                # for i in range(len(objsInfo) - 1, -1, -1):
+                #     if objsInfo[i]["timestamp"] == delaySecMark:
+                #         obj_id = objsInfo[i]["id"]
+                #         updatedLatestFrame[obj_id] = objsInfo[i]
+                # 将该遍历修正为无需遍历的操作
+                obj_id = objsInfo[index]["id"]
+                updatedLatestFrame[obj_id] = objsInfo[index]
+                # 或者这样呢？
+                # targetedObj = [obj for obj in objsInfo if obj["timestamp"] == delaySecMark][0]
+                # updatedLatestFrame[targetedObj["id"]] = targetedObj
         time2 = time.time()
         self.timeList[2].append(time2 - time1)
         return updatedLatestFrame
