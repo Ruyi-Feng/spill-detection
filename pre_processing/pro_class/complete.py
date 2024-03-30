@@ -60,8 +60,8 @@ class Interpolation:
         # 获取设备名称
         key = list(currentFrame.keys())[0]
         self.deviceID = currentFrame[key]["deviceID"]
-        if self.count % 2400 == 0:
-            self.reportRuntime()
+        # if self.count % 2400 == 0:
+            # self.reportRuntime()
         time1 = time.time()
         # if self.count > 6000:
         #     print(f'count is {self.count}')
@@ -69,7 +69,7 @@ class Interpolation:
             contextFrames, currentFrame, lastTimestamp
         )
         time2 = time.time()
-        self.timeList[0].append(time2 - time1)
+        # self.timeList[0].append(time2 - time1)
         return (
             self._handleInterpolation(
                 contextFrames, self._findDelaySecMark(contextFrames)
@@ -84,7 +84,7 @@ class Interpolation:
             if j - value >= 0:
                 return index
         time2 = time.time()
-        self.timeList[3].append(time2 - time1)
+        # self.timeList[3].append(time2 - time1)
         return index
 
     def _isFrameValid(
@@ -122,7 +122,7 @@ class Interpolation:
         objsInfo[index]["timestamp"] = delaySecMark
         objsInfo[index]["secMark"] = delaySecMark % utils.MaxSecMark
         time2 = time.time()
-        self.timeList[4].append(time2 - time1)
+        # self.timeList[4].append(time2 - time1)
 
     def _findDelaySecMark(self, frames: dict) -> int:
         # 找到 delaySecMark, 并更新原 frames的 secmark
@@ -138,7 +138,7 @@ class Interpolation:
                     delaySecMark = min(fr["timestamp"], delaySecMark)
                     break
         time2 = time.time()
-        self.timeList[1].append(time2 - time1)
+        # self.timeList[1].append(time2 - time1)
         return delaySecMark
 
     def _handleInterpolation(self, frames: dict, delaySecMark: int) -> dict:
@@ -162,7 +162,7 @@ class Interpolation:
                 # targetedObj = [obj for obj in objsInfo if obj["timestamp"] == delaySecMark][0]
                 # updatedLatestFrame[targetedObj["id"]] = targetedObj
         time2 = time.time()
-        self.timeList[2].append(time2 - time1)
+        # self.timeList[2].append(time2 - time1)
         return updatedLatestFrame
 
     def reportRuntime(self):
