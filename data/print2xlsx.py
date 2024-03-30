@@ -201,10 +201,13 @@ def contorllerInfo2Xlsx(infoPath: str):
 
 if __name__ == "__main__":
     # 已ok, 请勿再次运行
-    path = r'D:\myscripts\spill-detection\data\extractedData\2024-3-27-17_byDevice\K81+320-prepro-runtime-report.txt'
-    preproInfo2Xlsx(path)
+    # path = r'D:\myscripts\spill-detection\data\extractedData\2024-3-27-17_byDevice\K81+320-prepro-runtime-report.txt'
+    # preproInfo2Xlsx(path)
     # path = r'D:\myscripts\spill-detection\data\extractedData\2024-3-27-17_byDevice\K81+320-contorller-runtime-report.txt'
     # contorllerInfo2Xlsx(path)
     # path = r'D:\myscripts\spill-detection\data\extractedData\2024-3-27-17_byDevice\K78+760-prepro-runtime-report.txt'
     # preproInfo2Xlsx(path)
+    # 即将执行
+    path = r'D:\myscripts\spill-detection\data\extractedData\2024-3-27-17_byDevice\K78+760-prepro-runtime-report.txt'
+    preproInfo2Xlsx(path)
     print('done.')
