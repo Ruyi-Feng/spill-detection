@@ -50,6 +50,7 @@ def simulatedMain():
 def main():
     '''单进程, 单设备, 可在外部起多进程'''
     args = params()
+    deviceName = args.deviceId + '_' + str(args.deviceType)
     logger = MyLogger(args.deviceId, args.deviceType)
     # 读取配置文件
     configPath = './config.yml'
@@ -58,7 +59,7 @@ def main():
     kc = KafkaConsumer(
         cfg['topic'], bootstrap_servers=cfg['ip'],
         api_version=tuple(cfg['producerversion']),
-        group_id=args.deviceId,
+        group_id=deviceName,
         # auto_offset_reset='smallest',
         # auto_offset_reset='latest',
         # auto_commit_interval_ms=cfg['kafkaAutoCommitIntervalMs']
@@ -130,11 +131,16 @@ def simulatedMainGrouped(dataPath: str):
         logger4Device = MyLogger(dID, dType)
         args = argsFromDeviceID(dID, dType)
         controllerGroup[name] = Controller(configPath, clbPath,
-                                           logger4Device, args)
+                                           logger4Device, args,
+                                           ifReportRunTime=True)
     print('算法组件生成成功, 数据进入算法通道.')
     # 持续性运行接收
     # 模拟接受数据
+    count = 0
     while True:
+        count += 1
+        # if count > 12000:       # 以该段时间测试运行速度
+        #     break
         msg = smltor.run()
         if msg == '':   # 读取到文件末尾
             break
@@ -143,9 +149,9 @@ def simulatedMainGrouped(dataPath: str):
             continue
         deviceID, deviceType = msg['deviceID'], str(msg['deviceType'])
         name = deviceID + '_' + deviceType
-        # dataTime = unixMilliseconds2Datetime(msg['targets'][0]['timestamp'])
-        # print('latest receiving time:', datetime.now(),
-        #       ' dataTime: ', dataTime, name, end='\r')   # 持续显示
+        dataTime = unixMilliseconds2Datetime(msg['targets'][0]['timestamp'])
+        print('latest receiving time:', datetime.now(),
+              ' dataTime: ', dataTime, name, end='\r')   # 持续显示
 
         # 当前消息的设备
         if name not in controllerGroup:
@@ -155,6 +161,13 @@ def simulatedMainGrouped(dataPath: str):
         controllerGroup[name].logger.updateDayLogFile()
         # 算法检测
         msg, events = controllerGroup[name].run(msg)
+        # if (count % 6000 == 0) & (deviceID == 'K81+320'):
+        #     print('time report:', name)
+        #     controllerGroup[name].reportRunTime()
+    # 各controller报告运行时间
+    for name in controllerGroup:
+        print(name, 'time report:')
+        controllerGroup[name].reportRunTime()
 
 
 def evaluateDeployedModel():
@@ -181,7 +194,9 @@ def evaluateDeployedModel():
 
 
 def mainGrouped():
-    '''单进程, 多设备组合的主函数'''
+    '''单进程, 多设备组合的主函数
+    因所有设备在同一个代码中运行, 且未区分consumer, 当前弃用
+    '''
     logger = MyLogger('main', 'noDeivce')
     # 读取配置文件
     configPath = './config.yml'
@@ -221,9 +236,9 @@ def mainGrouped():
             continue
         deviceID, deviceType = msg['deviceID'], str(msg['deviceType'])
         name = deviceID + '_' + deviceType
-        # dataTime = unixMilliseconds2Datetime(msg['targets'][0]['timestamp'])
-        # print('latest receiving time:', datetime.now(),
-        #       ' dataTime: ', dataTime, name, end='\r')   # 持续显示
+        dataTime = unixMilliseconds2Datetime(msg['targets'][0]['timestamp'])
+        print('latest receiving time:', datetime.now(),
+              ' dataTime: ', dataTime, name, end='\r')   # 持续显示
         # 当前消息的设备
         if name not in controllerGroup:
             logger.error('该设备未在config中设置, 请添加.' + name)
@@ -243,5 +258,7 @@ if __name__ == "__main__":
     # main()
     # evaluateDeployedModel()
     # mainGrouped()
-    dataPath = r'D:\东南大学\科研\金科\data\dataRy\data\2024-3-27-17.txt'
+    # dataPath = r'D:\东南大学\科研\金科\data\dataRy\data\2024-3-27-17.txt'
+    # dataPath = r'D:\myscripts\spill-detection\data\extractedData\2024-3-27-17_byDevice\K81+320_1.txt'
+    dataPath = r'D:\myscripts\spill-detection\data\extractedData\2024-3-27-17_byDevice\K78+760_1.txt'
     simulatedMainGrouped(dataPath)
