@@ -244,8 +244,10 @@ class Controller:
             for msg in self.cache:
                 f.write(str(msg) + '\n')
 
-    def reportRunTime(self, seconds: float):
+    def reportRunTime(self):
         '''计算各阶段总耗用和平均耗用时长, 以及各阶段的时长占比，并输出'''
+        # 计算次数
+        count = len(self.timeTmp[0])
         # 总耗
         timeDriver = sum(self.timeTmp[0])
         timeTraffic = sum(self.timeTmp[1])
@@ -257,13 +259,13 @@ class Controller:
         if timeTotal == 0:
             return   # 说明该设备数据为空, controller未接收数据
         # 平均耗
-        avgDriver = timeDriver / seconds
-        avgTraffic = timeTraffic / seconds
-        avgPre = timePre / seconds
-        avgDetect = timeDetect / seconds
-        avgSend = timeSend / seconds
-        avgSave = timeSave / seconds
-        avgTotal = timeTotal / seconds
+        avgDriver = timeDriver / count
+        avgTraffic = timeTraffic / count
+        avgPre = timePre / count
+        avgDetect = timeDetect / count
+        avgSend = timeSend / count
+        avgSave = timeSave / count
+        avgTotal = timeTotal / count
         # 占比
         percentDriver = timeDriver / timeTotal
         percentTraffic = timeTraffic / timeTotal
@@ -272,6 +274,7 @@ class Controller:
         percentSend = timeSend / timeTotal
         percentSave = timeSave / timeTotal
         # print输出, ms单位
+        print('count: ', count)
         print('驱动器平均耗时: {:.2f}ms, 占比: {:.2%}'.format(avgDriver * 1000, percentDriver))
         print('交通参数计算平均耗时: {:.2f}ms, 占比: {:.2%}'.format(avgTraffic * 1000, percentTraffic))
         print('预处理平均耗时: {:.2f}ms, 占比: {:.2%}'.format(avgPre * 1000, percentPre))
