@@ -92,13 +92,13 @@ def loadDataAsList(path: str) -> list:
 
 def loadDeviceData2df(dataPath: str, deviceID: str, deviceType: int = 1):
     '''function loadDeviceData2df
-    
+
     input
     -----
     dataPath: str, 数据文件路径
     deviceID: str, 设备ID
     deviceType: int, 设备类型, 默认为1
-    
+
     return
     ------
     None

@@ -1,7 +1,6 @@
 import yaml
 import os
 from datetime import datetime
-# import pandas as pd
 from utils.default import defaultEventTypes
 
 '''Contain commonly used functions.'''
@@ -247,9 +246,11 @@ def fixDfSpeed0(dataPath: str, vxColId: int, vyColId: int, speedColId: int):
 
     修复df中速度为0的情况。
     '''
+    import pandas as pd
     # 直接将speed列数据换为vxvy的模
     df = pd.read_csv(dataPath)
-    df.iloc[:, speedColId] = (df.iloc[:, vxColId] ** 2 + df.iloc[:, vyColId] ** 2) ** 0.5
+    df.iloc[:, speedColId] = (df.iloc[:, vxColId] ** 2 +
+                              df.iloc[:, vyColId] ** 2) ** 0.5
     df.to_csv(dataPath, index=False)
 
 
