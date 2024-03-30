@@ -1,6 +1,6 @@
 # import math
 import pre_processing.utils as utils
-
+import time
 
 class Interpolation:
     """插值补全算法
@@ -36,12 +36,15 @@ class Interpolation:
         #     "non-motor": maxSpeedNonMotor / self._speedCoefficient,
         #     "pedestrian": maxSpeedPedestrian / self._speedCoefficient,
         # }
+        self.count = 0   # 记录用于报告时长
+        # 时长记录列表
+        self.timeList = [[] for _ in range(5)]
 
     def run(
         self, contextFrames: dict, currentFrame: dict, lastTimestamp: int
     ) -> tuple:
         """外部调用函数
-
+        # TODO 将contextFrames每个id保存都改写为以timestamp为索引的dict, 提高效率
         input
         -----
         contextFrames: 算法的历史帧数据, 从上一次调用的结果中获得
@@ -53,9 +56,20 @@ class Interpolation:
         updatedLatestFrame: 完成处理后的最新帧数据
         lastTimestamp: 下次调用的当前帧数据的时间戳
         """
+        self.count += 1
+        # 获取设备名称
+        key = list(currentFrame.keys())[0]
+        self.deviceID = currentFrame[key]["deviceID"]
+        if self.count % 2400 == 0:
+            self.reportRuntime()
+        time1 = time.time()
+        # if self.count > 6000:
+        #     print(f'count is {self.count}')
         _, lastTimestamp = utils.framesCombination(
             contextFrames, currentFrame, lastTimestamp
         )
+        time2 = time.time()
+        self.timeList[0].append(time2 - time1)
         return (
             self._handleInterpolation(
                 contextFrames, self._findDelaySecMark(contextFrames)
@@ -64,10 +78,13 @@ class Interpolation:
         )
 
     def _findNearest(self, array: list, value: int) -> int:
+        time1 = time.time()
         # 找出需要做补全指定帧号下指定id的下标
         for index, j in enumerate(array):
             if j - value >= 0:
                 return index
+        time2 = time.time()
+        self.timeList[3].append(time2 - time1)
         return index
 
     def _isFrameValid(
@@ -92,6 +109,7 @@ class Interpolation:
     def _complete_obj(
         self, objsInfo: list, index: int, delaySecMark: int
     ) -> None:
+        time1 = time.time()
         # 补全指定的帧号下指定 id的轨迹点
         objsInfo.insert(index, objsInfo[index].copy())
         for i in ("x", "y"):
@@ -103,9 +121,12 @@ class Interpolation:
             )
         objsInfo[index]["timestamp"] = delaySecMark
         objsInfo[index]["secMark"] = delaySecMark % utils.MaxSecMark
+        time2 = time.time()
+        self.timeList[4].append(time2 - time1)
 
     def _findDelaySecMark(self, frames: dict) -> int:
         # 找到 delaySecMark, 并更新原 frames的 secmark
+        time1 = time.time()
         maxSec = 0
         for objsInfo in frames.values():
             maxSecEachId = objsInfo[-1]["timestamp"]
@@ -116,10 +137,13 @@ class Interpolation:
                 if fr["timestamp"] >= maxSec - self._lagTime:
                     delaySecMark = min(fr["timestamp"], delaySecMark)
                     break
+        time2 = time.time()
+        self.timeList[1].append(time2 - time1)
         return delaySecMark
 
     def _handleInterpolation(self, frames: dict, delaySecMark: int) -> dict:
         # 判断是否需要做补全, 并调相应函数做补全处理
+        time1 = time.time()
         updatedLatestFrame = {}
         for objsInfo in frames.values():
             secMarkList = [fr["timestamp"] for fr in objsInfo]
@@ -131,4 +155,45 @@ class Interpolation:
                     if objsInfo[i]["timestamp"] == delaySecMark:
                         obj_id = objsInfo[i]["id"]
                         updatedLatestFrame[obj_id] = objsInfo[i]
+        time2 = time.time()
+        self.timeList[2].append(time2 - time1)
         return updatedLatestFrame
+
+    def reportRuntime(self):
+        '''func reportRuntime
+        
+        输出算法运行时长
+        '''
+        # 计算各阶段
+        totalTimeCombination = sum(self.timeList[0])
+        totalTimeFindDelay = sum(self.timeList[1])
+        totalTimeHandleInterpolation = sum(self.timeList[2])
+        totalTimeFindNearest = sum(self.timeList[3])
+        totalTimeCompleteObj = sum(self.timeList[4])
+        totalTimeAll = totalTimeCombination + totalTimeFindDelay + \
+            totalTimeHandleInterpolation
+        # 计算平均每次计算的平均时长
+        avgTimeCombination = totalTimeCombination / self.count
+        avgTimeFindDelay = totalTimeFindDelay / self.count
+        avgTimeHandleInterpolation = totalTimeHandleInterpolation / self.count
+        avgTimeFindNearest = totalTimeFindNearest / self.count
+        avgTimeCompleteObj = totalTimeCompleteObj / self.count
+        avgTimeAll = totalTimeAll / self.count
+        # 计算各阶段耗时占总时长的比例
+        ratioCombination = totalTimeCombination / totalTimeAll
+        ratioFindDelay = totalTimeFindDelay / totalTimeAll
+        ratioHandleInterpolation = totalTimeHandleInterpolation / totalTimeAll
+        ratioTimeFindNearest = totalTimeFindNearest / totalTimeAll
+        ratioCompleteObj = totalTimeCompleteObj / totalTimeAll
+        # 输出报告，单位ms
+        print('Interpolation report:')
+        print('deviceID', self.deviceID, 'count:', self.count)
+        print(f'总耗时：{totalTimeAll*1000:.2f}ms, 平均每次耗时：{avgTimeAll*1000:.2f}ms')
+        print(f'合并历史帧数据耗时：{totalTimeCombination*1000:.2f}ms, 平均每次耗时：{avgTimeCombination*1000:.2f}ms, 占比：{ratioCombination:.2%}')
+        print(f'查找延迟帧号耗时：{totalTimeFindDelay*1000:.2f}ms, 平均每次耗时：{avgTimeFindDelay*1000:.2f}ms, 占比：{ratioFindDelay:.2%}')
+        print(f'处理插值耗时：{totalTimeHandleInterpolation*1000:.2f}ms, 平均每次耗时：{avgTimeHandleInterpolation*1000:.2f}ms, 占比：{ratioHandleInterpolation:.2%}')
+        print(f'查找最近帧号耗时：{totalTimeFindNearest*1000:.2f}ms, 平均每次耗时：{avgTimeFindNearest*1000:.2f}ms, 占比：{ratioTimeFindNearest:.2%}')
+        print(f'补全轨迹点耗时：{totalTimeCompleteObj*1000:.2f}ms, 平均每次耗时：{avgTimeCompleteObj*1000:.2f}ms, 占比：{ratioCompleteObj:.2%}')
+        # # count重置0
+        # self.count = 0
+        # self.timeList = [[] for _ in range(5)]
