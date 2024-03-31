@@ -42,7 +42,7 @@ eventTypes: ["spill", "stop", "emgcBrake", "incident", "crowd", "illegalOccupati
 tTolerance: 300
 qStandard: 10000
 vLateral: 3
-rate2: 0.0017
+rate2: 0.0005
 WarnFreq: 300
 vStop: 2.22
 durationStop: 1
