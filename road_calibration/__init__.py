@@ -327,6 +327,15 @@ class Calibrator():
             if self.vDirDict[id]['y'] < 0:
                 valid.reverse()
             self.cells[id] = valid
+        # 将应急车道的cell全部设为False
+        for id in self.emgcIDs:
+            self.cells[id] = [False] * cellNum
+        # TODO若某元胞不可用, 需对其做检查
+        # 若该元胞为lane上的第一个或最后一个元胞, 则其确认不可用
+        # 若该元胞为lane上的中间元胞, 则检查其前后元胞是否不可用
+        # 需保证不可用元胞能够与边缘的不可用元胞相邻，以确保不可用元胞的连续性
+
+
 
     def save(self):
         '''class function save
