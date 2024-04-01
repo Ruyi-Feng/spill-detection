@@ -25,11 +25,11 @@ kafkaAutoCommitIntervalMs: 5000
 fps: 20
 
 ifRecalib: false
-calibSeconds: 120
+calibSeconds: 600
 laneWidth: 3.75
 emgcWidth: 3.5
 cellLen: 50
-qMerge: 0
+qMerge: 20
 
 maxCompleteTime: 2
 smoothAlpha: 0.1
@@ -38,7 +38,7 @@ qDuration: 300
 calInterval: 30
 
 # eventTypes: ["spill", "stop", "lowSpeed", "highSpeed", "emgcBrake", "incident", "crowd", "illegalOccupation"]
-eventTypes: ["spill", "stop", "emgcBrake", "incident", "crowd", "illegalOccupation"]
+eventTypes: ["spill", "stop", "incident", "crowd", "illegalOccupation"]
 tTolerance: 300
 qStandard: 10000
 vLateral: 3
@@ -56,5 +56,5 @@ dTouch: 3
 tSupervise: 20
 densityCrowd: 18
 vCrowd: 5.555
-durationIllegalOccupation: 3
+durationIllegalOccupation: 5
 cacheSeconds: 60
