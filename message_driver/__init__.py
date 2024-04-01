@@ -213,10 +213,12 @@ class DriverOffline:
         # 调整时间戳格式
         # 统一将时间戳记为ms的时间戳
         car['timestamp'] = self.count * self.timeIntervalMs
-        car['secMark'] = car['timestamp'] % maxCount           # 用于complete使用
+        # car['secMark'] = car['timestamp'] % maxCount           # 用于complete使用
+        car['secMark'] = car['timestamp']
         # 补充在线数据有的属性
         car['deviceID'] = 'K68+366'
         car['deviceType'] = 1
+        car['a'] = 0
 
     def _formatTransInner2Outer(self, car: dict) -> dict:
         '''function _formatTransInner2Outer
@@ -380,7 +382,9 @@ class DriverOnline:
             car['laneID'] -= 100
             car['laneNeedAdd'] = True
         # 调整时间戳格式
-        car['secMark'] = car['timestamp'] % maxCount    # 用于complete使用
+        # car['secMark'] = car['timestamp'] % maxCount    # 用于complete使用
+        car['secMark'] = car['timestamp']
+        car['a'] = 0
 
     def _formatTransInner2Outer(self, car: dict):
         '''function _formatTransInner2Outer
