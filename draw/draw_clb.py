@@ -74,7 +74,8 @@ def drawClb(clbPath: str):
     plt.ylim(0, maxDistance)
     plt.ylabel('distance')
     plt.title(clbPath[:-4].split('/')[-1])
-    plt.show()
+    # plt.show()
+    plt.savefig(clbPath[:-4] + '.png', dpi=300)
 
     return
 
