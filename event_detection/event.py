@@ -67,11 +67,13 @@ class EventMng():
         startTime: int, 事件发生unix时间戳, 单位ms
         endTime: int, 事件结束unix时间戳, 单位ms
         info: any, 事件信息, 为可变数量的参数。
-        - 当type为'spill'时, info为[cellMng, deviceID, deviceType, eventID]
+        - 当type为'spill'时, info为[cellMng, deviceID, deviceType, eventID,
+          'start'/'end']
         - 当type为'stop', 'lowSpeed', 'highSpeed', 'EmgcBrake',
-          'illegalOccupation'时, info为[car, eventID]
+          'illegalOccupation'时, info为[car, eventID, 'start'/'end']
         - 当type为'incident'时, info为[car1, car2]
-        - 当type为'crowd'时, info为[laneMng, deviceID, deviceType, eventID]
+        - 当type为'crowd'时, info为[laneMng, deviceID, deviceType, eventID,
+          'start'/'end']
 
         执行事件管理, 将事件信息添加到events中。在检测到event时调用。
         '''
@@ -84,12 +86,23 @@ class EventMng():
         if ifFilter:    # 如果过滤, 将不会分配eventID, 不会生成事件
             return None
         # distribute event ID
-        if (info[-1] == '') or (type == 'incident'):
+        # 为新事件
+        if (
+            ((type in ['stop', 'lowSpeed', 'highSpeed',
+                       'illegalOccupation', 'emgcBrake'])
+                       and (info[1] == '')) or
+            ((type in ['spill', 'crowd']) and (info[3] == '')) or
+            (type == 'incident')
+        ):
             self.eventIdCount[type] += 1
             eventID = self.currentDay + '-' + typeCharDict[type] +\
                 int2strID(self.eventIdCount[type], self.idLen)
         else:  # 从已经记录的id继承
-            eventID = info[-1]
+            if (type in ['stop', 'lowSpeed', 'highSpeed',
+                       'illegalOccupation', 'emgcBrake']):
+                eventID = info[1]
+            elif type in ['spill', 'crowd']:
+                eventID = info[3]
 
         # formulate event
         event = self._generateEvent(type, eventID, startTime, endTime, info)
