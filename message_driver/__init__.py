@@ -5,7 +5,7 @@ from utils import unixMilliseconds2Datetime
 '''Define the send and receive interface processor of message.'''
 
 
-# count记录最大值(达到后重置)ss
+# count记录最大值(达到后重置)
 maxCount = 600000         # 10min对应的最大ms时长
 # maxCount = 172800000    # fps=20时, 10天重置1次
 
@@ -138,7 +138,7 @@ class DriverOffline:
             interfaceBack[interface[key]] = key
         # 从内部数据输出到外部应删除的键值
         keys2delete = ['laneNeedAdd', 'speed', 'a', 'ax', 'ay',
-                       'timestamp', 'secMark', 'deviceID', 'deviceType']
+                       'timestamp', 'deviceID', 'deviceType']
         self.interface = interface
         self.interfaceBack = interfaceBack
         self.keys2delete = keys2delete
@@ -213,8 +213,6 @@ class DriverOffline:
         # 调整时间戳格式
         # 统一将时间戳记为ms的时间戳
         car['timestamp'] = self.count * self.timeIntervalMs
-        # car['secMark'] = car['timestamp'] % maxCount           # 用于complete使用
-        car['secMark'] = car['timestamp']
         # 补充在线数据有的属性
         car['deviceID'] = 'K68+366'
         car['deviceType'] = 1
@@ -284,7 +282,7 @@ class DriverOnline:
         for key in interface.keys():
             interfaceBack[interface[key]] = key
         # 从内部数据输出到外部应删除的键值
-        keys2delete = ['laneNeedAdd', 'a', 'ax', 'ay', 'secMark']
+        keys2delete = ['laneNeedAdd', 'a', 'ax', 'ay']
         self.interface = interface
         self.interfaceBack = interfaceBack
         self.keys2delete = keys2delete
@@ -381,9 +379,6 @@ class DriverOnline:
         if car['laneID'] > 100:
             car['laneID'] -= 100
             car['laneNeedAdd'] = True
-        # 调整时间戳格式
-        # car['secMark'] = car['timestamp'] % maxCount    # 用于complete使用
-        car['secMark'] = car['timestamp']
         car['a'] = 0
 
     def _formatTransInner2Outer(self, car: dict):
