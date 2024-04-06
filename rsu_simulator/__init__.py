@@ -1,5 +1,4 @@
 import json
-# import pandas as pd
 from utils import swapQuotes
 from utils.file_read import BigFileReader
 
@@ -61,6 +60,7 @@ class DfSimulator:
         dataPath: str
             仿真数据文件路径
         '''
+        import pandas as pd
         self.dataPath = dataPath
         self.df = pd.read_csv(dataPath)
         self.runIndex = -1
