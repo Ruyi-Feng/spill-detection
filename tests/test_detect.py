@@ -31,7 +31,7 @@ def testDetect():
     # 生成驱动器
     d = Driver(cfg['fps'])
     # 生成预处理器
-    pp = PreProcessor(cfg['maxCompleteTime'], cfg['smoothAlpha'])
+    pp = PreProcessor(cfg, clb)
     # 生成检测器(内含交通管理器)
     ed = EventDetector(clb, cfg)
     # 仿真器读取数据
@@ -44,6 +44,9 @@ def testDetect():
             continue
         # 数据预处理
         cars = pp.run(cars)
+        if len(cars) == 0:
+            # print('cars数量为0', i)
+            continue
         # 事件检测
         events = ed.run(cars)
         # 检查点1
@@ -89,6 +92,7 @@ def testStop():
             if type != 'stop':
                 assert not events[type]['occured']
             elif events[type]['occured']:
+                print(events[type])
                 assert events[type] == dataStopEvent
 
 
@@ -121,6 +125,7 @@ def testHighSpeed():
             if type != 'highSpeed':
                 assert not events[type]['occured']
             elif events[type]['occured']:
+                print(events[type])
                 assert events[type] == dataHighSpeedEvent
 
 
@@ -137,6 +142,7 @@ def testIllegalOccupation():
             if type != 'illegalOccupation':
                 assert not events[type]['occured']
             elif events[type]['occured']:
+                print(events[type])
                 assert events[type] == dataIllegalOccupationEvent
 
 
@@ -191,6 +197,7 @@ def testCrowd():
 
 
 if __name__ == "__main__":
+    # 注意运行前, 需要将config.yml中的eventTypes调整为全8类
     testDetect()
     # testSpill()
     # testStop()
