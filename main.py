@@ -95,6 +95,8 @@ def main():
         # 非空数据判断
         if isInvalidMsg(msg) or isNotTargetDevice(msg, args):
             continue
+        if (len(msg) == 0) or (len(msg['targets']) == 0):
+            continue
         dataTime = unixMilliseconds2Datetime(msg['targets'][0]['timestamp'])
         print('latest receiving time:', datetime.now(),
               ' dataTime: ', dataTime,
@@ -147,6 +149,8 @@ def simulatedMainGrouped(dataPath: str):
         # 非空数据判断
         if isInvalidMsg(msg):
             continue
+        if (len(msg) == 0) or (len(msg['targets']) == 0):
+            continue
         deviceID, deviceType = msg['deviceID'], str(msg['deviceType'])
         name = deviceID + '_' + deviceType
         dataTime = unixMilliseconds2Datetime(msg['targets'][0]['timestamp'])
@@ -161,13 +165,78 @@ def simulatedMainGrouped(dataPath: str):
         controllerGroup[name].logger.updateDayLogFile()
         # 算法检测
         msg, events = controllerGroup[name].run(msg)
+    # 各controller报告运行时间
+    # for name in controllerGroup:
+    #     print(name, 'time report:')
+    #     controllerGroup[name].reportRunTime()
+
+
+def simulatedMainGroupedMultiThread(dataPath: str):
+    '''多设备组合的主函数, 用于从离线数据读取进行测试'''
+    # 读取配置文件
+    configPath = './config.yml'
+    cfg = loadConfig(configPath)
+    condition, hint = checkConfigDevices(cfg)
+    if not condition:
+        print(hint)
+        return
+
+    # 数据地址
+    smltor = Smltor(dataPath)
+
+    # 根据设备信息生成clbPath, 为./road_calibration/clb_设备名_设备类型.yml
+    # 生成主控制器
+    controllerGroup = {}
+    for dID, dType in zip(cfg['deviceIDs'], cfg['deviceTypes']):
+        name = dID + '_' + str(dType)       # 桩号+设备类型
+        clbPath = './road_calibration/clbymls/clb_' + name + '.yml'
+        logger4Device = MyLogger(dID, dType)
+        args = argsFromDeviceID(dID, dType)
+        controllerGroup[name] = Controller(configPath, clbPath,
+                                           logger4Device, args,
+                                           ifReportRunTime=True)
+    print('算法组件生成成功, 数据进入算法通道.')
+    # 持续性运行接收
+    # 模拟接受数据
+    count = 0
+    import threading
+    while True:
+        count += 1
+        # if count > 12000:       # 以该段时间测试运行速度
+        #     break
+        msg = smltor.run()
+        if msg == '':   # 读取到文件末尾
+            break
+        # 非空数据判断
+        if isInvalidMsg(msg):
+            continue
+        if (len(msg) == 0) or (len(msg['targets']) == 0):
+            continue
+        deviceID, deviceType = msg['deviceID'], str(msg['deviceType'])
+        name = deviceID + '_' + deviceType
+        dataTime = unixMilliseconds2Datetime(msg['targets'][0]['timestamp'])
+        print('latest receiving time:', datetime.now(),
+              ' dataTime: ', dataTime, name, end='\r')   # 持续显示
+
+        # 当前消息的设备
+        if name not in controllerGroup:
+            print('该设备未在config中设置, 请添加.' + name)
+            continue
+        # log文件保存更新
+        controllerGroup[name].logger.updateDayLogFile()
+        # 算法检测
+        # msg, events = controllerGroup[name].run(msg)
+        def runController(controller):
+            controller.run(msg)
+        t = threading.Thread(target=runController, args=(controllerGroup[name],))
+        t.start()
         # if (count % 6000 == 0) & (deviceID == 'K81+320'):
         #     print('time report:', name)
         #     controllerGroup[name].reportRunTime()
     # 各controller报告运行时间
-    for name in controllerGroup:
-        print(name, 'time report:')
-        controllerGroup[name].reportRunTime()
+    # for name in controllerGroup:
+    #     print(name, 'time report:')
+    #     controllerGroup[name].reportRunTime()
 
 
 def evaluateDeployedModel():
@@ -179,18 +248,27 @@ def evaluateDeployedModel():
     '''
     # dataDir = './data/'
     # dataDir = r'D:\东南大学\科研\金科\data'
-    dataDir = r'D:\myscripts\spill-detection\data\extractedData'
-    # 2024-3-26-0.txt, 568914行
-    # 2024-3-26-1.txt, 863957行
+    # dataDir = r'D:\myscripts\spill-detection\data\extractedData'
+    dataDir = r'D:\东南大学\科研\金科\data\dataRy\data'
+    targetEvaluateFiles = [
+        '2024-3-26-8.txt',
+        '2024-3-26-9.txt',
+        '2024-3-27-17.txt',
+        '2024-3-27-18.txt'
+    ]
     for file in os.listdir(dataDir):
-        if ('dump' in file) or ('result' in file) or ('heartbeat' in file):
+        if (
+            ('dump' in file) or
+            ('result' in file) or
+            ('heartbeat' in file) or
+            (not file.endswith('.txt'))
+            ):
             continue
-        if not file.endswith('.txt'):
-            continue
-        if '2024-03-26' in file:
+        if file not in targetEvaluateFiles:
             continue
         print(file, 'is running.')
         simulatedMainGrouped(dataDir + '/' + file)
+        # simulatedMainGroupedMultiThread(dataDir + '/' + file)
 
 
 def mainGrouped():
@@ -234,6 +312,8 @@ def mainGrouped():
         # 非空数据判断
         if isInvalidMsg(msg):   # 注意顺序, 在msg获取deviceID等属性前判断, 防止报错
             continue
+        if (len(msg) == 0) or (len(msg['targets']) == 0):
+            continue
         deviceID, deviceType = msg['deviceID'], str(msg['deviceType'])
         name = deviceID + '_' + deviceType
         dataTime = unixMilliseconds2Datetime(msg['targets'][0]['timestamp'])
@@ -249,7 +329,7 @@ def mainGrouped():
         msg, events = controllerGroup[name].run(msg)
         if (events is None) or (len(events) == 0):
             continue    # 未检测到事件
-        # 上报事件        
+        # 上报事件
         hp.run(events)
 
 
@@ -258,7 +338,20 @@ if __name__ == "__main__":
     # main()
     # evaluateDeployedModel()
     # mainGrouped()
-    # dataPath = r'D:\东南大学\科研\金科\data\dataRy\data\2024-3-27-17.txt'
+    # dataPath = r'D:\东南大学\科研\金科\data\dataRy\data\2024-3-27-18.txt'
     # dataPath = r'D:\myscripts\spill-detection\data\extractedData\2024-3-27-17_byDevice\K81+320_1.txt'
-    dataPath = r'D:\myscripts\spill-detection\data\extractedData\2024-3-27-17_byDevice\K78+760_1.txt'
+    # dataPath = r'D:\myscripts\spill-detection\data\extractedData\2024-3-27-17_byDevice\K78+760_1.txt'
+    # dataPath = r'D:\myscripts\spill-detection\data\extractedData\2024-03-26-08-20-18_2024-03-26-08-20-42.txt'
+    # dataPath = r'D:\myscripts\spill-detection\data\extractedData\2024-03-26-08-29-51_2024-03-26-08-30-34.txt'
+    # dataPath = r'D:\myscripts\spill-detection\data\extractedData\2024-03-26-09-36-21_2024-03-26-09-41-45.txt'
+    # dataPath = r'D:\myscripts\spill-detection\data\extractedData\2024-03-26-09-41-27_2024-03-26-09-41-57.txt'
+    # dataPath = r'D:\myscripts\spill-detection\data\extractedData\2024-03-27-18-42-33_2024-03-27-18-46-33.txt'
+    # dataPath = r'D:\myscripts\spill-detection\data\extractedData\2024-03-27-18-42-33_2024-03-27-18-46-33.txt'
+    # total evaluation
+    dataPath = r'D:\东南大学\科研\金科\data\dataRy\data\2024-3-26-8.txt'
+    dataPath = r'D:\东南大学\科研\金科\data\dataRy\data\2024-3-26-9.txt'
+    dataPath = r'D:\东南大学\科研\金科\data\dataRy\data\2024-3-27-17.txt'
+    dataPath = r'D:\东南大学\科研\金科\data\dataRy\data\2024-3-27-18.txt'
+
     simulatedMainGrouped(dataPath)
+    # simulatedMainGroupedMultiThread(dataPath)
