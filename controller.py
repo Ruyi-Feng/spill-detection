@@ -138,8 +138,7 @@ class Controller:
         # driver接收当前路段的lanes列表
         self.drv.setLanes(list(self.clb.keys()))
         # 生成数据预处理器
-        self.pp = PreProcessor(self.cfg['maxCompleteTime'],
-                               self.cfg['smoothAlpha'])
+        self.pp = PreProcessor(self.cfg, self.clb)
         # 生成事件检测器(内含交通参数管理器)
         self.edt = EventDetector(self.clb, self.cfg, self.logger)
 
@@ -175,7 +174,9 @@ class Controller:
         # 预处理
         if len(cars) == 0:      # fix bug: 无车辆时不进行预处理
             return None, None
-        # cars = self.pp.run(cars)
+        cars = self.pp.run(cars)
+        if len(cars) == 0:      # fix bug: 无车辆时不进行预处理
+            return None, None
         time4 = time.time()
         # if 1107720 in [car['id'] for car in cars]:
         #     print('controller after pp: ', cars)
