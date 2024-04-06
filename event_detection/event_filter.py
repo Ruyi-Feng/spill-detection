@@ -53,6 +53,9 @@ class EventFilter():
         返回该事件是否近期已经被报警, 如果已经报警, 则需要过滤返回True
         '''
         info = info[0]  # 传进来的时候会在外边又套一层tuple
+        isLowGlobalSpeed = self._isLowGlobalSpeedEvent(type, info)
+        if isLowGlobalSpeed:
+            return True
         # 获取当前事件最新的时间戳
         timestamp = max(startTime, endTime)  # 可能endTime是-1
         # 获取列表索引
@@ -121,7 +124,7 @@ class EventFilter():
         '''
         info = info[0]  # 传进来的时候会在外边又套一层tuple
         if type in ['stop', 'lowSpeed', 'highSpeed',
-                    'EmgcBrake', 'illegalOccupation']:
+                    'emgcBrake', 'illegalOccupation']:
             key = info[0]['id']
         elif type == 'spill':
             key = (info[0].laneID, info[0].order)
@@ -206,3 +209,32 @@ class EventFilter():
         if (type in ['spill', 'crowd']) and (info[4] == 'end'):
             isEnd = True
         return isEnd
+
+    def _isLowGlobalSpeedEvent(self, type, *info):
+        '''function _isLowGlobalSpeedEvent
+
+        input
+        -----
+        type: str, 事件类型
+        info: any, 事件信息
+
+        return
+        ------
+        isLowGlobalSpeed: bool, 是否为低速事件
+
+        判断事件是否为低速事件
+        TODO 当前情况, 全局低速目标会在prepro中直接被过滤掉, 因此这里不需要判断。
+        '''
+        info = info[0]  # 传进来的时候会在外边又套一层tuple
+        isLowGlobalSpeed = False
+        # 根据传来的car信息判断是否为低速事件
+        if type in ['spill', 'crowd']:
+            isLowGlobalSpeed = False
+        elif type in ['stop', 'lowSpeed', 'highSpeed',
+                      'EmgcBrake', 'illegalOccupation']:
+            car = info[0]
+            if car['globalSpeed'] < 5:
+                isLowGlobalSpeed = True
+        elif type == 'incident':
+            isLowGlobalSpeed = False
+        return isLowGlobalSpeed
