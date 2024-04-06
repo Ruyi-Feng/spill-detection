@@ -84,7 +84,7 @@ class EventDetector(TrafficMng):
         # 初始化潜在事件记录变量
         self.currentIDs = []    # 当前帧车辆id列表
         self.potentialEventTypes = ['stop', 'lowSpeed', 'highSpeed',
-                                    'emgcBrake', 'illegalOccupation']
+                                    'illegalOccupation']      # 'emgcBrake'
         # 记录数据格式为: {车辆id: [开始时间, 当前时间, car, eventID]}, 当达到持续阈值或者事件结束时, 报警
         self.stopDict = dict()
         self.lowSpeedDict = dict()
@@ -135,6 +135,9 @@ class EventDetector(TrafficMng):
         # 更新事件过滤器的记录
         if len(cars) > 0:
             self.eventMng.ef.clearEventCache(cars[0]['timestamp'])
+        # if 1509417 in [car['id'] for car in cars]:
+        #     print(self.stopDict, 'timestamp')
+        #     print('------------', unixMilliseconds2Datetime(cars[0]['timestamp']), '------------')
         return self.eventMng.events
 
     def updatePotentialDict(self, cars: list) -> None:
@@ -156,19 +159,29 @@ class EventDetector(TrafficMng):
                     continue
                 # 事件发生
                 if car['id'] not in getattr(self, f'{type}Dict').keys():
+                    # if car['id'] == 1509417:
+                    #     print('***** not in', 'stopDict', self.stopDict)
                     # 未有该车记录, 该事件首次出现
                     getattr(self, f'{type}Dict')[car['id']] = \
                         [car['timestamp'], car['timestamp'], car, '']
+                    # if car['id'] == 1509417:
+                    #     print('***** not in after', 'stopDict', self.stopDict)
                 else:
+                    # if car['id'] == 1509417:
+                    #     print('in before', 'stopDict', self.stopDict)
                     # 已有该车记录, 该事件已出现过, 更新该事件的当前时间和车辆信息
                     getattr(self, f'{type}Dict')[car['id']][1] = \
                         car['timestamp']
                     getattr(self, f'{type}Dict')[car['id']][2] = \
                         car
+                    # if car['id'] == 1509417:
+                    #     print('in after', 'stopDict', self.stopDict)
         # 2. 遍历潜在事件记录字典
         # 删除无效dict键, 包括当前帧丢失目标, 或未消失但已脱离事件检测条件的目标
         for type in self.potentialEventTypes:
             self._deleteNoUsePotentialDictKeys(type, cars)
+        # if cars[0]['deviceID'] == 'K81+320':
+        #     print('after deletion', 'stopDict', self.stopDict)
 
     def detect(self, cars: list):
         '''function detect
@@ -208,48 +221,7 @@ class EventDetector(TrafficMng):
         for id in self.lanes:
             for order in self.lanes[id].cells:
                 if self.lanes[id].cells[order].danger < 1:
-                    continue    # 危险度小于1, 跳过
-                # 记录
-                if (id, order) not in self.dangerDict.keys():
-                    self.dangerDict[(id, order)] = \
-                        [cars[0]['timestamp'], cars[0]['timestamp'],
-                            self.lanes[id].cells[order], '']
-                else:       # 若已记录, 更新记录的当前时间和cell
-                    self.dangerDict[(id, order)][1] = cars[0]['timestamp']
-                    self.dangerDict[(id, order)][2] = \
-                        self.lanes[id].cells[order]
-                # 报警
-                deltaTms = self.dangerDict[(id, order)][1] - \
-                    self.dangerDict[(id, order)][0]
-                deltaTs = deltaTms / 1000
-                if (deltaTs % self.WarnFreq) <= (1 / self.fps) * 0.9:
-                    # 生成事件
-                    eventID = self.eventMng.run(
-                        'spill', self.dangerDict[(id, order)][0], -1,
-                        self.dangerDict[(id, order)][2],
-                        deviceID, deviceType, self.dangerDict[(id, order)][3])
-                    # 若eventID返回None, 说明该事件应当过滤, 并且未生成新事件, 不输出报警
-                    if eventID is None:
-                        continue
-                    self.dangerDict[(id, order)][3] = eventID
-                    # 生成log信息
-                    cellStart = self.lanes[id].cells[order].start
-                    cellEnd = self.lanes[id].cells[order].end
-                    if cellStart >= cellEnd:
-                        cellStart, cellEnd = cellEnd, cellStart
-                    startTime = unixMilliseconds2Datetime(
-                        self.dangerDict[(id, order)][0])
-                    endTime = unixMilliseconds2Datetime(
-                        self.dangerDict[(id, order)][1])
-                    logEvent = f"事件ID={eventID} - " +\
-                        f"id={id}车道可能有抛洒物, " + \
-                        f"元胞起点: {cellStart}, 元胞终点: {cellEnd}, " + \
-                        f"危险度: {self.lanes[id].cells[order].danger}, " + \
-                        f"开始时间: {startTime}, " + \
-                        f"当前时间: {endTime}"
-                    self.logger.warning(logEvent)
-
-                else:   # 未达到1, 检查是否在记录表内, 若在则删除
+                    # 检查是否已在记录中, 如在，则删除，报警事件结束
                     if (id, order) in self.dangerDict.keys():
                         # 生成结束事件告警
                         eventID = self.eventMng.run(
@@ -258,7 +230,8 @@ class EventDetector(TrafficMng):
                             self.dangerDict[(id, order)][1],
                             self.dangerDict[(id, order)][2],
                             deviceID, deviceType,
-                            self.dangerDict[(id, order)][3])
+                            self.dangerDict[(id, order)][3],
+                            'end')
                         # 若eventID返回None, 说明该事件应当过滤, 并且未生成新事件, 不输出报警
                         if eventID is None:
                             continue
@@ -279,7 +252,47 @@ class EventDetector(TrafficMng):
                             f"结束时间: {endTime}"
                         self.logger.warning(logEvent)
                         del self.dangerDict[(id, order)]
-
+                    continue    # 危险度小于1, 跳过
+                # 记录
+                if (id, order) not in self.dangerDict.keys():
+                    self.dangerDict[(id, order)] = \
+                        [cars[0]['timestamp'], cars[0]['timestamp'],
+                            self.lanes[id].cells[order], '']
+                else:       # 若已记录, 更新记录的当前时间和cell
+                    self.dangerDict[(id, order)][1] = cars[0]['timestamp']
+                    self.dangerDict[(id, order)][2] = \
+                        self.lanes[id].cells[order]
+                # 报警
+                deltaTms = self.dangerDict[(id, order)][1] - \
+                    self.dangerDict[(id, order)][0]
+                deltaTs = deltaTms / 1000
+                if (deltaTs % self.WarnFreq) <= (1 / self.fps) * 0.9:
+                    # 生成事件
+                    eventID = self.eventMng.run(
+                        'spill', self.dangerDict[(id, order)][0], -1,
+                        self.dangerDict[(id, order)][2],
+                        deviceID, deviceType, self.dangerDict[(id, order)][3],
+                        'start')
+                    # 若eventID返回None, 说明该事件应当过滤, 并且未生成新事件, 不输出报警
+                    if eventID is None:
+                        continue
+                    self.dangerDict[(id, order)][3] = eventID
+                    # 生成log信息
+                    cellStart = self.lanes[id].cells[order].start
+                    cellEnd = self.lanes[id].cells[order].end
+                    if cellStart >= cellEnd:
+                        cellStart, cellEnd = cellEnd, cellStart
+                    startTime = unixMilliseconds2Datetime(
+                        self.dangerDict[(id, order)][0])
+                    endTime = unixMilliseconds2Datetime(
+                        self.dangerDict[(id, order)][1])
+                    logEvent = f"事件ID={eventID} - " + \
+                        f"id={id}车道可能有抛洒物, " + \
+                        f"元胞起点: {cellStart}, 元胞终点: {cellEnd}, " + \
+                        f"危险度: {self.lanes[id].cells[order].danger}, " + \
+                        f"开始时间: {startTime}, " + \
+                        f"当前时间: {endTime}"
+                    self.logger.warning(logEvent)
         self.resetCellDetermineStatus()
 
     def _singleCarEventDetect(self, cars: list, eventType: str):
@@ -310,7 +323,7 @@ class EventDetector(TrafficMng):
                 car = getCarFromCars(cars, id)
                 eventID = self.eventMng.run(
                     eventType, eventRecordDict[id][0], -1,
-                    car, eventRecordDict[id][3])
+                    car, eventRecordDict[id][3], 'start')
                 eventRecordDict[id][3] = eventID
                 # 若eventID返回None, 说明该事件应当过滤, 并且未生成新事件, 不输出报警
                 if eventID is None:
@@ -432,13 +445,14 @@ class EventDetector(TrafficMng):
                 # 生成事件
                 eventID = self.eventMng.run(
                     'incident', self.incidentDict[(car1['id'], car2['id'])],
-                    car1['timestamp'], car1, car2)
+                    car1['timestamp'], car1, car2)   # 无需start, end时间, 发生即结束
                 # 若eventID返回None, 说明该事件应当过滤, 并且未生成新事件, 不输出报警
                 if eventID is None:
                     continue
                 logEvent = f"事件ID={eventID} - " +\
                     f"id={str(ids[0])},{str(ids[1])}车辆碰撞, " + \
-                    getCarBaseInfo(car1) + getCarBaseInfo(car2)
+                    getCarBaseInfo(car1) + getCarBaseInfo(car2) +\
+                    f", 时间: {unixMilliseconds2Datetime(car1['timestamp'])}"
                 self.logger.warning(logEvent)
                 # 删除记录
                 key2delete.append(ids)
@@ -535,7 +549,7 @@ class EventDetector(TrafficMng):
                     eventID = self.eventMng.run(
                         'crowd', cars[0]['timestamp'], -1,
                         self.lanes[id], deviceID, deviceType,
-                        self.crowdDict[id][3])
+                        self.crowdDict[id][3], 'start')
                     # 若eventID返回None, 说明该事件应当过滤, 并且未生成新事件, 不输出报警
                     if eventID is None:
                         continue
@@ -550,7 +564,8 @@ class EventDetector(TrafficMng):
                     eventID = self.eventMng.run(
                         'crowd', self.crowdDict[id][0],
                         self.crowdDict[id][1], self.crowdDict[id][2],
-                        deviceID, deviceType, self.crowdDict[id][3])
+                        deviceID, deviceType, self.crowdDict[id][3],
+                        'end')
                     # 若eventID返回None, 说明该事件应当过滤, 并且未生成新事件, 不输出报警
                     if eventID is None:
                         continue
@@ -647,13 +662,23 @@ class EventDetector(TrafficMng):
         删除无效dict键, 包括当前帧丢失目标, 或未消失但已脱离事件检测条件的目标。
         注意: dict键记录的只是潜在事件, 可能有些id车辆并未发生该事件。
         '''
+        recordKeepMax = 1000    # 1秒钟, 单位ms
+        currentTimestamp = cars[0]['timestamp']
         key2delete = []
         # 遍历该类type的dict记录表
         for id in getattr(self, f'{type}Dict').keys():
+            # if (id == 1107720) and (type == 'illegalOccupation') and (self.illegalOccupationDict[id][2]['timestamp'] >= 1711412106292):
+                # print('id in illegalOccupation', self.illegalOccupationDict[1107720])
+                # print(self.currentIDs)
             # 若该id不在当前帧id列表中, 则删除
-            if id not in self.currentIDs:
+            # if id not in self.currentIDs:     # 弃用，放宽事件结束的严格程度
+            if (currentTimestamp - getattr(self, f'{type}Dict')[id][1]) > recordKeepMax:
+                # if id == 1509417:
+                #     print('id not in currentIDs', 'stopDict', self.stopDict)
                 key2delete.append(id)
                 continue
+            if id not in self.currentIDs:
+                continue    # 如果是当前没有该目标，则不检查是否脱离了事件条件
             # 若该id车辆已经脱离了交通事件的条件, 则删除
             car = getCarFromCars(cars, id)
             if not getattr(self, f'_isCar{strCapitalize(type)}')(car):
@@ -664,12 +689,12 @@ class EventDetector(TrafficMng):
             dictInfo = getattr(self, f'{type}Dict')[key]
             startTime, endTime = dictInfo[0], dictInfo[1]
             car, eventID = dictInfo[2], dictInfo[3]
-            # 潜在事件表中可能有一些车辆并未发生事件
+            # 潜在事件表中可能有一些车辆并未发生事件,
             # 只对已经触发事件报警的车辆生成结束event
             if eventID != '':
                 # 告警
                 eventID = self.eventMng.run(
-                    type, startTime, endTime, car, eventID)
+                    type, startTime, endTime, car, eventID, 'end')
                 # 若eventID返回None, 说明该事件应当过滤, 并且未生成新事件, 不输出报警
                 if eventID is None:
                     continue
