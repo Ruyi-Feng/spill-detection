@@ -1,6 +1,7 @@
+import os
 import json
 import pandas as pd
-
+from utils import swapQuotes
 
 def loadDataByLine(path: str) -> None:
     '''function loadDataByLine
@@ -90,8 +91,9 @@ def loadDataAsList(path: str) -> list:
     return allData
 
 
-def loadDeviceData2df(dataPath: str, deviceID: str, deviceType: int = 1):
-    '''function loadDeviceData2df
+def loadFieldData2df(dataPath: str, deviceID: str = None,
+                     deviceType: int = 1):
+    '''function loadFieldData2df
 
     input
     -----
@@ -112,35 +114,47 @@ def loadDeviceData2df(dataPath: str, deviceID: str, deviceType: int = 1):
             row = f.readline()
             if row == '':
                 break
+            row = swapQuotes(row) if row[1] == '\'' else row
             row = json.loads(row)
             condition1 = row['deviceID'] == deviceID
             condition2 = row['deviceType'] == deviceType
-            if not (condition1 and condition2):
+            if (deviceID is not None) and (not (condition1 and condition2)):
                 continue
             for target in row['targets']:
-                target['deviceID'] = deviceID
-                target['deviceType'] = deviceType
+                target['deviceID'] = row['deviceID']
+                target['deviceType'] = row['deviceType']
                 deviceData.append(target)
     # 保存到DataFrame
     df = pd.DataFrame(deviceData)
     print(df)
-    csvPath = dataPath.replace('.txt', f'_{deviceID}_{deviceType}.csv')
+    suffix = f'_{deviceID}_{deviceType}.csv' if deviceID is not None \
+        else '.csv'
+    csvPath = dataPath.replace('.txt', suffix)
     df.to_csv(csvPath, index=False)
 
 
 if __name__ == "__main__":
     # loadDataAsDict("../data/result.txt")
-    dirPath = "./data/extractedData/"
-    fileNameList = ["2024-03-26 08-20-18_2024-03-26 08-20-42.txt",
-                    "2024-03-26 08-29-51_2024-03-26 08-30-34.txt",
-                    "2024-03-26 09-36-21_2024-03-26 09-41-45.txt",
-                    "2024-03-26 09-41-27_2024-03-26 09-41-57.txt"]
-    deviceIDList = ['K81+320',
-                    'K81+866',
-                    'K78+600',
-                    'K73+516']
-    for fileName, deviceID in zip(fileNameList, deviceIDList):
-        if deviceID != 'K81+866':
+    # dirPath = "./data/extractedData/"
+    # fileNameList = ["2024-03-26 08-20-18_2024-03-26 08-20-42.txt",
+    #                 "2024-03-26 08-29-51_2024-03-26 08-30-34.txt",
+    #                 "2024-03-26 09-36-21_2024-03-26 09-41-45.txt",
+    #                 "2024-03-26 09-41-27_2024-03-26 09-41-57.txt"]
+    # deviceIDList = ['K81+320',
+    #                 'K81+866',
+    #                 'K78+600',
+    #                 'K73+516']
+    # for fileName, deviceID in zip(fileNameList, deviceIDList):
+    #     if deviceID != 'K81+866':
+    #         continue
+    #     loadDeviceData2df(dirPath + fileName, deviceID)
+    dir = r'D:\myscripts\spill-detection\data\extractedData\2024-3-27-17_byDevice'
+    fileList = os.listdir(dir)
+    for file in fileList:
+        if (not file.endswith('.txt')) or ('report' in file):
             continue
-        loadDeviceData2df(dirPath + fileName, deviceID)
-    print("数据加载完成.")
+        path = os.path.join(dir, file)
+        loadFieldData2df(path)
+        print(path, '数据完成转化为excel.')
+    # path = r'D:\myscripts\spill-detection\data\extractedData\2024-3-26-9_byDevice\K68+366_1.txt'
+    # loadFieldData2df(path, 'K68+366', 1)
