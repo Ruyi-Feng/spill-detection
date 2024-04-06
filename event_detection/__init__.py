@@ -84,7 +84,7 @@ class EventDetector(TrafficMng):
         # 初始化潜在事件记录变量
         self.currentIDs = []    # 当前帧车辆id列表
         self.potentialEventTypes = ['stop', 'lowSpeed', 'highSpeed',
-                                    'illegalOccupation']      # 'emgcBrake'
+                                    'emgcBrake', 'illegalOccupation']
         # 记录数据格式为: {车辆id: [开始时间, 当前时间, car, eventID]}, 当达到持续阈值或者事件结束时, 报警
         self.stopDict = dict()
         self.lowSpeedDict = dict()
@@ -164,8 +164,9 @@ class EventDetector(TrafficMng):
                     # 未有该车记录, 该事件首次出现
                     getattr(self, f'{type}Dict')[car['id']] = \
                         [car['timestamp'], car['timestamp'], car, '']
-                    # if car['id'] == 1509417:
-                    #     print('***** not in after', 'stopDict', self.stopDict)
+                    # if car['id'] == 9934:
+                    #     print('***** not in after', 'emgcBrakeDict',
+                    #           self.emgcBrakeDict)
                 else:
                     # if car['id'] == 1509417:
                     #     print('in before', 'stopDict', self.stopDict)
@@ -174,8 +175,8 @@ class EventDetector(TrafficMng):
                         car['timestamp']
                     getattr(self, f'{type}Dict')[car['id']][2] = \
                         car
-                    # if car['id'] == 1509417:
-                    #     print('in after', 'stopDict', self.stopDict)
+                    # if car['id'] == 9934:
+                    #     print('in after', 'emgcBrakeDict', self.emgcBrakeDict)
         # 2. 遍历潜在事件记录字典
         # 删除无效dict键, 包括当前帧丢失目标, 或未消失但已脱离事件检测条件的目标
         for type in self.potentialEventTypes:
