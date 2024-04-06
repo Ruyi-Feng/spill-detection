@@ -41,7 +41,7 @@ def save():
         with open(outputPath, 'a') as f:
             msgStr = msgBytes.value.decode('utf-8')
             msg = json.loads(msgStr)        # dict
-            f.write(str(msg) + '\n')
+            f.write(json.dumps(msg) + '\n')
 
 
 if __name__ == '__main__':
