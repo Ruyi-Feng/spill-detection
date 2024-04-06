@@ -2,7 +2,7 @@ from rsu_simulator import Smltor
 from message_driver import Driver
 from pre_processing import PreProcessor
 import yaml
-
+from pre_processing.utils import carsList2Dict
 
 def test_preprocess():
     # 1. 离线数据测试
@@ -10,14 +10,17 @@ def test_preprocess():
     cfgPath = './config.yml'
     with open(cfgPath, 'r') as f:
         cfg = yaml.load(f, Loader=yaml.FullLoader)
+    # 读取标定文件
+    clbPath = './road_calibration/clbymls/clb_K68+366_1.yml'
+    with open(clbPath, 'r') as f:
+        clb = yaml.load(f, Loader=yaml.FullLoader)
     # 生成仿真器
     dataPath = './data/result.txt'
     smltor = Smltor(dataPath)
     # 生成驱动器
     d = Driver(cfg['fps'])
     # 生成预处理器
-    pp = PreProcessor(comMaxFrm=cfg['maxCompleteTime'],
-                      smthA=cfg['smoothAlpha'])
+    pp = PreProcessor(cfg, clb)
     # 仿真器读取数据
     while True:
         msg = smltor.run()
@@ -44,5 +47,47 @@ def test_preprocess():
     #     assert type(cars) == list
 
 
+def test_VandAccCalculator():
+    # 配置
+    cfgPath = './config.yml'
+    with open(cfgPath, 'r') as f:
+        cfg = yaml.load(f, Loader=yaml.FullLoader)
+    # 标定
+    clbPath = './road_calibration/clbymls/clb_K68+366_1.yml'
+    with open(clbPath, 'r') as f:
+        clb = yaml.load(f, Loader=yaml.FullLoader)
+
+    # 生成仿真器
+    dataPath = './data/result.txt'
+    smltor = Smltor(dataPath)
+    # 生成驱动器
+    d = Driver(20)
+    # 预处理器
+    pp = PreProcessor(cfg, clb)
+    # 仿真器读取数据
+    while True:
+        msg = smltor.run()
+        if msg == '':
+            break
+        valid, cars = d.receive(msg)
+        if not valid:
+            continue
+        # 计算速度、全局速度和加速度属性
+        pp._updateLatestTimestamp(cars)
+        cars = carsList2Dict(cars)
+        pp._updateRecords(cars)
+        cars = pp.vaCal.run(pp.records, cars)
+        # 检查点1
+        # 经过计算后的数据中存在speed, globalSpeed, ax, ay, a属性
+        for car in cars.values():
+            assert 'speed' in car
+            assert 'globalSpeed' in car
+            assert 'ax' in car
+            assert 'ay' in car
+            assert 'a' in car
+    print('you passed test of VandAccCalculator!')
+
+
 if __name__ == "__main__":
     test_preprocess()
+    # test_VandAccCalculator()
