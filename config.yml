@@ -29,10 +29,14 @@ calibSeconds: 600
 laneWidth: 3.75
 emgcWidth: 3.5
 cellLen: 50
-qMerge: 20
+qMerge: 200
 
-maxCompleteTime: 2
+filterLowSpeed: 5
+# EdgeLength is usually set as cellLen*2
+filterEdgeLength: 100
+completeMs: 500
 smoothAlpha: 0.1
+filterInitMs: 500
 
 qDuration: 300
 calInterval: 30
@@ -56,7 +60,7 @@ dTouch: 3
 tSupervise: 20
 densityCrowd: 18
 vCrowd: 5.555
-durationIllegalOccupation: 10
+durationIllegalOccupation: 3
 cacheSeconds: 60
 
 ifSaveEventDataCache: false
