@@ -170,17 +170,25 @@ class Controller:
         # 更新缓存
         self._updateCache(cars)
         time3 = time.time()
+        # if 1107720 in [car['id'] for car in cars]:
+        #     print('controller before pp: ', cars)
         # 预处理
-        cars = self.pp.run(cars)
+        if len(cars) == 0:      # fix bug: 无车辆时不进行预处理
+            return None, None
+        # cars = self.pp.run(cars)
         time4 = time.time()
+        # if 1107720 in [car['id'] for car in cars]:
+        #     print('controller after pp: ', cars)
         # 事件检测(内含交通流参数计算+事件检测)
         events = self.edt.run(cars)
         time5 = time.time()
+        # if 1107720 in [car['id'] for car in cars]:
+        #     print('controller after ed: ', cars)
         # 发送数据
         msg, events = self.drv.send(cars.copy(), events)
         time6 = time.time()
         # 保存缓存
-        if len(events) > 0:
+        if self.cfg['ifSaveEventDataCache'] and (len(events) > 0):
             for event in events:
                 self._saveCache(event['eventID'])
         time7 = time.time()
@@ -200,6 +208,8 @@ class Controller:
             self.timeTmp[4].append(timeSend)
             self.timeTmp[5].append(timeSave)
             self.timeTmp[6].append(timeTotal)
+        if len(self.timeTmp[0]) % 2400 == 0:
+            self.reportRunTime()
         return msg, events
 
     def _initCache(self):
