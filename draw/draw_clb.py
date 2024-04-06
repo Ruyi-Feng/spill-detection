@@ -62,7 +62,9 @@ def drawClb(clbPath: str):
     for id, laneClb in clb.items():
         maxDistance = laneClb['len'] if laneClb['len'] > maxDistance \
             else maxDistance
-        for i, cell in enumerate(laneClb['cells']):
+        cellsInYOrder = laneClb['cells'] if laneClb['vDir']['y'] == 1 \
+            else laneClb['cells'][::-1]     # 保存顺序有方向, 是从车道起点到终点
+        for i, cell in enumerate(cellsInYOrder):
             color = (0.4, 0.6, 1) if cell else (0.5, 0.5, 0.5)
             rect = patches.Rectangle(xy=(id - 0.5, i * cellLen),
                                      width=1, height=50, color=color)
@@ -81,10 +83,10 @@ def drawClb(clbPath: str):
 
 
 if __name__ == '''__main__''':
-    # clbPath = './road_calibration/clbymls/clb.yml'
-    # drawClb(clbPath)
-    fileList = os.listdir('./road_calibration/clbymls')
-    for file in fileList:
-        if file.endswith('.yml'):
-            clbPath = './road_calibration/clbymls/' + file
-            drawClb(clbPath)
+    clbPath = './road_calibration/clbymls/clb.yml'
+    drawClb(clbPath)
+    # fileList = os.listdir('./road_calibration/clbymls')
+    # for file in fileList:
+    #     if file.endswith('.yml'):
+    #         clbPath = './road_calibration/clbymls/' + file
+    #         drawClb(clbPath)
