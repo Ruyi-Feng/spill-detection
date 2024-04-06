@@ -51,8 +51,43 @@ def observeTimeStep20240327EveningPeak():
         getAverageTimeStepForSingleDevice(dataDir + '/' + file)
 
 
+def get260820data():
+    dataPath = r'D:\东南大学\科研\金科\data\dataRy\data/2024-3-26-8.txt'
+    extractFieldDataByTimeRange(dataPath, '2024-03-26 08:15:00', '2024-03-26 08:25:00')
+    print('数据提取完成.')
+
+
+def get2608DeviceData():
+    dataPath = r'D:\东南大学\科研\金科\data\dataRy\data/2024-3-26-8.txt'
+    extracctFieldDataByDeviceID(dataPath)
+
+
+def get2609DeviceData():
+    dataPath = r'D:\东南大学\科研\金科\data\dataRy\data/2024-3-26-9.txt'
+    extracctFieldDataByDeviceID(dataPath)
+
+def get2717DeviceData():
+    dataPath = r'D:\东南大学\科研\金科\data\dataRy\data/2024-3-27-17.txt'
+    extracctFieldDataByDeviceID(dataPath)
+
+def get2718DeviceData():
+    dataPath = r'D:\东南大学\科研\金科\data\dataRy\data/2024-3-27-18.txt'
+    extracctFieldDataByDeviceID(dataPath)
+
+def get2609K68366Data():
+    dataPath = r'D:\东南大学\科研\金科\data\dataRy\data/2024-3-26-9.txt'
+    deviceID = 'K68+366'
+    extracctFieldDataByDeviceID(dataPath, deviceID)
+
+
 if __name__ == "__main__":
     # extractSpecifiedTimeRangeToDetectEvent()
     # extract20240327EveningPeakDataByDevice()  # 已提取, 勿重复
     # observe20240327EveningPeakData()
-    observeTimeStep20240327EveningPeak()
+    # observeTimeStep20240327EveningPeak()
+    # get260820data()
+    # get2608DeviceData()
+    # get2609DeviceData()
+    # get2717DeviceData()
+    # get2718DeviceData()
+    get2609K68366Data()
