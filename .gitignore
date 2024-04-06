@@ -189,3 +189,5 @@ logger/eventsCache/*/*.txt
 */*/*/*/*.index
 */*/*/*/*/*.index
 road_calibration/clbymls copy/*
+./*.xlsx
+logger/*.xlsx
