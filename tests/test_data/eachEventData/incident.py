@@ -38,6 +38,7 @@ dataIncidentEvent = {
             'endTime': 0,
             'carID1': 1,
             'carID2': 2,
+            'laneID': 4,
             'laneID1': 4,
             'laneID2': 4,
             'x1': 2.36,
