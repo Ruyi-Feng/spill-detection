@@ -29,10 +29,10 @@ def params():
 
 def simulatedMain():
     configPath = './config.yml'
-    # clbPath = './road_calibration/clbymls/clb.yml'
-    # dataPath = './data/result.txt'
-    clbPath = './road_calibration/clbymls/clb_K81+866_1.yml'
-    dataPath = r'D:\myscripts\spill-detection\data\sample\stop20240326-K81+866.csv'
+    clbPath = './road_calibration/clbymls/clb.yml'
+    dataPath = './data/result.txt'
+    # clbPath = './road_calibration/clbymls/clb_K81+866_1.yml'
+    # dataPath = r'D:\myscripts\spill-detection\data\sample\stop20240326-K81+866.csv'
     args = params()
     logger = MyLogger(args.deviceId, args.deviceType)
     controller = Controller(configPath, clbPath, logger, args)
@@ -334,7 +334,7 @@ def mainGrouped():
 
 
 if __name__ == "__main__":
-    # simulatedMain()
+    simulatedMain()
     # main()
     # evaluateDeployedModel()
     # mainGrouped()
@@ -353,5 +353,5 @@ if __name__ == "__main__":
     dataPath = r'D:\东南大学\科研\金科\data\dataRy\data\2024-3-27-17.txt'
     dataPath = r'D:\东南大学\科研\金科\data\dataRy\data\2024-3-27-18.txt'
 
-    simulatedMainGrouped(dataPath)
+    # simulatedMainGrouped(dataPath)
     # simulatedMainGroupedMultiThread(dataPath)
