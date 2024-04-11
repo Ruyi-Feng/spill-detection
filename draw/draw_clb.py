@@ -83,10 +83,10 @@ def drawClb(clbPath: str):
 
 
 if __name__ == '''__main__''':
-    clbPath = './road_calibration/clbymls/clb.yml'
-    drawClb(clbPath)
-    # fileList = os.listdir('./road_calibration/clbymls')
-    # for file in fileList:
-    #     if file.endswith('.yml'):
-    #         clbPath = './road_calibration/clbymls/' + file
-    #         drawClb(clbPath)
+    # clbPath = './road_calibration/clbymls/clb.yml'
+    # drawClb(clbPath)
+    fileList = os.listdir('./road_calibration/clbymls')
+    for file in fileList:
+        if file.endswith('.yml'):
+            clbPath = './road_calibration/clbymls/' + file
+            drawClb(clbPath)
