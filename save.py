@@ -33,7 +33,7 @@ def save():
     kc = KafkaConsumer(
         cfg['topic'], bootstrap_servers=cfg['ip'],
         api_version=tuple(cfg['producerversion']),
-        group_id=cfg['groupid'],
+        group_id='save',
         )
     for msgBytes in kc:
         outputPath = updateFilePathPerHour()
@@ -45,5 +45,5 @@ def save():
 
 
 if __name__ == '__main__':
-    simulatedSave()
-    # save()
+    # simulatedSave()
+    save()
