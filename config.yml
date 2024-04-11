@@ -60,7 +60,7 @@ dTouch: 3
 tSupervise: 20
 densityCrowd: 18
 vCrowd: 5.555
-durationIllegalOccupation: 3
+durationIllegalOccupation: 5
 cacheSeconds: 60
 
 ifSaveEventDataCache: false
