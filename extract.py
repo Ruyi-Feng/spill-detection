@@ -80,6 +80,11 @@ def get2609K68366Data():
     extracctFieldDataByDeviceID(dataPath, deviceID)
 
 
+def get2717SecondHalfData():
+    dataPath = r'D:\东南大学\科研\金科\data\dataRy\data/2024-3-27-17.txt'
+    extractFieldDataByTimeRange(dataPath, '2024-03-27 17:30:00', '2024-03-27 17:40:00')
+    print('数据提取完成.')
+
 if __name__ == "__main__":
     # extractSpecifiedTimeRangeToDetectEvent()
     # extract20240327EveningPeakDataByDevice()  # 已提取, 勿重复
@@ -90,4 +95,5 @@ if __name__ == "__main__":
     # get2609DeviceData()
     # get2717DeviceData()
     # get2718DeviceData()
-    get2609K68366Data()
+    # get2609K68366Data()
+    get2717SecondHalfData()
