@@ -78,6 +78,10 @@ class PreProcessor:
         # print('after filter edge', len(cars), end='    ')
         # 2. 更新records
         self._updateRecords(cars)
+        # update包括增加和删除机制。当接收数据为老数据时，会因为数据过老而被删除,
+        # 导致当前帧接受的老数据有一部分目标在records中无记录, 需要删除cars中对应的目标。
+        # 该过程类似于过滤掉积压的过时数据。
+        cars = {id: car for id, car in cars.items() if id in self.records}
         # 3. 计算全局速度和加速度
         cars = self.vaCal.run(self.records, cars)
         # print('after vaCal', len(cars), end='    ')
