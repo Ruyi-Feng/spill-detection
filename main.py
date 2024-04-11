@@ -48,7 +48,11 @@ def simulatedMain():
 
 
 def main():
-    '''单进程, 单设备, 可在外部起多进程'''
+    '''function main
+
+    单进程, 单设备, 可在外部起多进程
+    部署版本的主函数
+    '''
     args = params()
     deviceName = args.deviceId + '_' + str(args.deviceType)
     logger = MyLogger(args.deviceId, args.deviceType)
@@ -134,7 +138,7 @@ def simulatedMainGrouped(dataPath: str):
         args = argsFromDeviceID(dID, dType)
         controllerGroup[name] = Controller(configPath, clbPath,
                                            logger4Device, args,
-                                           ifReportRunTime=True)
+                                           ifReportRunTime=False)
     print('算法组件生成成功, 数据进入算法通道.')
     # 持续性运行接收
     # 模拟接受数据
@@ -334,24 +338,14 @@ def mainGrouped():
 
 
 if __name__ == "__main__":
-    simulatedMain()
-    # main()
+    # simulatedMain()
+    main()
     # evaluateDeployedModel()
     # mainGrouped()
-    # dataPath = r'D:\东南大学\科研\金科\data\dataRy\data\2024-3-27-18.txt'
-    # dataPath = r'D:\myscripts\spill-detection\data\extractedData\2024-3-27-17_byDevice\K81+320_1.txt'
-    # dataPath = r'D:\myscripts\spill-detection\data\extractedData\2024-3-27-17_byDevice\K78+760_1.txt'
-    # dataPath = r'D:\myscripts\spill-detection\data\extractedData\2024-03-26-08-20-18_2024-03-26-08-20-42.txt'
-    # dataPath = r'D:\myscripts\spill-detection\data\extractedData\2024-03-26-08-29-51_2024-03-26-08-30-34.txt'
-    # dataPath = r'D:\myscripts\spill-detection\data\extractedData\2024-03-26-09-36-21_2024-03-26-09-41-45.txt'
-    # dataPath = r'D:\myscripts\spill-detection\data\extractedData\2024-03-26-09-41-27_2024-03-26-09-41-57.txt'
-    # dataPath = r'D:\myscripts\spill-detection\data\extractedData\2024-03-27-18-42-33_2024-03-27-18-46-33.txt'
-    # dataPath = r'D:\myscripts\spill-detection\data\extractedData\2024-03-27-18-42-33_2024-03-27-18-46-33.txt'
-    # total evaluation
-    dataPath = r'D:\东南大学\科研\金科\data\dataRy\data\2024-3-26-8.txt'
-    dataPath = r'D:\东南大学\科研\金科\data\dataRy\data\2024-3-26-9.txt'
-    dataPath = r'D:\东南大学\科研\金科\data\dataRy\data\2024-3-27-17.txt'
-    dataPath = r'D:\东南大学\科研\金科\data\dataRy\data\2024-3-27-18.txt'
 
+    # total evaluation
+    # dataPath = r'D:\东南大学\科研\金科\data\dataRy\data\2024-3-26-8.txt'
+    # dataPath = r'D:\东南大学\科研\金科\data\dataRy\data\2024-3-26-9.txt'
+    # dataPath = r'D:\东南大学\科研\金科\data\dataRy\data\2024-3-27-17.txt'
+    # dataPath = r'D:\东南大学\科研\金科\data\dataRy\data\2024-3-27-18.txt'
     # simulatedMainGrouped(dataPath)
-    # simulatedMainGroupedMultiThread(dataPath)
