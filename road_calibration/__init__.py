@@ -318,6 +318,8 @@ class Calibrator():
             cellCount[id] = count
 
         for id in self.laneIDs:
+            if id in self.emgcIDs:
+                continue
             # 判定有效性
             # 法1: 计算各元胞在一小时内的经过车辆数
             # valid = []
