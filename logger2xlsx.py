@@ -408,12 +408,15 @@ def reverseDict2LayerKeys(d: dict):
 
 if __name__ == "__main__":
     # logger转化为xlsx
-    # dir = r'D:\myscripts\spill-detection\logger\logs-2608'
-    # dir = r'D:\myscripts\spill-detection\logger\logs-2609'
-    # dir = r'D:\myscripts\spill-detection\logger\logs-2717'
-    # dir = r'D:\myscripts\spill-detection\logger\logs-2718'
-    # convertLoggerDirFiles2Xlsx(dir)
-    # print(dir, '日志信息保存完成.')
+    dirList = [
+        r'D:\myscripts\spill-detection\logger\logs-2608',
+        r'D:\myscripts\spill-detection\logger\logs-2609',
+        r'D:\myscripts\spill-detection\logger\logs-2717',
+        r'D:\myscripts\spill-detection\logger\logs-2718',
+    ]
+    for dir in dirList:
+        convertLoggerDirFiles2Xlsx(dir)
+        print(dir, '日志信息保存完成.')
 
     # # 对logger xlsx统计
     dir = './logger'
