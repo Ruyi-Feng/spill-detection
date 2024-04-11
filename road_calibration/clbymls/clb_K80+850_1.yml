@@ -14,18 +14,19 @@
   - false
   - false
   coef:
-  - -1.369
-  - -66.236
-  - -234.612
+  - -0.252
+  - -36.359
+  - -167.503
   emgc: true
   end: 0
-  len: 604.9
-  start: 604.9
+  len: 604.95
+  start: 604.95
   vDir:
     x: 1
     y: -1
 2:
   cells:
+  - false
   - false
   - true
   - true
@@ -38,15 +39,14 @@
   - true
   - true
   - true
-  - true
   coef:
-  - -1.369
-  - -66.236
-  - -220.099
+  - -0.252
+  - -36.359
+  - -61.068
   emgc: false
   end: 0
-  len: 604.9
-  start: 604.9
+  len: 604.95
+  start: 604.95
   vDir:
     x: 1
     y: -1
@@ -66,13 +66,13 @@
   - true
   - true
   coef:
-  - -1.369
-  - -55.555
-  - 6.124
+  - -0.252
+  - -31.527
+  - 84.598
   emgc: false
   end: 0
-  len: 604.9
-  start: 604.9
+  len: 604.95
+  start: 604.95
   vDir:
     x: 1
     y: -1
@@ -92,13 +92,13 @@
   - true
   - true
   coef:
-  - -1.369
-  - -46.915
-  - 122.548
+  - -0.252
+  - -30.339
+  - 183.762
   emgc: false
   end: 0
-  len: 604.9
-  start: 604.9
+  len: 604.95
+  start: 604.95
   vDir:
     x: 1
     y: -1
@@ -115,15 +115,15 @@
   - true
   - true
   - true
-  - true
+  - false
   - false
   coef:
-  - -1.369
-  - -22.362
-  - 509.106
+  - -0.252
+  - -27.494
+  - 460.005
   emgc: false
-  end: 604.9
-  len: 604.9
+  end: 604.95
+  len: 604.95
   start: 0
   vDir:
     x: -1
@@ -144,19 +144,19 @@
   - true
   - false
   coef:
-  - -1.369
-  - -12.501
-  - 560.133
+  - -0.252
+  - -23.909
+  - 534.867
   emgc: false
-  end: 604.9
-  len: 604.9
+  end: 604.95
+  len: 604.95
   start: 0
   vDir:
     x: -1
     y: 1
 7:
   cells:
-  - true
+  - false
   - true
   - true
   - true
@@ -170,12 +170,12 @@
   - true
   - false
   coef:
-  - -1.369
-  - -3.877
-  - 620.079
+  - -0.252
+  - -29.344
+  - 742.579
   emgc: false
-  end: 604.9
-  len: 604.9
+  end: 604.95
+  len: 604.95
   start: 0
   vDir:
     x: -1
@@ -196,12 +196,12 @@
   - false
   - false
   coef:
-  - -1.369
-  - -3.877
-  - 634.592
+  - -0.252
+  - -29.344
+  - 849.013
   emgc: true
-  end: 604.9
-  len: 604.9
+  end: 604.95
+  len: 604.95
   start: 0
   vDir:
     x: -1
