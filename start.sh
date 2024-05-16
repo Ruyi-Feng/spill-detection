@@ -3,6 +3,7 @@ python main.py --deviceId "K68+366" &
 python main.py --deviceId "K68+400" &
 python main.py --deviceId "K69+000" &
 python main.py --deviceId "K69+800" &
+python main.py --deviceId "K70+800" &
 python main.py --deviceId "K71+616" &
 python main.py --deviceId "K73+516" &
 python main.py --deviceId "K75+001" &
