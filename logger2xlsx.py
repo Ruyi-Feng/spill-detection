@@ -392,6 +392,8 @@ def loggerInfoStatistic(xlsxPath: str):
     infoDict = reverseDict2LayerKeys(infoDict)
     # 转为DataFrame
     df_statistic = pd.DataFrame(infoDict)
+    # 对index进行排序
+    df_statistic.sort_index(inplace=True)
     # 写入xlsx文件
     with pd.ExcelWriter(xlsxPath, engine='openpyxl', mode='a') as writer:  # Use mode='a' to append data
         df_statistic.to_excel(writer, sheet_name='统计信息')  # Write the statistic data to a new sheet '统计信息'
@@ -409,11 +411,13 @@ def reverseDict2LayerKeys(d: dict):
 if __name__ == "__main__":
     # logger转化为xlsx
     dirList = [
-        r'D:\myscripts\spill-detection\logger\logs-2608',
-        r'D:\myscripts\spill-detection\logger\logs-2609',
-        r'D:\myscripts\spill-detection\logger\logs-2717',
-        r'D:\myscripts\spill-detection\logger\logs-2718',
+        # r'D:\myscripts\spill-detection\logger\logs-2608',
+        # r'D:\myscripts\spill-detection\logger\logs-2609',
+        # r'D:\myscripts\spill-detection\logger\logs-2717',
+        # r'D:\myscripts\spill-detection\logger\logs-2718',
+        r'D:\myscripts\spill-detection\logger\logs'
     ]
+
     for dir in dirList:
         convertLoggerDirFiles2Xlsx(dir)
         print(dir, '日志信息保存完成.')
