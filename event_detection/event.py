@@ -35,7 +35,7 @@ class EventMng():
                                    ...}}
             ...}
     '''
-    def __init__(self):
+    def __init__(self, cfg):
         '''function __init__
 
         初始化事件管理器
@@ -55,7 +55,7 @@ class EventMng():
         self.currentDay = datetime.now().strftime('%Y%m%d')
         self.idLen = 5
         # 事件过滤器, 用于防止同id长期多次报警
-        self.ef = EventFilter()
+        self.ef = EventFilter(cfg)
 
     def run(self, type: str, startTime: int, endTime: int,
             *info: any):
