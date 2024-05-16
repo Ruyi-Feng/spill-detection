@@ -31,7 +31,7 @@ emgcWidth: 3.5
 cellLen: 50
 qMerge: 200
 
-filterLowSpeed: 5
+filterLowSpeed: 1
 # EdgeLength is usually set as cellLen*2
 filterEdgeLength: 100
 completeMs: 500
@@ -43,6 +43,7 @@ calInterval: 30
 
 # eventTypes: ["spill", "stop", "lowSpeed", "highSpeed", "emgcBrake", "incident", "crowd", "illegalOccupation"]
 eventTypes: ["spill", "stop", "incident", "crowd", "illegalOccupation"]
+# eventTypes: ["stop"]
 tTolerance: 300
 qStandard: 10000
 vLateral: 3
