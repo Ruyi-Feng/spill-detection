@@ -253,13 +253,16 @@ def evaluateDeployedModel():
     # dataDir = './data/'
     # dataDir = r'D:\东南大学\科研\金科\data'
     # dataDir = r'D:\myscripts\spill-detection\data\extractedData'
-    dataDir = r'D:\东南大学\科研\金科\data\dataRy\data'
-    targetEvaluateFiles = [
-        '2024-3-26-8.txt',
-        '2024-3-26-9.txt',
-        '2024-3-27-17.txt',
-        '2024-3-27-18.txt'
-    ]
+    # dataDir = r'D:\东南大学\科研\金科\data\dataRy\data'
+    dataDir = r'E:\data'
+    # dataDir = r'D:\myscripts\spill-detection\data\extractedData\4月22，23日平台告警时间段数据'
+    # targetEvaluateFiles = [
+    #     # 'K81+320_1_2024-04-23-06-51-34_2024-04-23-06-53-34.txt',
+    #     # 'K81+320_1_2024-04-22-17-02-06_2024-04-22-17-04-06.txt'
+    #     # 'K81+866_1_2024-04-23-15-00-04_2024-04-23-15-02-04.txt'
+    #     # r'K73+516_1_2024-04-23-15-00-59_2024-04-23-15-02-59.txt'
+    #     '2024-4-22-19.txt'
+    # ]
     for file in os.listdir(dataDir):
         if (
             ('dump' in file) or
@@ -268,8 +271,8 @@ def evaluateDeployedModel():
             (not file.endswith('.txt'))
             ):
             continue
-        if file not in targetEvaluateFiles:
-            continue
+        # if file not in targetEvaluateFiles:
+        #     continue
         print(file, 'is running.')
         simulatedMainGrouped(dataDir + '/' + file)
         # simulatedMainGroupedMultiThread(dataDir + '/' + file)
