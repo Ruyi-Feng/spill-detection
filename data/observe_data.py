@@ -32,7 +32,8 @@ def observeFieldData(dataPath: str, ifSave: bool = False):
     infoDict = dict()   # 一层索引deviceID, 二层索引deviceType, 三层索引baseInfo
     for i in range(rowNum):
         data = reader.getRow(i)
-        data = swapQuotes(data)
+        if data[2] == '\'':
+            data = swapQuotes(data)
         data = json.loads(data)
         deviceID = data['deviceID']
         deviceType = data['deviceType']
