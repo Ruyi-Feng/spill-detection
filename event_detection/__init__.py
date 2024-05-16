@@ -71,7 +71,7 @@ class EventDetector(TrafficMng):
         super().__init__(clb, cfg)
         self.logger = logger if logger else MyLogger('Driver', 20)
         # 生成事件管理器
-        self.eventMng = EventMng()
+        self.eventMng = EventMng(cfg)
         # 初始化属性(其中秒为单位属性, 统一初次赋值后, 乘fps以帧为单位)
         self.clb = clb
         self.fps = cfg['fps']
@@ -130,6 +130,7 @@ class EventDetector(TrafficMng):
         self.update(cars)
         # 检测交通事件
         self.updatePotentialDict(cars)
+        
         self.detect(cars)
         # print(self.stopDict, unixMilliseconds2Datetime(cars[0]['timestamp']))
         # 更新事件过滤器的记录
@@ -177,10 +178,12 @@ class EventDetector(TrafficMng):
                         car
                     # if car['id'] == 9934:
                     #     print('in after', 'emgcBrakeDict', self.emgcBrakeDict)
+        # print('after update', cars[0]['timestamp'], ' ', self.stopDict)
         # 2. 遍历潜在事件记录字典
         # 删除无效dict键, 包括当前帧丢失目标, 或未消失但已脱离事件检测条件的目标
         for type in self.potentialEventTypes:
             self._deleteNoUsePotentialDictKeys(type, cars)
+        # print('after delete', cars[0]['timestamp'], ' ', self.stopDict)
         # if cars[0]['deviceID'] == 'K81+320':
         #     print('after deletion', 'stopDict', self.stopDict)
 
@@ -317,11 +320,15 @@ class EventDetector(TrafficMng):
             deltaTms = eventRecordDict[id][1] - eventRecordDict[id][0]
             deltaTs = deltaTms / 1000
             condition1 = deltaTs > threshold
-            condition2 = eventRecordDict[id][3] == ''
+            condition2 = (eventRecordDict[id][3] == '') or (eventRecordDict[id][3] is None)
+            # if id == 1606764:
+            #     print(condition1, condition2)
             # 生成事件
             if condition1 and condition2:
                 # 告警
                 car = getCarFromCars(cars, id)
+                if car is None:
+                    continue
                 eventID = self.eventMng.run(
                     eventType, eventRecordDict[id][0], -1,
                     car, eventRecordDict[id][3], 'start')
@@ -441,6 +448,8 @@ class EventDetector(TrafficMng):
             # 检查两辆车是否在某时刻速度趋于0
             car1 = getCarFromCars(cars, ids[0])
             car2 = getCarFromCars(cars, ids[1])
+            if car1 is None or car2 is None:
+                    continue
             # 速度趋于0, 则报警
             if self._isCarStop(car1) & self._isCarStop(car2):
                 # 生成事件
@@ -490,6 +499,8 @@ class EventDetector(TrafficMng):
                 # 获取车辆
                 car1 = getCarFromCars(cars, abIDs[i])
                 car2 = getCarFromCars(cars, abIDs[j])
+                if car1 is None or car2 is None:
+                    continue
                 # 判定非拥堵情况(拥堵情况跳过判断)
                 kLane1 = self.lanes[car1['laneID']].k
                 kLane2 = self.lanes[car2['laneID']].k
@@ -588,6 +599,8 @@ class EventDetector(TrafficMng):
 
         判断车辆是否静止
         '''
+        # if car['id'] == 1606764:
+        #     print('car in stop', car)
         return math.sqrt(car['vx']**2 + car['vy']**2) <= self.vStop
 
     def _isCarLowSpeed(self, car: dict) -> bool:
@@ -682,6 +695,9 @@ class EventDetector(TrafficMng):
                 continue    # 如果是当前没有该目标，则不检查是否脱离了事件条件
             # 若该id车辆已经脱离了交通事件的条件, 则删除
             car = getCarFromCars(cars, id)
+            if car is None:
+                key2delete.append(id)
+                continue
             if not getattr(self, f'_isCar{strCapitalize(type)}')(car):
                 key2delete.append(id)
         # 遍历key2delete, 生成结束event, 删除无效keys
