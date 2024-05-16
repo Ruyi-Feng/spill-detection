@@ -13,7 +13,7 @@ class EventFilter():
     实现操作: 同一id同一type事件报警两次后, 开始限制3分钟。
     加入到pipeline的最后,driver之前。
     '''
-    def __init__(self):
+    def __init__(self, cfg):
         '''
         缓存组织形式
         {
@@ -27,6 +27,7 @@ class EventFilter():
         }
         '''
         self.eventCache = {type: {} for type in defaultEventTypes}
+        self.filterLowSpeed = cfg['filterLowSpeed']
 
     def run(self, type: str, startTime: int, endTime: int,
             *info: any) -> bool:
@@ -233,7 +234,7 @@ class EventFilter():
         elif type in ['stop', 'lowSpeed', 'highSpeed',
                       'EmgcBrake', 'illegalOccupation']:
             car = info[0]
-            if car['globalSpeed'] < 5:
+            if car['globalSpeed'] < self.filterLowSpeed:
                 isLowGlobalSpeed = True
         elif type == 'incident':
             isLowGlobalSpeed = False
