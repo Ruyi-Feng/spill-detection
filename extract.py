@@ -2,6 +2,8 @@ import os
 from data.extract_data import (
     extractFieldDataByTimeRange,
     extracctFieldDataByDeviceID,
+    extractFieldDataByDeviceTimeRange,
+    extractEventDataByPlatformWarn,
 )
 from data.observe_data import (
     observeFieldData,
@@ -85,6 +87,87 @@ def get2717SecondHalfData():
     extractFieldDataByTimeRange(dataPath, '2024-03-27 17:30:00', '2024-03-27 17:40:00')
     print('数据提取完成.')
 
+
+def observe042210data():
+    dataPath = r'E:\data\2024-4-22-10.txt'
+    observeFieldData(dataPath, ifSave=True)
+
+
+def get042210data():
+    dataPath = r'E:\data\2024-4-22-10.txt'
+    extracctFieldDataByDeviceID(dataPath)
+    print('数据提取完成.')
+
+
+# def extractEventDataByPlatformWarn042223():
+#     warnPath = r'D:\myscripts\spill-detection\analysis\4月22，23日全天数据\事件明细[2024-04-22-2024-04-23]4月下旬测试.xlsx'
+#     dataDir = r'E:\data'
+#     extractEventDataByPlatformWarn(warnPath, dataDir)
+
+
+def get04dataK68366():
+    datadir = r'E:\data'
+    deviceID = 'K68+366'
+    for file in os.listdir(datadir):
+        if not file.endswith('.txt'):
+            continue
+        dataPath = os.path.join(datadir, file)
+        extracctFieldDataByDeviceID(dataPath, deviceID)
+        print(dataPath, '数据提取完成.')
+
+
+def observe04data():
+    datadir = r'E:\data'
+    for file in os.listdir(datadir):
+        if not file.endswith('.txt'):
+            continue
+        dataPath = os.path.join(datadir, file)
+        observeFieldData(dataPath, ifSave=True)
+        print(dataPath, '数据观察完成.')
+
+
+def get0424K68366dataFrom14To18():
+    dir = r'E:\data'
+    filename = [
+        '2024-4-23-14.txt',
+        '2024-4-23-15.txt',
+        '2024-4-23-16.txt',
+        '2024-4-23-18.txt',
+    ]
+    deviceID = 'K68+366'
+    for file in filename:
+        dataPath = os.path.join(dir, file)
+        extracctFieldDataByDeviceID(dataPath, deviceID)
+        print(dataPath, '数据提取完成.')
+
+
+def get042223dataK79886forillegalOccupation():
+    dir = r'E:\data'
+    filename = [
+        '2024-4-22-13.txt',
+        '2024-4-22-14.txt',
+        '2024-4-22-15.txt',
+        '2024-4-22-16.txt',
+        '2024-4-22-17.txt',
+        '2024-4-23-8.txt',
+        '2024-4-23-9.txt',
+    ]
+    deviceID = 'K79+886'
+    for file in filename:
+        dataPath = os.path.join(dir, file)
+        extracctFieldDataByDeviceID(dataPath, deviceID)
+        print(dataPath, '数据提取完成.')
+
+
+def get202404230810to20dataK81320():
+    dir = r'E:\data'
+    filename = '2024-4-23-8.txt'
+    deviceID = 'K81+320'
+    startTime = '2024-04-23 08:10:00'
+    endTime = '2024-04-23 08:20:00'
+    extractFieldDataByDeviceTimeRange(dir + '/' + filename, deviceID, 1, startTime, endTime)
+
+
 if __name__ == "__main__":
     # extractSpecifiedTimeRangeToDetectEvent()
     # extract20240327EveningPeakDataByDevice()  # 已提取, 勿重复
@@ -96,4 +179,12 @@ if __name__ == "__main__":
     # get2717DeviceData()
     # get2718DeviceData()
     # get2609K68366Data()
-    get2717SecondHalfData()
+    # get2717SecondHalfData()
+    # observe042210data()
+    # get042210data()
+    # extractEventDataByPlatformWarn042223()
+    # get04dataK68366()
+    # observe04data()
+    # get0424K68366dataFrom14To18()
+    # get042223dataK79886forillegalOccupation()
+    # get202404230810to20dataK81320()
