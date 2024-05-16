@@ -1,4 +1,5 @@
 import os
+import time
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
@@ -13,7 +14,7 @@ plt.rcParams['figure.dpi'] = 300
 plt.rcParams['savefig.dpi'] = 300
 
 
-def drawTimespace(data: pd.DataFrame, saveDir: str, suffix: str,
+def drawTimespace(data: pd.DataFrame, saveDir: str, suffix: str = '',
                   maxFrameNum = 1e20, v_trans = False, laneIndex: int = 2,
                   carIDIndex: int = 1, frameIndex: int = 0,
                   locationIndex: int = 4, vIndex = 10):
@@ -55,7 +56,7 @@ def drawTimespace(data: pd.DataFrame, saveDir: str, suffix: str,
         plt.title("lane %d" % lane)
         plt.colorbar()
         plt.savefig(saveDir +
-                    f"/deviceID_{deviceID}id_{carID}_{suffix}_lane_{lane}.jpg", dpi=300)
+                    f"/{deviceID}_id-{carID}_{suffix}_lane-{lane}.jpg", dpi=300)
         plt.close()
 
 
@@ -111,7 +112,8 @@ def drawExcelEventCarIDTrajectory(
     eventDf = pd.read_excel(excelPath)
     dataDf = pd.read_csv(dataPath)
     dataDf['lane'] = dataDf['lane'].apply(lambda x: x - 100 if x > 100 else x)
-    imgDirPath = excelPath.replace('.xlsx', '_images')
+    imgDirPath = excelPath.replace('.xlsx', '_images').replace(
+        '.csv', 'images')
     if not os.path.exists(imgDirPath):
         os.makedirs(imgDirPath)
     # 画图
@@ -121,9 +123,15 @@ def drawExcelEventCarIDTrajectory(
             continue
         deviceID = eventDf['deviceID'].iloc[i]
         eventID = eventDf['eventID'].iloc[i]
-        print(f'drawing deviceID {deviceID} eventID {eventID}')
         eventData = getEventData(eventDf.iloc[i], dataDf, type)
-        drawTimespace(eventData, imgDirPath, type)
+        if len(eventData) == 0:
+            print(f'no data for deviceID {deviceID} eventID {eventID}')
+            continue
+        print(f'drawing deviceID {deviceID} eventID {eventID}')
+        startTime = eventData['timestamp'].min() / 1000     # s为单位
+        timeStr = time.strftime(
+            "%Y-%m-%d %H-%M-%S", time.localtime(startTime))
+        drawTimespace(eventData, imgDirPath, suffix=type + '_' + timeStr)
 
 
 def drawTimespaceIdColor(data: pd.DataFrame, saveDir: str, suffix: str,
@@ -172,41 +180,51 @@ def drawTimespaceIdColor(data: pd.DataFrame, saveDir: str, suffix: str,
         plt.title("lane %d" % lane)
         plt.colorbar()
         plt.savefig(saveDir +
-                    f"/deviceID_{deviceID}id_{carID}_{suffix}_lane_{lane}.jpg", dpi=300)
+                    f"/{deviceID}_id-{carID}_{suffix}_lane-{lane}.jpg", dpi=300)
         plt.close()
 
 
 if __name__ == "__main__":
-    # toPlot = {
-    #     2608: [
-    #         r'D:\myscripts\spill-detection\logger\logs-2608.xlsx',
-    #         r'D:\东南大学\科研\金科\data\dataRy\data\2024-3-26-8.csv'
-    #     ],
-    #     # 2609: [
-    #     #     r'D:\myscripts\spill-detection\logger\logs-2609.xlsx',
-    #     #     r'D:\东南大学\科研\金科\data\dataRy\data\2024-3-26-9.csv'
-    #     # ],
-    #     # 2717: [
-    #     #     r'D:\myscripts\spill-detection\logger\logs-2717.xlsx',
-    #     #     r'D:\东南大学\科研\金科\data\dataRy\data\2024-3-27-17.csv'
-    #     # ],
-    #     # 2718: [
-    #     #     r'D:\myscripts\spill-detection\logger\logs-2718.xlsx',
-    #     #     r'D:\东南大学\科研\金科\data\dataRy\data\2024-3-27-18.csv'
-    #     # ]
-    # }
-    # for key in toPlot:
-    #     drawExcelEventCarIDTrajectory(toPlot[key][0], toPlot[key][1],
-    #                                   typeList=['stop', 'incident', 'spill'])
-    #     print(f"{key}数据绘图完成.")
-    dataPath = r'D:\myscripts\spill-detection\data\extractedData\2024-3-27-17_byDevice\K81+866_1.csv'
-    data = pd.read_csv(dataPath)
-    # # 全部时长
-    # drawTimespaceIdColor(data, r'D:\myscripts\spill-detection\data\extractedData\2024-3-27-17_byDevice\K81+866_1_images', 'test')
-    # 10分钟一画, 1小时数据分为6份
-    cutPoints = np.linspace(0, len(data), 7)
-    for i in range(6):
-        drawTimespaceIdColor(
-            data[int(cutPoints[i]):int(cutPoints[i+1])],
-            r'D:\myscripts\spill-detection\data\extractedData\2024-3-27-17_byDevice\K81+866_1_images',
-            f'_{i}0~{i+1}0min')
+    # # # 画出事件车辆的时空轨迹图
+    # eventSummaryPath = r'D:\myscripts\spill-detection\analysis\4月22，23日全天数据\logs.xlsx'
+    # dataPathList = [
+    #     # r'E:\data\2024-4-22-15.csv',
+    #     r'E:\data\2024-4-22-16.csv',
+    #     r'E:\data\2024-4-22-17.csv',
+    #     r'E:\data\2024-4-23-8.csv',
+    #     r'E:\data\2024-4-23-9.csv',
+    #     r'E:\data\2024-4-23-13.csv',
+    #     r'E:\data\2024-4-23-15.csv',
+    #     r'E:\data\2024-4-23-16.csv'
+    # ]
+    # for dataPath in dataPathList:
+    #     drawExcelEventCarIDTrajectory(eventSummaryPath, dataPath,
+    #                                 typeList=['stop', 'incident', 'spill'])
+
+    # # 按id分配不同color画ts图
+    # dataPath = r'D:\myscripts\spill-detection\data\extractedData\2024-3-27-17_byDevice\K81+866_1.csv'
+    # saveDir = r'D:\myscripts\spill-detection\data\extractedData\2024-3-27-17_byDevice\K81+866_1_images'
+    # data = pd.read_csv(dataPath)
+    # # # 全部时长
+    # # drawTimespaceIdColor(data, saveDir, 'test')
+    # # 10分钟一画, 1小时数据分为6份
+    # cutPoints = np.linspace(0, len(data), 7)
+    # for i in range(6):
+    #     drawTimespaceIdColor(
+    #         data[int(cutPoints[i]):int(cutPoints[i+1])],
+    #         saveDir, f'_{i}0~{i+1}0min')
+
+    # # 画出指定数据的时空轨迹图
+    # dataPathList = [
+    #     r'D:\myscripts\spill-detection\data\extractedData\K81+320_1_2024-04-23-08-10-00_2024-04-23-08-20-00.csv'
+    # ]
+    dataDir = r'D:\myscripts\spill-detection\data\extractedData'
+    dataPathList = [os.path.join(dataDir, x) for x in os.listdir(dataDir) if x.endswith('.csv')]
+    # TODO 过滤lane
+    for dataPath in dataPathList:
+        data = pd.read_csv(dataPath)
+        saveDir = dataPath.replace('.csv', '_images')
+        if not os.path.exists(saveDir):
+            os.makedirs(saveDir)
+        drawTimespace(data, saveDir)
+        print(f'{dataPath} done.')
